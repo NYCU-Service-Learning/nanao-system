@@ -1,0 +1,23 @@
+.stat{
+    position: relative;
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+.table .stat-time-column {
+    width: 50%;
+}
+
+.table .stat-actions-column {
+    width: 50%;
+}
+
+.chart-container {
+    text-align: center;
+}
+
+.chart-container .recharts-wrapper {
+    display: inline-block;
+}

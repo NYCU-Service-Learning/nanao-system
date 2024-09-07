@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// for dev: add DATABASE_URL in the .env file
+// for dev: See the format of mysql URL: https://www.prisma.io/docs/orm/overview/databases/mysql
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id            Int           @id @default(autoincrement())
+  username      String        @unique
+  password      String
+  name          String
+  reg_time      DateTime      @default(now())
+  role          Role
+  userDetail    UserDetail?
+  session       Session?
+  hurtForms     HurtForm[]
+  weekForms     WeekForm[]
+  yearForms     YearForm[]
+  
+}
+model UserDetail{
+  user              User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id           Int           @id
+  gender            Gender?
+  birthday          String?
+  age               Int?
+  medical_History   String?
+  headshot          String?
+  address           String?
+  email             String?
+  phone             String?
+  updateAt          DateTime      @updatedAt
+}
+
+model Session{
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         Int       @id
+  token           String
+  expired_time    DateTime
+}
+model HurtForm{
+  id              Int       @id @default(autoincrement())
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         Int
+  fill_time       DateTime  @default(now())
+  neck                  Int       @default(0)
+  right_upper_arm       Int       @default(0)
+  right_shoulder        Int       @default(0)
+  right_lower_arm       Int       @default(0)
+  right_hand            Int       @default(0)
+  left_upper_arm        Int       @default(0)
+  left_shoulder         Int       @default(0)
+  left_lower_arm        Int       @default(0)
+  left_lower_leg        Int       @default(0)
+  left_hand             Int       @default(0)
+  left_upper_leg        Int       @default(0)
+  left_ankle            Int       @default(0)
+  left_feet             Int       @default(0)
+  left_knee             Int       @default(0)
+  right_lower_leg       Int       @default(0)
+  right_ankle           Int       @default(0)
+  right_upper_leg       Int       @default(0)
+  right_feet            Int       @default(0)
+  right_knee            Int       @default(0)
+  abdomen               Int       @default(0)
+  lower_body            Int       @default(0)
+  upper_body            Int       @default(0)
+  right_ear             Int       @default(0)
+  left_ear              Int       @default(0)
+  head                  Int       @default(0)
+  right_eye             Int       @default(0)
+  mouth                 Int       @default(0)
+  left_eye              Int       @default(0)
+  nose                  Int       @default(0)
+  back_head             Int       @default(0)
+  back_neck             Int       @default(0)
+  left_elbow            Int       @default(0)
+  right_elbow           Int       @default(0)
+  lower_back            Int       @default(0)
+  back                  Int       @default(0)
+  butt                  Int       @default(0)
+  right_upper_shoulder  Int       @default(0)
+}
+
+model YearForm{
+  id                    Int       @id @default(autoincrement())
+  user                  User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id               Int
+  fill_time             DateTime  @default(now())
+  neck                  Boolean   @default(false)
+  right_upper_arm       Boolean   @default(false)
+  right_shoulder        Boolean   @default(false)
+  right_lower_arm       Boolean   @default(false)
+  right_hand            Boolean   @default(false)
+  left_upper_arm        Boolean   @default(false)
+  left_shoulder         Boolean   @default(false)
+  left_lower_arm        Boolean   @default(false)
+  left_lower_leg        Boolean   @default(false)
+  left_hand             Boolean   @default(false)
+  left_upper_leg        Boolean   @default(false)
+  left_ankle            Boolean   @default(false)
+  left_feet             Boolean   @default(false)
+  left_knee             Boolean   @default(false)
+  right_lower_leg       Boolean   @default(false)
+  right_ankle           Boolean   @default(false)
+  right_upper_leg       Boolean   @default(false)
+  right_feet            Boolean   @default(false)
+  right_knee            Boolean   @default(false)
+  abdomen               Boolean   @default(false)
+  lower_body            Boolean   @default(false)
+  upper_body            Boolean   @default(false)
+  right_ear             Boolean   @default(false)
+  left_ear              Boolean   @default(false)
+  head                  Boolean   @default(false)
+  right_eye             Boolean   @default(false)
+  mouth                 Boolean   @default(false)
+  left_eye              Boolean   @default(false)
+  nose                  Boolean   @default(false)
+  back_head             Boolean   @default(false)
+  back_neck             Boolean   @default(false)
+  left_elbow            Boolean   @default(false)
+  right_elbow           Boolean   @default(false)
+  lower_back            Boolean   @default(false)
+  back                  Boolean   @default(false)
+  butt                  Boolean   @default(false)
+  right_upper_shoulder  Boolean   @default(false)
+}
+
+model WeekForm{
+  id                    Int       @id @default(autoincrement())
+  user                  User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id               Int
+  fill_time             DateTime  @default(now())
+  neck                  Boolean   @default(false)
+  right_upper_arm       Boolean   @default(false)
+  right_shoulder        Boolean   @default(false)
+  right_lower_arm       Boolean   @default(false)
+  right_hand            Boolean   @default(false)
+  left_upper_arm        Boolean   @default(false)
+  left_shoulder         Boolean   @default(false)
+  left_lower_arm        Boolean   @default(false)
+  left_lower_leg        Boolean   @default(false)
+  left_hand             Boolean   @default(false)
+  left_upper_leg        Boolean   @default(false)
+  left_ankle            Boolean   @default(false)
+  left_feet             Boolean   @default(false)
+  left_knee             Boolean   @default(false)
+  right_lower_leg       Boolean   @default(false)
+  right_ankle           Boolean   @default(false)
+  right_upper_leg       Boolean   @default(false)
+  right_feet            Boolean   @default(false)
+  right_knee            Boolean   @default(false)
+  abdomen               Boolean   @default(false)
+  lower_body            Boolean   @default(false)
+  upper_body            Boolean   @default(false)
+  right_ear             Boolean   @default(false)
+  left_ear              Boolean   @default(false)
+  head                  Boolean   @default(false)
+  right_eye             Boolean   @default(false)
+  mouth                 Boolean   @default(false)
+  left_eye              Boolean   @default(false)
+  nose                  Boolean   @default(false)
+  back_head             Boolean   @default(false)
+  back_neck             Boolean   @default(false)
+  left_elbow            Boolean   @default(false)
+  right_elbow           Boolean   @default(false)
+  lower_back            Boolean   @default(false)
+  back                  Boolean   @default(false)
+  butt                  Boolean   @default(false)
+  right_upper_shoulder  Boolean   @default(false)
+}
+
+enum Gender{
+  MALE
+  FEMALE
+}
+
+enum Role{
+  USER
+  ADMIN
+}

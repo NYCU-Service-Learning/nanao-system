@@ -1,0 +1,91 @@
+.center{
+    position:absolute;
+    width:400px;
+    height:400px;
+    top:50%;
+    left:50%;
+    margin-left:-200px;
+    margin-top:-200px;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding:30px;
+    color:#333;
+    
+    input{
+      width:100%;
+      padding:15px;
+      margin:5px;
+      border-radius:1px;
+      border:1px solid #ccc;
+      font-family:inherit;
+    }
+}
+.login {
+    position:relative;
+    width: 350px;
+    margin: 0 auto;
+    padding: 10px;
+    padding-top: 20px;
+    padding-bottom: 40px;
+    border-radius: 10px;
+}
+.login label {
+    position:relative;
+    text-align: left;
+    display:inline-block;
+}
+.login p{
+    display:inline-block;
+    float: right;
+}
+.login h2 {
+    font-size: 20px;
+    color: #1f2e6b;
+    margin-bottom: 30px;
+}
+.login input, .login textarea, .login select {
+    width: 100%;
+    padding: 6px 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    display: block;
+}
+.login button {
+    margin-bottom: 10%;
+    width: 100%;
+    margin: 10px 0;
+    background: #404040;
+    color: #fff;
+    border: 0;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login button:hover {
+    background-color: #505050;
+}
+
+.errmsg {
+    color: red;
+    font-size: 16px; /* Example of additional style */
+}
+
+.offscreen {
+    display: none;
+}
+
+.logged{
+    /* position:absolute; */
+    width:100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding:30px;
+    color:#333;
+}

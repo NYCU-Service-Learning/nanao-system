@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+  display: flex;
+  /* place-items: center; */
+  background-color: rgb(230, 230, 230);
+  user-select: none; /* Disable text selection for the entire page */
+}

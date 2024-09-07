@@ -1,0 +1,54 @@
+.admin {
+    position:relative;
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+.table .name-column {
+    width: 15%;
+}
+
+.table .username-column {
+    width: 15%;
+}
+
+.table .role-column {
+    width: 10%;
+}
+
+.table .link-column {
+    width: 25%;
+}
+
+.table .actions-column {
+    width: 35%;
+}
+
+.errmsg {
+    color: red;
+    font-size: 16px; 
+}
+
+.offscreen {
+    display: none;
+}
+
+.edit-avatar-modal .modal-body {
+    padding: 20px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    gap: 15px; 
+}
+
+.ai-modal .modal-body {
+    padding: 20px; 
+    display: flex; 
+    flex-direction: row; 
+    justify-content: center;
+    align-items: center;
+    gap: 15px; 
+}
