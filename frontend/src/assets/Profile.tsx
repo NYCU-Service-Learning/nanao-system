@@ -6,11 +6,14 @@ import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
 import { isNullOrUndef } from 'chart.js/helpers';
 
+// 定義 User 介面，描述從後端獲取的使用者基本信息
 interface User {
   name: string;
   username: string;
   role: string;
 }
+
+// 定義 UserData 介面，描述使用者詳細資料（如個人資訊）
 interface UserData {
   gender: string;
   birthday: string;
@@ -22,16 +25,24 @@ interface UserData {
   headshot: string;
 }
 
+// 自定義的 hook，用 `use` 開頭
+// `useQuery` 用於從當前網址中解析查詢的參數
 const useQuery = () => {
+
+  // 使用 `useLocation` 來獲取當前的網址，並返回查詢參數物件
   return new URLSearchParams(useLocation().search);
 };
 
+// 定義 ProfileProps 介面，描述 Profile 組件所需的屬性
 interface ProfileProps {
   user: string | null;
   url: string;
 }
 
+// Profile 組件，這是一個 functional component，接收 `user` 和 `url` 作為接收的參數類型
 const Profile: React.FC<ProfileProps> = ({ user, url }) => {
+
+  // 定義組件的狀態
   const query = useQuery();
   const id = query.get('id');
   const [users, setUsers] = useState<User | null>(null);
@@ -40,6 +51,8 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
   const [key, setKey] = useState(0);
+
+  // 定義一個異步函數 `getUserID`，根據使用者名稱從伺服器取得使用者 ID
   const getUserID = async (username: string) => {
     const response = await axios.get(url + `user/find/${username}`, {
       headers: {
@@ -50,6 +63,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     return response.data;
   };
 
+  // 使用 useEffect 用於獲取使用者資料
   useEffect(() => {
     const fetchUserId = async () => {
 
@@ -68,8 +82,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
 
   }, [userId, user]);
 
-
-
+  // 使用 useEffect 根據 userData 和 userId 來更新頭像 URL
   useEffect(() => {
     if(userData){
       if(userData.headshot !== "0"){
@@ -81,6 +94,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     }
   }, [userData, userId]);
 
+  // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
     try {
       const response1 = await axios.get(`${url}user/${id}`, {
@@ -103,6 +117,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     }
   };
 
+  // 定義預設的使用者詳細資料（如果未能取得 userData，則使用該預設值）
   const defaultData: UserData = {
     gender: '無',
     birthday: '無',
@@ -114,8 +129,10 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     headshot: '0'
   };
 
+  // 使用實際取得的資料，或預設資料
   const displayData = userData || defaultData;
 
+  // 性別的對應表，用於將性別代碼轉換為顯示的字串
   const genderMap: { [key: string]: string } = {
     MALE: '男',
     FEMALE: '女',
@@ -124,9 +141,13 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   return (
     <div className="profile">
       <div>
+
+        {/* 頭像圖片的顯示，如果是預設頭像，則使用預設圖片；否則顯示動態 URL 來強制刷新圖片 */}
         <img key={key} src={avatarUrl === '/default_avatar.jpg' ? '/default_avatar.jpg' :   `${avatarUrl}?${new Date().getTime()}`} alt="Profile Picture" />
       </div>
       <div className="info">
+
+        {/* 顯示使用者的基本和詳細資訊，若資料不存在則顯示 '無' */}
         <div><span className="label">姓名：</span>{users?.name || '無'}</div>
         <div><span className="label">性別：</span>{genderMap[displayData.gender] || '無'}</div>
         <div><span className="label">生日：</span>{displayData.birthday || '無'}</div>
@@ -136,9 +157,12 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
         <div><span className="label">地址：</span>{displayData.address || '無'}</div>
         <div><span className="label">過去病史：</span>{displayData.medical_History || '無'}</div>
       </div>
+
+      {/* 若有錯誤訊息則顯示 */}
       {errMsg && <div className="errmsg">{errMsg}</div>}
     </div >
   );
 };
 
+// 使用 withAuthRedirect 高階組件包裹 Profile 組件
 export default withAuthRedirect(Profile);
