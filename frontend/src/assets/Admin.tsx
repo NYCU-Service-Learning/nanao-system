@@ -8,12 +8,14 @@ import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload, Flex } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 
+// 定義 User 的 interface，指定資料類型
 interface User {
     name: string;
     username: string;
     role: string;
 }
 
+// 定義 Userdata 的 interface，指定資料類型
 interface Userdata {
     gender: string;
     birthday: string;
@@ -25,13 +27,16 @@ interface Userdata {
     headshot: string;
 }
 
+// 定義 AdminProps 的 interface，指定 url 的類型為 string
 interface AdminProps {
     url: string;
 }
 
 
 
+// 定義 Admin component為一個 React Function Component 類型，傳入參數的interface為 AdminProps
 const Admin: React.FC<AdminProps> = ({ url }) => {
+    // useState 是 React Hooks，用於管理 React component 的狀態，會觸發 component 的重新渲染
     const [users, setUsers] = useState<User[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [newUsername, setNewUsername] = useState('');
@@ -67,29 +72,38 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     const [aiImgSrc2, setAiImgSrc2] = useState<string>();
     const [aiImgSrc3, setAiImgSrc3] = useState<string>();
 
+    // useEffect 是一個 React Hook，用於在 component render 完成後執行一些副作用的操作
+    // 第二個參數為空陣列，表示只在 component render 完成後執行一次。
     useEffect(() => {
+        // 當 component render 完成後，call fetchUsers
         fetchUsers();
     }, []);
 
+    // useNavigate 是一個 React Hook，用於導航到其他routes
     const navigate = useNavigate();
 
     const fetchUsers = async () => {
         try {
+            // 使用 axios 發送 GET 請求到後端的 /user 路由
             const response = await axios.get(`${url}user`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // 從 GET 請求 response 中取出用戶資料，更新用戶列表
             const users = response.data;
             setUsers(users);
         } catch (error) {
+            // 錯誤處理
             console.error('Error fetching users:', error);
         }
     };
 
+    // 定義一個異步函數 `fetchUserdata`，根據使用者 ID 取得詳細用戶資料
     const fetchUserdata = async (id: number): Promise<Userdata | null> => {
         try {
+            // 使用 axios 發送 GET 請求到後端的 /user-detail/{ID} 路由
             const response = await axios.get(`${url}user-detail/${id}`, {
                 headers: {
                     'Content-Type': 'application/json'
@@ -99,63 +113,80 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             console.log(response.data);
             return response.data;
         } catch (error) {
+            // 錯誤處理，return null 表示失敗
             setErrMsg('Error fetching users.');
             return null;
         }
     };
 
+    // 定義一個異步函數 `handleDelete`，根據使用者 ID 刪除用戶資料
     const handleDelete = async (id: number) => {
         try {
+            // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
             await axios.delete(`${url}user/${id}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // 重新取得用戶列表
             fetchUsers();
         } catch (error) {
             setErrMsg('Error deleting user.');
         }
     };
 
+    // 定義函數 handleEditUser，用於打開編輯用戶帳密的編輯表單
     const handleEditUser = (user: User) => {
+        // 設定編輯表單中的用戶資料
         setEditName(user.name);
         setEditUsername(user.username);
         setEditUserrole(user.role);
+        // 打開編輯視窗
         setShowEditModal(true);
     };
 
+    // 定義一個異步函數 `handleUpdate`，根據使用者名稱和 role 更新用戶資料
     const handleUpdate = async (username: string, role: string) => {
+        // 根據用戶名稱取得用戶 ID
         const editUserId = await getUserID(username);
         try {
+            // 建立更新的用戶資料
             const updatedUser = {
                 name: editName,
                 username: editUsername,
                 password: editPassword,
                 role: role
             };
+            // 使用 axios 發送 PATCH 請求到後端的 /user/{editUserID} 路由
             await axios.patch(`${url}user/${editUserId}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // 重新取得用戶列表
             fetchUsers();
+            // 關閉編輯視窗，清空表單
             setShowEditModal(false);
             setEditUsername('');
             setEditPassword('');
         } catch (error) {
+            // 錯誤處理
             setErrMsg('Error updating user.');
         }
     };
 
+    // 定義一個異步函數 `handleEditUser2`，編輯使用者詳細資料
     const handleEditUser2 = async (user: User) => {
+        // 設定編輯表單中的用戶資料，根據使用者名稱取得 ID 及詳細資料
         setEditUsername2(user.username);
         setEditName2(user.name);
         const editUserId = await getUserID(user.username);
         const userdata = await fetchUserdata(editUserId);
 
         if (userdata) {
+            // 如果取得用戶資料，將其設定到編輯表單中
             setEditGender2(userdata.gender);
             setEditUserbirth2(userdata.birthday);
             setEditUserage2(userdata.age);
@@ -176,22 +207,29 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             setEditUserhs2('0');
         }
 
+        // 打開編輯資料的視窗
         setShowEditModal2(true);
     };
+    // 定義一個異步函數 `handleEditImg`，開啟編輯使用者頭像的視窗
     const handleEditImg = async (user: User) => {
         setEditNameImg(user.username);
         setShowEditImgModal(true);
     };
 
+    // 定義一個異步函數 `handleUploadImg`，根據使用者名稱更改使用者頭像圖片
     const handleUploadImg = async (username: string) => {
+        // 建立 FormData 來處理資料，根據使用者名稱取得 ID
         const formData = new FormData();
         const editUserID = await getUserID(username);
         try {
             if (fileList.length > 0) {
+                // 取得上傳的第一個文件，append 到 formData
                 const file = fileList[0] as unknown as File;
                 formData.append('file', file); 
             }
+            // 設定上傳狀態為 true
             setUploading(true);
+            // 使用 axios 發送 POST 請求到指定 url
             const response = await axios.post(`https://elk-on-namely.ngrok-free.app/upload?user_id=${editUserID.toString()}`,
                 formData
                 , {
@@ -201,11 +239,14 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                     },
                     withCredentials: true
                 });
+            // 200 OK
             if (response.status == 200) {
                 message.success('上傳成功');
+                // 更新用戶頭像資料
                 const updatedUser = {
                     headshot: '4'
                 };
+                // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
                 await axios.patch(`${url}user-detail/${editUserID}`, updatedUser, {
                     headers: {
                         'Content-Type': 'application/json'
@@ -213,18 +254,24 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                     withCredentials: true
                 });
             } else {
+                // 錯誤處理
                 message.error('上傳失敗');
             }
         } catch (error) {
+            // 錯誤處理
             message.error('上傳失敗');
         } finally {
+            // 設定上傳狀態回 false
             setUploading(false);
         }
     };
 
+    // 定義一個異步函數 `handleUpdate2`，根據使用者名稱更新使用者詳細資料
     const handleUpdate2 = async (username: string) => {
+        // 根據使用者名稱取得 ID
         const editUserId = await getUserID(username);
         try {
+            // 建立更新的用戶詳細資料
             const updatedUser = {
                 gender: editGender2,
                 birthday: editUserbirth2,
@@ -235,13 +282,16 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 phone: editUserphone2,
                 headshot: editUserhs2
             };
+            // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
             await axios.patch(`${url}user-detail/${editUserId}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // 重新取得用戶列表
             fetchUsers();
+            // 關閉編輯視窗，清空表單
             setShowEditModal2(false);
             setEditUsername2('');
             setEditName2('');
@@ -254,16 +304,20 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             setEditUsermhis2('');
             setEditUserhs2('0');
         } catch (error) {
+            // 錯誤處理
             setErrMsg('Error updating user.');
         }
     };
 
+    // 定義一個異步函數 `handleAddUser`，用於新增用戶
     const handleAddUser = async () => {
         try {
+            // 建立新用戶資料
             const newUser = {
                 name: newName,
                 username: newUsername,
                 password: newPassword,
+                // 預設新用戶 role 為 "USER"
                 role: "USER",
                 userDetail: {
                     create: {
@@ -278,38 +332,49 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                     }
                 }
             };
+            // 使用 axios 發送 POST 請求到後端的 /user 路由
             await axios.post(`${url}user`, newUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // 重新取得用戶列表
             fetchUsers();
+            // 關閉視窗，清除資料
             setShowModal(false);
             setNewName('');
             setNewUsername('');
             setNewPassword('');
         } catch (error) {
+            // 錯誤處理
             setErrMsg('Error adding user.');
         }
     };
 
+    // 定義一個異步函數 `getUserID`，根據使用者名稱取得 ID
     const getUserID = async (username: string) => {
+        // 使用 axios 發送 GET 請求到後端的 /user/find/{username} 路由
         const response = await axios.get(`${url}user/find/${username}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
             withCredentials: true
         });
+        // 回傳資料
         return response.data;
     };
+    // 定義一個異步函數 `handleEditUploadImg`，開啟上傳圖片的視窗
     const handleEditUploadImg = async () => {
         setShowEditImgModal(false);
         setShowUploadImgModal(true);
     }
 
+    // 定義一個異步函數 `handleEditAiImg`，用於設定 AI 頭像並打開 AI 頭像選擇視窗
     const handleEditAiImg = async (username: string) => {
+        // 根據使用者名稱取得 ID
         const editUserID = await getUserID(username);
+        // 設定AI生成的頭像圖片 url
         setAiImgSrc1(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca1-${editUserID}.jpg`);
         setAiImgSrc2(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca2-${editUserID}.jpg`);
         setAiImgSrc3(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca3-${editUserID}.jpg`);
@@ -318,23 +383,29 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         setShowEditImgModal(false);
     }
 
+    // 定義一個異步函數 `handleAiClick`，根據使用者名稱設定 AI 頭像
     const handleAiClick = async (username: string, imgNum: string) => {
         message.info('正在設定用戶頭像，請耐心等待');  
+        // 根據使用者名稱取得 ID
         const editUserID = await getUserID(username);
         try {
+            // 建立更新的用戶頭像資料，設定頭像為選取之 AI 頭像編號
             const updatedUser = {
                 headshot: imgNum
             };
+            // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
             await axios.patch(`${url}user-detail/${editUserID}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // 3秒處理時間，顯示成功訊息
             setTimeout(() => {
                 message.success('用戶頭像更新成功');
             }, 3000);
         } catch (error) {
+            // 錯誤處理，回傳 null
             console.error('Failed to update user avatar:', error);  
             message.error('無法更新用戶頭像，請檢查網絡連接並重試');  
             setErrMsg('無法更新用戶頭像，請檢查網絡連接並重試');  
@@ -342,26 +413,34 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         }
     }    
 
+    // 定義 uploadProps 物件，設定上傳圖片的相關屬性
     const uploadProps: UploadProps = {
+        // 指定上傳的文件名稱，限制文件類型為 jpeg jpg png
         name: 'file',
         accept: '.jpeg,.jpg,.png',
+        // 定義刪除文件的處理方式
         onRemove: (file) => {
+            // 找出被刪除文件在 fileList 中的 index，刪除後更新 fileList
             const index = fileList.indexOf(file);
             const newFileList = fileList.slice();
             newFileList.splice(index, 1);
             setFileList(newFileList);
         },
+        // 定義上傳前的處理方式
         beforeUpload: (file) => {
             const isJpgOrJpeg = file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png';
+            // 阻止錯誤文件類型上傳
             if (!isJpgOrJpeg) {
                 message.error('You can only upload JPEG/PNG file!');
                 return false;
             }
             const isLt2M = file.size / 1024 / 1024 < 2;
+            // 阻止超過 2M 文件上傳
             if (!isLt2M) {
                 message.error('Image must be smaller than 2MB!');
                 return false;
             }
+            // 更新 fileList 狀態，手動觸發上傳
             setFileList([file]);
             return false;
         },
