@@ -8,6 +8,7 @@ on:
 
 jobs:
   build_and_test:
+    name: Build and Test Application
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -30,6 +31,10 @@ jobs:
       #   working-directory: ./backend
       #   run: npm run lint
 
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
+
       - name: Set up Node.js (Frontend)
         uses: actions/setup-node@v3
         with:
@@ -47,7 +52,12 @@ jobs:
       #   working-directory: ./frontend
       #   run: npm run lint
 
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
   build_and_push:
+    name: Build and Push Docker Images
     needs: build_and_test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
