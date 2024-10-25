@@ -50,7 +50,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
-  // const [key, setKey] = useState(0);
+  const [key, ] = useState(0);
 
   // 定義一個異步函數 `getUserID`，根據使用者名稱從伺服器取得使用者 ID
   const getUserID = async (username: string) => {
