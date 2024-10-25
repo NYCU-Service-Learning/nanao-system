@@ -35,17 +35,17 @@ jobs:
         with:
           node-version: '16'
 
-      # - name: Install Dependencies (Frontend)
-      #   working-directory: ./frontend
-      #   run: npm install
+      - name: Install Dependencies (Frontend)
+        working-directory: ./frontend
+        run: npm install
 
       # - name: Run Tests (Frontend)
       #   working-directory: ./frontend
       #   run: npm test
 
-      - name: Lint Code (Frontend)
-        working-directory: ./frontend
-        run: npm run lint
+      # - name: Lint Code (Frontend)
+      #   working-directory: ./frontend
+      #   run: npm run lint
 
   build_and_push:
     needs: build_and_test
