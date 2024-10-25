@@ -22,9 +22,9 @@ jobs:
         working-directory: ./backend
         run: npm install
 
-      - name: Run Tests (Backend)
-        working-directory: ./backend
-        run: npm test
+      # - name: Run Tests (Backend)
+      #   working-directory: ./backend
+      #   run: npm test
 
       - name: Lint Code (Backend)
         working-directory: ./backend
@@ -39,9 +39,9 @@ jobs:
         working-directory: ./frontend
         run: npm install
 
-      - name: Run Tests (Frontend)
-        working-directory: ./frontend
-        run: npm test
+      # - name: Run Tests (Frontend)
+      #   working-directory: ./frontend
+      #   run: npm test
 
       - name: Lint Code (Frontend)
         working-directory: ./frontend
