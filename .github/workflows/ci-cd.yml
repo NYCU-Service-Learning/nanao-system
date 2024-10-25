@@ -78,16 +78,15 @@ jobs:
       - name: Build and Push Docker Image for Backend
         working-directory: ./backend
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker build -t userwei/nycu_service-learning-nanao:backend-$IMAGE_TAG .
-          docker push userwei/nycu_service-learning-nanao:backend-$IMAGE_TAG
+          docker build -t userwei/nycu_service-learning-nanao:backend .
+          docker push userwei/nycu_service-learning-nanao:backend
 
       - name: Build and Push Docker Image for Frontend
         working-directory: ./frontend
         run: |
           IMAGE_TAG=${{ github.sha }}
-          docker build -t userwei/nycu_service-learning-nanao:frontend-$IMAGE_TAG .
-          docker push userwei/nycu_service-learning-nanao:frontend-$IMAGE_TAG
+          docker build -t userwei/nycu_service-learning-nanao:frontend .
+          docker push userwei/nycu_service-learning-nanao:frontend
 
       # - name: Deploy Application via SSH
       #   if: ${{ github.ref == 'refs/heads/main' }}
