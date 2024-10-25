@@ -454,11 +454,12 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 <Navbar expand="lg">
                     <Container>
                         <Nav className="ms-auto">
+                            {/*新增帳號按鈕，點擊時顯示新增帳號視窗*/}
                             <Button variant="outline-success" onClick={() => setShowModal(true)}>新增帳號</Button>
                         </Nav>
                     </Container>
                 </Navbar>
-
+                {/*用戶列表表格*/}
                 <Table striped bordered hover className="mt-4">
                     <thead>
                         <tr>
@@ -470,24 +471,34 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/*遍歷users數組，為每個用戶創建一行*/}
                         {users.map(user => (
                             <tr key={user.username}>
+                                {/*姓名*/}
                                 <td className="name-column">{user.name}</td>
+                                {/*帳號*/}
                                 <td className="username-column">{user.username}</td>
+                                {/*角色，如果是ADMIN則顯示為管理員，否則顯示為使用者*/}
                                 <td className="role-column">{user.role === "ADMIN" ? "管理員" : "使用者"}</td>
                                 <td className="link-column">
+                                    {/*個人資料按鈕，點擊時導航到用戶個人資料頁面*/}
                                     <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await getUserID(user.username)}`)}>個人資料</Button>
                                     &nbsp;
+                                    {/*疼痛統計按鈕，點擊時導航到用戶疼痛統計頁面*/}
                                     <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await getUserID(user.username)}`)}>疼痛統計</Button>
                                     &nbsp;
                                 </td>
                                 <td className="actions-column">
+                                    {/*編輯帳密按鈕，點擊時打開編輯帳密視窗*/}
                                     <Button variant="outline-secondary" onClick={() => handleEditUser(user)}>編輯帳密</Button>
                                     &nbsp;
+                                    {/*編輯資料按鈕，點擊時打開編輯資料視窗*/}
                                     <Button variant="outline-secondary" onClick={() => handleEditUser2(user)}>編輯資料</Button>
                                     &nbsp;
+                                    {/*個人頭像按鈕，點擊時打開編輯頭像視窗*/}
                                     <Button variant="outline-secondary" onClick={() => handleEditImg(user)}>個人頭像</Button>
                                     &nbsp;
+                                    {/*刪除按鈕，僅對非管理員用戶顯示*/}
                                     {user.role !== 'ADMIN' && (
                                         <Button variant="outline-danger" onClick={async () => handleDelete(await getUserID(user.username))}>刪除</Button>
                                     )}
@@ -496,12 +507,14 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                         ))}
                     </tbody>
                 </Table>
+                {/*點擊新增帳號後的彈出介面*/}
                 <Modal show={showModal} onHide={() => setShowModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>新增帳號</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
+                            {/*姓名輸入欄位*/}
                             <Form.Group controlId="formName">
                                 <Form.Label>姓名</Form.Label>
                                 <Form.Control
@@ -510,6 +523,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     onChange={(e) => setNewName(e.target.value)}
                                 />
                             </Form.Group>
+                            {/*帳號輸入欄位*/}
                             <Form.Group controlId="formUsername" className="mt-3">
                                 <Form.Label>帳號</Form.Label>
                                 <Form.Control
@@ -518,6 +532,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     onChange={(e) => setNewUsername(e.target.value)}
                                 />
                             </Form.Group>
+                            {/*密碼輸入欄位*/}
                             <Form.Group controlId="formPw" className="mt-3">
                                 <Form.Label>密碼</Form.Label>
                                 <Form.Control
@@ -527,21 +542,25 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                 />
                             </Form.Group>
                         </Form>
+                        {/*錯誤訊息顯示區*/}
                         <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</div>
                     </Modal.Body>
                     <Modal.Footer>
+                        {/*送出按鈕，點擊時調用handleAddUser函數*/}
                         <Button variant="outline-primary" onClick={handleAddUser}>
                             送出
                         </Button>
                     </Modal.Footer>
                 </Modal>
 
+                {/*點擊編輯帳密後的彈出介面*/}
                 <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>編輯帳密</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body">
                         <Form>
+                            {/*姓名編輯欄位*/}
                             <Form.Group controlId="formEditUsername" className="mt-3">
                                 <Form.Label>姓名</Form.Label>
                                 <Form.Control
@@ -551,6 +570,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     required
                                 />
                             </Form.Group>
+                            {/*帳號顯示欄位（不可編輯）*/}
                             <Form.Group controlId="formEditUsername" className="mt-3">
                                 <Form.Label>帳號</Form.Label>
                                 <Form.Control
@@ -560,6 +580,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     disabled
                                 />
                             </Form.Group>
+                            {/*密碼編輯欄位*/}
                             <Form.Group controlId="formEditName" className="mt-3">
                                 <Form.Label>密碼</Form.Label>
                                 <Form.Control
@@ -570,21 +591,25 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                 /> 
                             </Form.Group>
                         </Form>
+                        {/*錯誤訊息顯示區*/}
                         <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</div>
                     </Modal.Body>
                     <Modal.Footer className="modal-footer">
+                        {/*送出按鈕，點擊時調用handleUpdate函數*/}
                         <Button variant="outline-primary" onClick={() => handleUpdate(editUsername, editUserrole)}>
                             送出
                         </Button>
                     </Modal.Footer>
                 </Modal>
 
+                {/*點擊編輯資料後的彈出介面*/}
                 <Modal show={showEditModal2} onHide={() => setShowEditModal2(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>編輯資料</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body">
                         <Form>
+                            {/*姓名編輯欄位(不可更改)*/}
                             <Form.Group controlId="formEditName2" >
                                 <Form.Label>姓名</Form.Label>
                                 <Form.Control
@@ -593,6 +618,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     disabled
                                 />
                             </Form.Group>
+                            {/*帳號編輯欄位(不可更改)*/}
                             <Form.Group controlId="formEditUsername2" className="mt-3">
                                 <Form.Label>帳號</Form.Label>
                                 <Form.Control
@@ -601,129 +627,154 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     disabled
                                 />
                             </Form.Group>
+                            {/*性別編輯欄位*/}
                             <Form.Group controlId="formEditGender2" className="mt-3">
                                 <Form.Label>性別</Form.Label>
                                 <Form.Control
-                                    as="select"
-                                    value={editGender2 || ""}
-                                    onChange={(e) => setEditGender2(e.target.value)}
+                                    as="select"  // 將輸入框渲染為下拉選擇框
+                                    value={editGender2 || ""}  // 綁定性別值,如果為空則顯示空字符串
+                                    onChange={(e) => setEditGender2(e.target.value)}  // 當選擇改變時更新性別值
                                 >
-                                    <option value="">選擇</option>
-                                    <option value="MALE">男</option>
-                                    <option value="FEMALE">女</option>
+                                    <option value="">選擇</option>  // 默認選項
+                                    <option value="MALE">男</option>  // 男性選項
+                                    <option value="FEMALE">女</option>  // 女性選項
                                 </Form.Control>
                             </Form.Group>
+
+                            {/*生日編輯欄位*/}
                             <Form.Group controlId="formEditBirth2" className="mt-3">
                                 <Form.Label>生日</Form.Label>
                                 <Form.Control
-                                    as="input"
-                                    type="date"
-                                    value={editUserbirth2}
-                                    onChange={(e) => setEditUserbirth2(e.target.value)}
+                                    as="input"  // 渲染為輸入框
+                                    type="date"  // 指定輸入類型為日期
+                                    value={editUserbirth2}  // 綁定生日值
+                                    onChange={(e) => setEditUserbirth2(e.target.value)}  // 當日期改變時更新生日值
                                 />
                             </Form.Group>
+
+                            {/*年齡編輯欄位*/}
                             <Form.Group controlId="formEditUserage" className="mt-3">
                                 <Form.Label>年齡</Form.Label>
                                 <Form.Control
-                                    type="text"
-                                    value={editUserage2 <= 0 ? "" : editUserage2}
-                                    onChange={(e) => setEditUserage2(Number(e.target.value))}
+                                    type="text"  // 文本輸入框
+                                    value={editUserage2 <= 0 ? "" : editUserage2}  // 如果年齡小於等於0,顯示空字符,否則顯示年齡值
+                                    onChange={(e) => setEditUserage2(Number(e.target.value))}  // 將輸入轉換為數字並更新年齡值
                                 />
                             </Form.Group>
+
+                            {/*電話編輯欄位*/}
                             <Form.Group controlId="formEditUserphone" className="mt-3">
                                 <Form.Label>電話</Form.Label>
                                 <Form.Control
-                                    type="text"
-                                    value={editUserphone2}
-                                    onChange={(e) => setEditUserphone2(e.target.value)}
+                                    type="text"  // 文本輸入框
+                                    value={editUserphone2}  // 綁定電話號碼值
+                                    onChange={(e) => setEditUserphone2(e.target.value)}  // 當輸入改變時更新電話號碼
                                 />
                             </Form.Group>
+
+                            {/*電子郵件編輯欄位*/}
                             <Form.Group controlId="formEditUseremail" className="mt-3">
                                 <Form.Label>電子郵件</Form.Label>
                                 <Form.Control
-                                    type="email"
-                                    value={editUseremail2}
-                                    onChange={(e) => setEditUseremail2(e.target.value)}
+                                    type="email"  // 電子郵件輸入框,提供基本的郵件格式驗證
+                                    value={editUseremail2}  // 綁定電子郵件值
+                                    onChange={(e) => setEditUseremail2(e.target.value)}  // 當輸入改變時更新電子郵件
                                 />
                             </Form.Group>
+
+                            {/*地址編輯欄位*/}
                             <Form.Group controlId="formEditUseraddr" className="mt-3">
                                 <Form.Label>地址</Form.Label>
                                 <Form.Control
-                                    type="text"
-                                    value={editUseraddr2}
-                                    onChange={(e) => setEditUseraddr2(e.target.value)}
+                                    type="text"  // 文本輸入框
+                                    value={editUseraddr2}  // 綁定地址值
+                                    onChange={(e) => setEditUseraddr2(e.target.value)}  // 當輸入改變時更新地址
                                 />
                             </Form.Group>
+
+                            {/*過去病史編輯欄位*/}
                             <Form.Group controlId="formEditUsermhis" className="mt-3">
                                 <Form.Label>過去病史 (以、分隔)</Form.Label>
                                 <Form.Control
-                                    type="text"
-                                    value={editUsermhis2}
-                                    onChange={(e) => setEditUsermhis2(e.target.value)}
+                                    type="text"  // 文本輸入框
+                                    value={editUsermhis2}  // 綁定病史值
+                                    onChange={(e) => setEditUsermhis2(e.target.value)}  // 當輸入改變時更新病史
                                 />
                             </Form.Group>
                         </Form>
                         <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</div>
                     </Modal.Body>
                     <Modal.Footer className="modal-footer">
+                        {/*送出按鈕，點擊時調用handleUpdate2函數*/}
                         <Button variant="outline-primary" onClick={() => handleUpdate2(editUsername2)}>
                             送出
                         </Button>
                     </Modal.Footer>
                 </Modal>
-
+                {/*點擊編輯頭像後的彈出介面*/}
                 <Modal show={showEditImgModal} onHide={() => setShowEditImgModal(false)} className="edit-avatar-modal">
                     <Modal.Header closeButton>
                         <Modal.Title>個人頭像</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                        {/*上傳圖片按鈕*/}
                         <Button variant="outline-secondary" style={{ width: '80%' }} onClick={() => handleEditUploadImg()}>上傳圖片</Button>
+                        {/*使用AI生成頭像按鈕*/}
                         <Button variant="outline-secondary" style={{ width: '80%' }} onClick={() => handleEditAiImg(editNameImg)}>使用AI頭貼</Button>
                     </Modal.Body>
                 </Modal>
 
+                {/*點擊上傳圖片後的彈出介面*/}
                 <Modal show={showUploadImgModal} onHide={() => setShowUploadImgModal(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>上傳圖片</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className="modal-body">
+                        {/*文件上傳組件*/}
                         <Upload {...uploadProps}>
                             <AntButton icon={<UploadOutlined />}>選擇檔案</AntButton>
                         </Upload>
+                        {/*開始上傳按鈕*/}
                         <AntButton
                             type="primary"
                             onClick={() => handleUploadImg(editNameImg)}
-                            disabled={fileList.length === 0}
-                            loading={uploading}
+                            disabled={fileList.length === 0}  // 如果沒有選擇文件則禁用按鈕
+                            loading={uploading}  // 上傳中顯示加載狀態
                             style={{ marginTop: 16 }}
                         >
                             {uploading ? '正在上傳' : '開始上傳'}
                         </AntButton>
+                        {/*錯誤信息顯示區*/}
                         <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</div>
                     </Modal.Body>
                 </Modal>
 
+                {/*點擊使用AI頭貼後的彈出介面*/}
                 <Modal show={showEditAiModal} onHide={() => setShowEditAiModal(false)} className='ai-modal'>
                     <Modal.Header closeButton>
                         <Modal.Title>選擇一張圖片作為頭像</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                        {/*AI生成的第一張圖片選項*/}
                         <div>
                             <button onClick={() => handleAiClick(editNameImg, "1")} style={{ cursor: 'pointer' }}>
                                 <img src={aiImgSrc1} style={{ maxWidth: '100%' }} />
                             </button>
                         </div>
+                        {/*AI生成的第二張圖片選項*/}
                         <div>
                             <button onClick={() => handleAiClick(editNameImg, "2")} style={{ cursor: 'pointer' }}>
                                 <img src={aiImgSrc2} style={{ maxWidth: '100%' }} />
                             </button>
                         </div>
+                        {/*AI生成的第三張圖片選項*/}
                         <div>
                             <button onClick={() => handleAiClick(editNameImg, "3")} style={{ cursor: 'pointer' }}>
                                 <img src={aiImgSrc3} style={{ maxWidth: '100%' }} />
                             </button>
                         </div>
                     </Modal.Body>
+                    {/*錯誤訊息顯示區*/}
                     <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
                         <Modal.Footer>
                             {errMsg}
