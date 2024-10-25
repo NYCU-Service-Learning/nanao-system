@@ -14,15 +14,12 @@ interface DataFillerProps {
 }
 
 const DataFiller: React.FC<DataFillerProps> = (props) => {
-  const [Weekvalue, setWeekValue] = useState(false);
   const onChangeWeek = (e: RadioChangeEvent) => {
     props.setWeekPain({ ...props.WeekPain, [props.currentPart]: e.target.value });
   };
-  const [Monthvalue, setMonthValue] = useState(false);
   const onChangeMonth = (e: RadioChangeEvent) => {
     props.setMonthPain({ ...props.MonthPain, [props.currentPart]: e.target.value });
   };
-  const [value, setValue] = useState(0);
   const onChangeValue = (value: number) => {
     props.setPainLevel({ ...props.PainLevel, [props.currentPart]: value });
   };
@@ -49,9 +46,6 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
         }
         onOk={() => {
           props.setCurrentPart('');
-          setMonthValue(false);
-          setWeekValue(false);
-          setValue(0);
         }}
         onCancel={() => { 
           // set the value back to the saved value

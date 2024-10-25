@@ -49,9 +49,9 @@ jobs:
       #   working-directory: ./frontend
       #   run: npm test
 
-      # - name: Lint Code for Frontend
-      #   working-directory: ./frontend
-      #   run: npm run lint
+      - name: Lint Code for Frontend
+        working-directory: ./frontend
+        run: npm run lint
 
       - name: Build Frontend Application
         working-directory: ./frontend

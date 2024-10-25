@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import './Admin.css';
 import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button as AntButton, message, Upload, Flex } from 'antd';
+import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 
 // 定義 User 的 interface，指定資料類型
