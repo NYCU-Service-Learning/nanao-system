@@ -16,31 +16,45 @@ import * as XLSX from 'xlsx';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
+// 使用自定義 Hook 取得 URL query string
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
 
+// 定義 StatProps 的 interface，指定 url 的類型為 string
 interface StatProps {
   url: string;
 }
 
+// 定義 Stat component 為一個 React Function Component，傳入參數的 interface 為 StatProps
 const Stat: React.FC<StatProps> = ({ url }) => {
+
+    // 使用 cookies Hook 取得當前 user
     const [cookies] = useCookies(["user"]);
     const user = cookies.user;
 
+    // 使用 useQuery Hook 取得 URL query string 中的 id
     const query = useQuery();
     const id = query.get('id');
+
+    // 使用 id 來設定 userId 的 state，並設定初始值為 null
     const [userId, setUserId] = useState<string | null>(id || null);
+
+    // userhurt 用來儲存使用者的疼痛指數，userweek 用來儲存使用者的一週內是否疼痛，useryear 用來儲存使用者的一年內是否影響正常生活
     const [userhurt, setUserhurt] = useState<Userhurt[]>([]);
     const [userweek, setUserweek] = useState<Usertime[]>([]);
     const [useryear, setUseryear] = useState<Usertime[]>([]);
 
+    // selectedBodyPart 用來儲存使用者選擇的部位，searchDatefrom 用來儲存使用者選擇的起始日期，searchDateto 用來儲存使用者選擇的結束日期
     const [selectedBodyPart, setSelectedBodyPart] = useState("default");
     const [searchDatefrom, setSearchDatefrom] = useState('');
     const [searchDateto, setSearchDateto] = useState('');
 
+    // 設定圖表的類型為 bar (長條圖)
     const [chartType, setChartType] = useState('bar');
     // const [filteredBodyParts, setFilteredBodyParts] = useState(bodyParts);
+
+    // chartData 用來儲存圖表的資料，包含 labels 和 datasets
     const [chartData, setChartData] = useState({
         labels: [] as string[],
         datasets: [
@@ -54,11 +68,15 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         ]
     });
 
+    // showModal 用來控制 Modal 的顯示與隱藏
     const [showModal, setShowModal] = useState(false);
 
+    // handleShow 用來顯示 Modal，handleClose 用來隱藏 Modal
+    // Modal 用來提供刪除功能 (僅限 admin)
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
 
+    // 使用 async function getUserID 以及 username 來取得 userId
     const getUserID = async (username: string) => {
         const response = await axios.get(url + `user/find/${username}`, {
             headers: {
@@ -69,6 +87,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         return response.data;
     };
 
+    // 若 userId 或 user 更新時，更新 userhurt、userweek、useryear 的資料
     useEffect(() => {
         const fetchUserId = async () => {
             if (!userId && user) {
@@ -88,7 +107,10 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         fetchUserId();
     }, [userId, user]);
 
+    // 當圖表相關資料(userhurt, selectedBodyPart, chartType, userweek, useryear)更新時，更新圖表(chartData)
     useEffect(() => {
+
+        // 設定圖表類型
         if (selectedBodyPart && selectedBodyPart !== 'default') {
             setChartType('line');
         } else {  
@@ -98,6 +120,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         const painData = calculatePainAverage(userhurt, selectedBodyPart);
         const individualPainData = calculatePainData(userhurt);
 
+        // 設定長條圖資料
         const barChartData = {
             labels: painData.map(item => item.name),
             datasets: [
@@ -112,6 +135,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
             ]
         };
 
+        // 設定折線圖資料
         const lineChartData = {
             labels: individualPainData.map(item => moment(item.name).format('YYYY-MM-DD HH:mm')),
             datasets: [
@@ -157,6 +181,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         setChartData(chartType === 'bar' ? barChartData : lineChartData);
     }, [userhurt, selectedBodyPart, chartType, userweek, useryear]);
 
+    // 取得特定部位的疼痛指數，並依時間排序
     const calculatePainData = (data: Userhurt[]) => {
         return data.map(item => ({
             name: item.fill_time,
@@ -164,6 +189,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         })).sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
     };
 
+    // 計算 全部/指定 部位平均疼痛指數
     const calculatePainAverage = (data: Userhurt[], selectedPart: string) => {
         if (selectedPart && selectedPart !== 'default') {
             const totalPain = data.reduce((acc, curr) => acc + curr[selectedPart], 0);
@@ -186,8 +212,10 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         }
     };
 
+    // 使用後端API取得使用者的疼痛資料
     const fetchUserhurt = async (id: string) => {
         try {
+            // params 為查詢時間區間
             const params: any = {};
             if (searchDatefrom) {
                 params.start = moment.tz(searchDatefrom, 'Asia/Taipei').startOf('day').toISOString();
@@ -218,6 +246,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         }
     };
 
+    // 使用後端API取得使用者的一週內是否疼痛資料
     const fetchUserweek = async (id: string) => {
         try {
             const params: any = {};
@@ -248,6 +277,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         }
     };
 
+    // 使用後端API取得使用者的一年內是否影響正常生活資料
     const fetchUseryear = async (id: string) => {
         try {
             const params: any = {};
@@ -278,6 +308,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         }
     };
 
+    // admin 管理介面刪除使用者疼痛資料
     const handleDelete = async (formId: string) => {
         await axios.delete(`${url}hurtform/${formId}`, {
             headers: { 'Content-Type': 'application/json' },
@@ -298,6 +329,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         }
     };
 
+    // 搜尋使用者疼痛資料(即搜尋按鈕的事件處理函式)
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (userId) {
@@ -307,11 +339,13 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         }
     };  
 
+    // 渲染下拉選單
     const renderDropdownItems = (parts: typeof bodyParts, setSelectedBodyPart: React.Dispatch<React.SetStateAction<string>>) => {
         const categories = Array.from(new Set(parts.map(part => part.category)));
         return (
             <div className="container-fluid">
                 <div className="d-flex flex-row flex-nowrap">
+                    {/* 對每個分類渲染一個下拉式選單 */}
                     {categories.map(category => (
                         <div className="p-2" key={category}>
                             <Dropdown>
@@ -336,6 +370,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         );
     };
 
+    // 使用 userId 獲得 username
     const getUsername = async (uid: string) => {
         const response = await axios.get(url + `user/${uid}`, {
             headers: {
@@ -346,6 +381,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         return response.data;
     };
 
+    // 匯出 Excel
     const exportToExcel = async (uid: string) => {
         const response = await getUsername(uid);
         const worksheet = XLSX.utils.json_to_sheet(userhurt);
@@ -360,6 +396,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                 <h1>疼痛統計</h1>
                 <Navbar expand="lg" className="justify-content-between mt-4">
                     <Form onSubmit={handleSearch} className="d-flex w-100 align-items-center" style={{ whiteSpace: 'nowrap' }}>
+                        {/* 部位選擇選單 */}
                         <div className="d-flex flex-wrap">
                             <Dropdown>
                                 <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="me-5">
@@ -372,6 +409,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                         </div>
 
                         <div className="text-center me-3" style={{ width: '120px' }}>搜尋時間</div>
+                        {/* 查詢日期設定(from) */}
                         <FormControl
                             type="date"
                             className="me-3"
@@ -379,18 +417,23 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                             onChange={e => setSearchDatefrom(e.target.value)}
                         />
                         <div className="text-center me-3" style={{ width: '30px' }}>至</div>
+                        {/* 查詢日期設定(to) */}
                         <FormControl
                             type="date"
                             className="me-3"
                             value={searchDateto}
                             onChange={e => setSearchDateto(e.target.value)}
                         />
+                        {/* 送出表單按鈕 */}
                         <Button variant="outline-success" type="submit" className="me-3">搜尋</Button>
+                        {/* admin 的管理及匯出 Excel 功能 */}
                         {user === 'admin' && (
                             <>
+                            {/* 展示互動介面，可刪除疼痛資料 */}
                             <Button variant="outline-primary" onClick={handleShow} className='me-2'>
                                 管理
                             </Button>
+                            {/* 匯出 Excel */}
                             <Button 
                                 variant="outline-primary" 
                                 onClick={() => exportToExcel(userhurt[0].user_id)} 
@@ -405,7 +448,9 @@ const Stat: React.FC<StatProps> = ({ url }) => {
 
                 <div className="chart-container mt-4">
                     {chartData && (
+                        // 根據圖表類型渲染不同的圖表
                         chartType === 'bar' ? (
+                            // 長條圖
                             <Bar 
                                 data={chartData} 
                                 options={{
@@ -420,6 +465,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                                 }} 
                             />
                         ) : (
+                            // 折線圖
                             <Line 
                                 data={chartData} 
                                 options={{
@@ -446,12 +492,14 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                         )
                     )}
                 </div>
-
+                
+                {/* admin 管理用 Modal */}
                 <Modal show={showModal} onHide={handleClose} size="lg">
                     <Modal.Header closeButton>
                         <Modal.Title>疼痛資料管理</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                        {/* 疼痛表單表格 */}
                         <Table striped bordered hover className="mt-4">
                             <thead>
                                 <tr>
@@ -465,6 +513,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                                         <td className="stat-time-column">{moment(uh.fill_time).format('YYYY-MM-DD HH:mm')}</td>
                                         <td className="stat-actions-column">
                                             {user === 'admin' && (
+                                                // 刪除按鈕，並使用 handleDelete 函式處理刪除事件
                                                 <Button variant="outline-danger" onClick={() => handleDelete(uh.id)}>刪除</Button>
                                             )}
                                         </td>
