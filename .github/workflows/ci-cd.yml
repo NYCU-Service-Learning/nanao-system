@@ -64,19 +64,19 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: Build and Push Backend Image
-      #   working-directory: ./backend
-      #   run: |
-      #     IMAGE_TAG=${{ github.sha }}
-      #     docker build -t userwei/nycu_service-learning-nanao:backend-$IMAGE_TAG .
-      #     docker push userwei/nycu_service-learning-nanao:backend-$IMAGE_TAG
+      - name: Build and Push Backend Image
+        working-directory: ./backend
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t userwei/nycu_service-learning-nanao:backend-$IMAGE_TAG .
+          docker push userwei/nycu_service-learning-nanao:backend-$IMAGE_TAG
 
-      # - name: Build and Push Frontend Image
-      #   working-directory: ./frontend
-      #   run: |
-      #     IMAGE_TAG=${{ github.sha }}
-      #     docker build -t userwei/nycu_service-learning-nanao:frontend-$IMAGE_TAG .
-      #     docker push userwei/nycu_service-learning-nanao:frontend-$IMAGE_TAG
+      - name: Build and Push Frontend Image
+        working-directory: ./frontend
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t userwei/nycu_service-learning-nanao:frontend-$IMAGE_TAG .
+          docker push userwei/nycu_service-learning-nanao:frontend-$IMAGE_TAG
 
       # - name: SSH and Deploy
       #   if: ${{ github.ref == 'refs/heads/main' }}
