@@ -16,46 +16,64 @@ interface DataFillerProps {
 const DataFiller: React.FC<DataFillerProps> = (props) => {
   const [Weekvalue, setWeekValue] = useState(false);
   const onChangeWeek = (e: RadioChangeEvent) => {
-    setWeekValue(e.target.value);
+    props.setWeekPain({ ...props.WeekPain, [props.currentPart]: e.target.value });
   };
   const [Monthvalue, setMonthValue] = useState(false);
   const onChangeMonth = (e: RadioChangeEvent) => {
-    setMonthValue(e.target.value);
+    props.setMonthPain({ ...props.MonthPain, [props.currentPart]: e.target.value });
   };
   const [value, setValue] = useState(0);
   const onChangeValue = (value: number) => {
-    setValue(value);
+    props.setPainLevel({ ...props.PainLevel, [props.currentPart]: value });
   };
-
+  const [valueBefore, setValueBefore] = useState(0);
+  const [MonthvalueBefore, setMonthValueBefore] = useState(false);
+  const [WeekvalueBefore, setWeekValueBefore] = useState(false);
   return (
     <>
       <Modal
+        maskClosable={false}
         title="填寫疼痛資料"
-        visible={props.currentPart !== ''}
+        open={props.currentPart !== ''}
+        afterOpenChange={
+          (open: boolean) => {
+            if(open) {
+              console.log('open');
+              // save the value of the current part
+              // if cancel, set the value back to the saved value
+              setValueBefore(props.PainLevel[props.currentPart] || 0);
+              setMonthValueBefore(props.MonthPain[props.currentPart] || false);
+              setWeekValueBefore(props.WeekPain[props.currentPart] || false);
+            }
+          }
+        }
         onOk={() => {
-          props.MonthPain[props.currentPart] = Monthvalue;
-          props.WeekPain[props.currentPart] = Weekvalue;
-          props.PainLevel[props.currentPart] = value;
           props.setCurrentPart('');
           setMonthValue(false);
           setWeekValue(false);
           setValue(0);
         }}
-        onCancel={() => { props.setCurrentPart(''); }}
+        onCancel={() => { 
+          // set the value back to the saved value
+          props.setPainLevel({ ...props.PainLevel, [props.currentPart]: valueBefore });
+          props.setMonthPain({ ...props.MonthPain, [props.currentPart]: MonthvalueBefore });
+          props.setWeekPain({ ...props.WeekPain, [props.currentPart]: WeekvalueBefore });
+          props.setCurrentPart(''); 
+        }}
         mask={false}
       >
         <Form>
           <Form.Item label="過去一年有無疼痛？">
-            <Slider onChange={onChangeValue} value={value} max={10} min={0} />
+            <Slider onChange={onChangeValue} value={props.PainLevel[props.currentPart]} max={10} min={0} />
           </Form.Item>
           <Form.Item label="此部位過去一年此部位的疼痛是否影響正常生活？">
-            <Radio.Group onChange={onChangeMonth} value={Monthvalue}>
+            <Radio.Group onChange={onChangeMonth} value={props.MonthPain[props.currentPart]}>
               <Radio value={true}>Yes</Radio>
               <Radio value={false}>No</Radio>
             </Radio.Group>
           </Form.Item>
           <Form.Item label="過去一星期中，此部位是否還疼痛？">
-            <Radio.Group onChange={onChangeWeek} value={Weekvalue}>
+            <Radio.Group onChange={onChangeWeek} value={props.WeekPain[props.currentPart]}>
               <Radio value={true}>Yes</Radio>
               <Radio value={false}>No</Radio>
             </Radio.Group>

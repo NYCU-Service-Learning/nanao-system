@@ -8,8 +8,12 @@ interface NavigProps {
   user: string | null;
 }
 
+// 定義一個 Functional Component（函數式組件）Navig，接收 NavigProps 作為參數
 const Navig: React.FC<NavigProps> = ({ user }) => {
   return (
+
+    // 使用 React-Bootstrap 的 Navbar 組件來創建導航欄
+    // 詳細可以參考 React-Bootstrap 的官方文件
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
       <Container>
         <Navbar.Brand>疼痛互動系統</Navbar.Brand>
@@ -17,9 +21,15 @@ const Navig: React.FC<NavigProps> = ({ user }) => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/home">首頁</Nav.Link>
+
+            {/* 如果 user 是 null，顯示登入按鈕，否則顯示使用者相關選項 */}
             {user == null ? (
+
+              // 未登入時顯示的導航鏈接
               <Nav.Link as={Link} to="/login">登入</Nav.Link>
             ) : (
+
+              // 已登入時顯示的導航鏈接
               <>
                 {user === "admin" ? (
                   <Nav.Link as={Link} to="/admin">管理介面</Nav.Link>

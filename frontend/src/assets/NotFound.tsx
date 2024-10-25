@@ -1,6 +1,8 @@
 import './NotFound.css'
 
 const NotFound = () => {
+  // 這個頁面是在進到不存在的網址出現的
+  // 我們自定義了Not found的頁面
   return (
     <div className="notfound">
       <h1>Page Not Found</h1>
