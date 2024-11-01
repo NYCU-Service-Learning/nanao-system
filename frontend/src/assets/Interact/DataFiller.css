@@ -1,33 +1,45 @@
-#SideSelector{
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* #SideSelector - 用於包裹左右視角按鈕的容器樣式 */
+#SideSelector {
+  display: flex;                /* 使用 flexbox 佈局，以便按鈕水平排列 */
+  justify-content: center;      /* 將按鈕組置於容器中央 */
+  align-items: center;          /* 垂直居中按鈕組 */
 }
+
+
+/* .button-54 - 按鈕樣式，用於體現復古按鈕的外觀和交互效果 */
 .button-54 {
-  font-family: "Open Sans", sans-serif;
-  font-size: 16px;
-  letter-spacing: 2px;
-  text-decoration: none;
-  text-transform: uppercase;
-  color: #000;
-  cursor: pointer;
-  border: 3px solid;
-  padding: 0.25em 0.5em;
-  box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
-  position: relative;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
+  font-family: "Open Sans", sans-serif; /* 設定字體，使用 Open Sans 或系統默認字體 */
+  font-size: 16px;                     /* 字體大小 */
+  letter-spacing: 2px;                 /* 增加字母間距以提升可讀性 */
+  text-decoration: none;               /* 移除下劃線 */
+  text-transform: uppercase;           /* 將文字轉為大寫 */
+  color: #000;                         /* 設置按鈕文字顏色為黑色 */
+  cursor: pointer;                     /* 鼠標移動到按鈕上時顯示為指針 */
+  border: 3px solid;                   /* 按鈕外邊框寬度為 3px，顏色同父元素 */
+  padding: 0.25em 0.5em;               /* 設置按鈕內邊距 */
+  box-shadow:                          /* 設置多層陰影，用於創建復古按鈕的 3D 效果 */
+    1px 1px 0px 0px,
+    2px 2px 0px 0px,
+    3px 3px 0px 0px,
+    4px 4px 0px 0px,
+    5px 5px 0px 0px;
+  position: relative;                  /* 相對定位，以便在按下時可以調整位置 */
+  user-select: none;                   /* 禁止用戶選擇按鈕文本 */
+  -webkit-user-select: none;           /* 適用於 Webkit 瀏覽器的禁用文本選擇 */
+  touch-action: manipulation;          /* 在觸控設備上禁用雙擊縮放 */
 }
 
+
+/* .button-54:active - 按鈕按下時的樣式 */
 .button-54:active {
-  box-shadow: 0px 0px 0px 0px;
-  top: 5px;
-  left: 5px;
+  box-shadow: 0px 0px 0px 0px; /* 移除按壓時的陰影，使按鈕顯得被按下 */
+  top: 5px;                     /* 向下移動 5px 模擬按下效果 */
+  left: 5px;                    /* 向右移動 5px 模擬按下效果 */
 }
 
+/* 在螢幕寬度大於等於 768px 時，增加按鈕的內邊距以適應更大螢幕 */
 @media (min-width: 768px) {
   .button-54 {
-    padding: 0.25em 0.75em;
+    padding: 0.25em 0.75em;     /* 調整按鈕的水平內邊距以保持設計的均衡 */
   }
 }
