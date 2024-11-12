@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ConsoleLogger, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt'
 import { session } from 'passport';
 import { DatabaseService } from 'src/database/database.service';
@@ -21,5 +21,16 @@ export class AuthService {
             return null;
         }
         return user
+    }
+
+    async validateGoogleUser(profile: any): Promise<any> {
+        console.log("validateGoogleUser")
+        console.log(profile)
+    }
+
+    async linkGoogleAccount(user: any, profile: any): Promise<any> {
+        console.log("linkGoogleAccount")
+        console.log(user)
+        console.log(profile)
     }
 }

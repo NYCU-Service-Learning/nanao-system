@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Inject, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Post, Request, UseGuards, Res, Redirect } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './utils/guards/LocalGuard';
+import { AdminOrSameUserIdGuard, AuthenticatedGuard, LocalAuthGuard } from './utils/guards/LocalGuard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -10,6 +11,26 @@ export class AuthController {
     @Post('login')
     login(){
         return true
+    }
+
+    @Get('google/login')
+    @UseGuards(AuthGuard('google-login'))
+    async googleAuth(@Request() req){}
+
+    @Get('google/login/callback')
+    @UseGuards(AuthGuard('google-login'))
+    async googleAuthRedirect(@Request() req){
+        return this.authService.validateGoogleUser(req.user)
+    }
+
+    @Get('google/link')
+    @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
+    async googleLink(@Request() req){}
+
+    @Get('google/link/callback')
+    @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
+    async googleLinkRedirect(@Request() req){
+        // return this.authService.linkGoogleAccount(req.user, req.user)
     }
 
     @Delete('logout')

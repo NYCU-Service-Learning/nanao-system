@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { LocalStrategy } from './utils/LocalStrategy';
 import { SessionSerializer } from './utils/SessionSerializer';
 import { DatabaseService } from 'src/database/database.service';
+import { GoogleLinkStrategy, GoogleLoginStrategy } from './utils/GoogleStrategy';
 
 @Module({
   imports: [DatabaseModule],
@@ -24,7 +25,9 @@ import { DatabaseService } from 'src/database/database.service';
       useClass: DatabaseService
     },
     LocalStrategy,
-    SessionSerializer
+    SessionSerializer,
+    GoogleLinkStrategy,
+    GoogleLoginStrategy
   ],
 })
 export class AuthModule {}
