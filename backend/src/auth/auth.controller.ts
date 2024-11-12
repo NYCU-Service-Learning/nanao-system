@@ -19,9 +19,7 @@ export class AuthController {
 
     @Get('google/login/callback')
     @UseGuards(AuthGuard('google-login'))
-    async googleAuthRedirect(@Request() req){
-        return this.authService.validateGoogleUser(req.user)
-    }
+    async googleAuthRedirect(@Request() req){}
 
     @Get('google/link')
     @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
@@ -29,9 +27,7 @@ export class AuthController {
 
     @Get('google/link/callback')
     @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
-    async googleLinkRedirect(@Request() req){
-        // return this.authService.linkGoogleAccount(req.user, req.user)
-    }
+    async googleLinkRedirect(@Request() req){}
 
     @Delete('logout')
     logout(@Request() req){
