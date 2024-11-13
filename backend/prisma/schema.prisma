@@ -18,6 +18,7 @@ model User{
   username      String        @unique
   password      String
   name          String
+  email         String?       @unique
   reg_time      DateTime      @default(now())
   role          Role
   userDetail    UserDetail?
@@ -36,7 +37,6 @@ model UserDetail{
   medical_History   String?
   headshot          String?
   address           String?
-  email             String?
   phone             String?
   updateAt          DateTime      @updatedAt
 }
