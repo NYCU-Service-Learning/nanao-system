@@ -87,4 +87,16 @@ export class UserService {
       throw new HttpException('user does not exist', HttpStatus.BAD_REQUEST)
     return user.id
   }
+
+  async findIdByEmail(email: string){
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        email: email,
+      }
+    })
+
+    if(!user)
+      throw new HttpException('email does not exist', HttpStatus.BAD_REQUEST)
+    return user.id
+  }
 }
