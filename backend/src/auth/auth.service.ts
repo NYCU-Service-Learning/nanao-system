@@ -24,8 +24,11 @@ export class AuthService {
     }
 
     async validateGoogleUser(profile: any): Promise<any> {
-        console.log("validateGoogleUser")
-        console.log(profile)
+        let user = await this.userService.findOne(await this.userService.findIdByEmail(profile.email));
+        if(!user){
+            return null;
+        }
+        return user
     }
 
     async linkGoogleAccount(user: any, profile: any): Promise<any> {
