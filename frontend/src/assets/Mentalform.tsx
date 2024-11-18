@@ -1,7 +1,10 @@
-import React from "react";
+import React, { Key } from "react";
 import { Form, Table, Radio } from "antd";
 import "./MentalForm.css"; // Import the CSS file
-
+type QuestionData = {
+  key: string; // Assuming keys are strings
+  question: string; // Question text
+};
 const dataSource = [
   { key: "1", question: "睡眠困難，譬如難以入睡、易醒或早醒。" },
   { key: "2", question: "感覺緊張不安。" },
@@ -12,8 +15,9 @@ const dataSource = [
 ];
 
 import { ColumnsType } from "antd/es/table";
+import { AnyObject } from "antd/es/_util/type";
 
-const columns: ColumnsType<any> = [
+const columns: ColumnsType<QuestionData> = [
   {
     title: "編號",
     align: "center" as "center",
@@ -90,7 +94,7 @@ const columns: ColumnsType<any> = [
 ];
 
 const MentalForm = () => {
-  const onFinish = (values: any) => {
+  const onFinish = (values: Record<string, string>) => {
     console.log("Received values of form: ", values);
   };
 
