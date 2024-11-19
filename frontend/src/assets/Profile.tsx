@@ -11,6 +11,7 @@ interface User {
   name: string;
   username: string;
   role: string;
+  email: string;
 }
 
 // 定義 UserData 介面，描述使用者詳細資料（如個人資訊）

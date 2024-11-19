@@ -15,10 +15,10 @@ datasource db {
 
 model User{
   id            Int           @id @default(autoincrement())
-  username      String        @unique
+  username      String        @unique 
   password      String
   name          String
-  email         String?       @unique
+  email         String       @unique
   reg_time      DateTime      @default(now())
   role          Role
   userDetail    UserDetail?
@@ -26,12 +26,12 @@ model User{
   hurtForms     HurtForm[]
   weekForms     WeekForm[]
   yearForms     YearForm[]
-  
 }
+
 model UserDetail{
   user              User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id           Int           @id
-  gender            Gender?
+  gender            Gender?       
   birthday          String?
   age               Int?
   medical_History   String?

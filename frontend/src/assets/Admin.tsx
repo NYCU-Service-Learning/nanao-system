@@ -13,6 +13,7 @@ interface User {
     name: string;
     username: string;
     role: string;
+    email: string;
 }
 
 // 定義 Userdata 的 interface，指定資料類型
@@ -37,11 +38,13 @@ interface AdminProps {
 // 定義 Admin component為一個 React Function Component 類型，傳入參數的interface為 AdminProps
 const Admin: React.FC<AdminProps> = ({ url }) => {
     // useState 是 React Hooks，用於管理 React component 的狀態，會觸發 component 的重新渲染
+    const [showValidation, setShowValidation] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [newUsername, setNewUsername] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [newName, setNewName] = useState('');
+    const [newEmail, setNewemail] = useState('');
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [editName, setEditName] = useState('');
@@ -81,7 +84,19 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
 
     // useNavigate 是一個 React Hook，用於導航到其他routes
     const navigate = useNavigate();
-
+    const handleValidateAndSubmit = () => {
+        // 檢查必填欄位
+        if (!newName || !newUsername || !newPassword) {
+            setShowValidation(true);
+            setErrMsg('請填寫所有必填欄位');
+            return;
+        }
+        
+        // 如果驗證通過，調用原本的 handleAddUser
+        handleAddUser();
+        setShowValidation(false);
+    };
+    
     const fetchUsers = async () => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user 路由
@@ -317,7 +332,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 name: newName,
                 username: newUsername,
                 password: newPassword,
-                // 預設新用戶 role 為 "USER"
+                email: newEmail || null,
                 role: "USER",
                 userDetail: {
                     create: {
@@ -326,7 +341,6 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                         age: 0,
                         medical_History: "",
                         address: "",
-                        email: "",
                         phone: "",
                         headshot: "0"
                     }
@@ -516,29 +530,53 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                         <Form>
                             {/*姓名輸入欄位*/}
                             <Form.Group controlId="formName">
-                                <Form.Label>姓名</Form.Label>
+                                <Form.Label>姓名 <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
+                                    required
+                                    isInvalid={!newName && showValidation}
                                 />
+                                <Form.Control.Feedback type="invalid">
+                                    請輸入姓名
+                                </Form.Control.Feedback>
                             </Form.Group>
                             {/*帳號輸入欄位*/}
                             <Form.Group controlId="formUsername" className="mt-3">
-                                <Form.Label>帳號</Form.Label>
+                                <Form.Label>帳號 <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={newUsername}
                                     onChange={(e) => setNewUsername(e.target.value)}
+                                    required
+                                    isInvalid={!newUsername && showValidation}
                                 />
+                                <Form.Control.Feedback type="invalid">
+                                    請輸入帳號
+                                </Form.Control.Feedback>
                             </Form.Group>
                             {/*密碼輸入欄位*/}
                             <Form.Group controlId="formPw" className="mt-3">
-                                <Form.Label>密碼</Form.Label>
+                                <Form.Label>密碼 <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                    isInvalid={!newPassword && showValidation}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    請輸入密碼
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            {/*Email欄位*/}
+                            <Form.Group controlId="formEmail" className="mt-3">
+                                <Form.Label>電子郵件</Form.Label>
+                                <Form.Control
+                                    type="email"
+                                    value={newEmail}
+                                    onChange={(e) => setNewemail(e.target.value)}
                                 />
                             </Form.Group>
                         </Form>
@@ -547,7 +585,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                     </Modal.Body>
                     <Modal.Footer>
                         {/*送出按鈕，點擊時調用handleAddUser函數*/}
-                        <Button variant="outline-primary" onClick={handleAddUser}>
+                        <Button variant="outline-primary" onClick={handleValidateAndSubmit}>
                             送出
                         </Button>
                     </Modal.Footer>

@@ -94,9 +94,9 @@ export class UserService {
         email: email,
       }
     })
-
+    
     if(!user)
-      throw new HttpException('email does not exist', HttpStatus.BAD_REQUEST)
+      return null
     return user.id
   }
 }
