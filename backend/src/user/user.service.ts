@@ -42,8 +42,10 @@ export class UserService {
     try{
       const user = await this.findOne(id)
       let hashedUpdateUser = {
-        ...updateUserDto,
-        password: await bcrypt.hash(updateUserDto.password.toString(), 10)
+        ...updateUserDto
+      }
+      if (updateUserDto.password) {
+        hashedUpdateUser.password = await bcrypt.hash(updateUserDto.password.toString(), 10)
       }
       return await this.databaseService.user.update({
         where:{
