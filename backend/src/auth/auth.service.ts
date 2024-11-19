@@ -55,8 +55,6 @@ export class AuthService {
     }
   }
   async linkGoogleAccount(user: any, profile: any): Promise<any> {
-    console.log("linkGoogleAccount")
-    console.log(user)
-    console.log(profile)
+    await this.userService.update(user.id, {email: profile.email})
   }
 }
