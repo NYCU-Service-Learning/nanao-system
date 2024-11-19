@@ -11,11 +11,13 @@ import NotFound from './assets/NotFound';
 import Profile from './assets/Profile';
 import Admin from './assets/Admin';
 import Stat from './assets/Stat';
+import Mentalform from './assets/mentalform'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import withAuthRedirect from './assets/withAuthRedirect';
 
 const InteractWithAuth = withAuthRedirect(Interact);
+const MentalformWithAuth = withAuthRedirect(Mentalform);
 const ProfileWithAuth = withAuthRedirect(Profile);
 const AdminWithAuth = withAuthRedirect(Admin);
 const StatWithAuth = withAuthRedirect(Stat);
@@ -36,6 +38,7 @@ function App() {
             <Routes>
               <Route path="/home" element={<Home />} />
               <Route path="/interact" element={<InteractWithAuth user={cookies.user} />} />
+              <Route path="/mentalform" element={<MentalformWithAuth user={cookies.user} />} />
               <Route path="/login" element={<Login url={url} />} />
               <Route path="/logout" element={<Logout url={url} />} />
               <Route path="/profile" element={<ProfileWithAuth user={cookies.user} url={url} />} />

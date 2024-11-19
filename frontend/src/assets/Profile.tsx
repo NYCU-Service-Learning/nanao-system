@@ -1,10 +1,10 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
+// import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
-import { isNullOrUndef } from 'chart.js/helpers';
+// import { isNullOrUndef } from 'chart.js/helpers';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
 interface User {
@@ -50,7 +50,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
-  const [key, setKey] = useState(0);
+  const [key, ] = useState(0);
 
   // 定義一個異步函數 `getUserID`，根據使用者名稱從伺服器取得使用者 ID
   const getUserID = async (username: string) => {

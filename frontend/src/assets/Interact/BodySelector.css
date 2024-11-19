@@ -1,14 +1,17 @@
-
+/* Main container for body selector, centers content */
 .BodySelector {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+/* Side selector container, also centers content */
 #SideSelector {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
+/* SVG styling for body selector */
 .BodySelector svg{
   margin: 100px auto;
   width: 60vh;
@@ -16,10 +19,11 @@
   cursor: pointer;
 }
 
+/* SVG path styling with smooth transition effect */
 .BodySelector svg path {
     transition: filter 0.3s ease-in-out;  /* Smooth transition for the glow effect */
 }
-
+/* SVG path hover effect with layered glow */
 .BodySelector svg path:hover {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.75))  /* White glow */
             drop-shadow(0 0 10px rgba(255, 255, 255, 0.75))  /* Stronger white glow */

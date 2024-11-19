@@ -10,7 +10,7 @@ const Logout = ({ url }) => {
 
   // 使用 useCookies 來取得 cookies 的相關功能
   // 這裡我們需要 removeCookie 來刪除 'user' 的 cookie
-  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const [, , removeCookie] = useCookies(['user']);
 
   // 當組件(component)被渲染時，或 navigate, removeCookie, url 中任一依賴值改變時，useEffect 會觸發
   useEffect(() => {

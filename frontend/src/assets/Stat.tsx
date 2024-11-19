@@ -26,6 +26,13 @@ interface StatProps {
   url: string;
 }
 
+// Define a type for the query parameters
+interface QueryParams {
+    start?: string;
+    end?: string;
+  }
+  
+
 // 定義 Stat component 為一個 React Function Component，傳入參數的 interface 為 StatProps
 const Stat: React.FC<StatProps> = ({ url }) => {
 
@@ -216,7 +223,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
     const fetchUserhurt = async (id: string) => {
         try {
             // params 為查詢時間區間
-            const params: any = {};
+            const params: QueryParams = {};
             if (searchDatefrom) {
                 params.start = moment.tz(searchDatefrom, 'Asia/Taipei').startOf('day').toISOString();
                 console.log(params.start);
@@ -249,7 +256,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
     // 使用後端API取得使用者的一週內是否疼痛資料
     const fetchUserweek = async (id: string) => {
         try {
-            const params: any = {};
+            const params: QueryParams = {};
             if (searchDatefrom) {
                 params.start = moment.tz(searchDatefrom, 'Asia/Taipei').startOf('day').toISOString();
             }
@@ -280,7 +287,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
     // 使用後端API取得使用者的一年內是否影響正常生活資料
     const fetchUseryear = async (id: string) => {
         try {
-            const params: any = {};
+            const params: QueryParams = {};
             if (searchDatefrom) {
                 params.start = moment.tz(searchDatefrom, 'Asia/Taipei').startOf('day').toISOString();
             }
