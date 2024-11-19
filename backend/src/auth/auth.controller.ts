@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Inject, Post, Request, UseGuards, Res, R
 import { AuthService } from './auth.service';
 import { AdminOrSameUserIdGuard, AuthenticatedGuard, LocalAuthGuard } from './utils/guards/LocalGuard';
 import { AuthGuard } from '@nestjs/passport';
+import { GoogleAuthGuard } from './utils/guards/GoogleGuard';
 
 @Controller('auth')
 export class AuthController {
@@ -14,12 +15,14 @@ export class AuthController {
     }
 
     @Get('google/login')
-    @UseGuards(AuthGuard('google-login'))
+    @UseGuards(GoogleAuthGuard)
     async googleAuth(@Request() req){}
 
     @Get('google/login/callback')
-    @UseGuards(AuthGuard('google-login'))
-    async googleAuthRedirect(@Request() req){}
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Request() req){
+        return true;
+    }
 
     @Get('google/link')
     @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
