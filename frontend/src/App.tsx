@@ -11,7 +11,7 @@ import NotFound from './assets/NotFound';
 import Profile from './assets/Profile';
 import Admin from './assets/Admin';
 import Stat from './assets/Stat';
-import Mentalform from './assets/mentalform'
+import Mentalform from './assets/Mentalform'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import withAuthRedirect from './assets/withAuthRedirect';
