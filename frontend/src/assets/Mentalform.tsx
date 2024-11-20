@@ -1,5 +1,5 @@
 import { Form, Table, Radio } from "antd";
-import "./MentalForm.css"; // Import the CSS file
+import "./Mentalform.css"; // Import the CSS file
 type QuestionData = {
   key: string; // Assuming keys are strings
   question: string; // Question text
