@@ -68,7 +68,10 @@ export class AuthController {
 
   @Get('google/link/callback')
   @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
-  async googleLinkRedirect(@Request() req){}
+  async googleLinkRedirect(@Request() req, @Res() res: Response){
+    const status = req.query.status
+    return res.redirect(`http://localhost:5173/profile?googleLink=${status}`);
+  }
 
   @Delete('logout')
   logout(@Request() req){

@@ -55,7 +55,7 @@ export class UserService {
       });
     } catch(error){
       if (error.message.includes('Unique constraint')) {
-        throw new ConflictException('username already exists')
+        throw new ConflictException('username or email already exists')
       } else if(error.message.includes('Unknown argument')){
         throw new BadRequestException('bad request, unknown labels is included')
       } else {
