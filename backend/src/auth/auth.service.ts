@@ -29,7 +29,7 @@ export class AuthService {
       if (!userId) {
         const newUser = {
           username: profile.email,
-          password: "third_party",
+          password: "third_party!@#$",
           name: profile.name,
           email: profile.email,
           role: Role.USER,
