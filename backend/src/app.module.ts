@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import { HurtformModule } from './hurtform/hurtform.module';
 import { YearformModule } from './yearform/yearform.module';
 import { WeekformModule } from './weekform/weekform.module';
+import { SttChineseModule } from './stt-chinese/stt-chinese.module';
 import { UserModule } from './user/user.module';
 import { UserDetailModule } from './user-detail/user-detail.module';
 import { ConfigModule } from '@nestjs/config';
@@ -20,6 +21,7 @@ import { APP_GUARD } from '@nestjs/core'
     HurtformModule, 
     YearformModule, 
     WeekformModule, 
+    SttChineseModule,
     UserModule, 
     UserDetailModule, 
     AuthModule,
