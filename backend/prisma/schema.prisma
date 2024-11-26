@@ -19,6 +19,7 @@ model User{
   password      String
   name          String
   email         String?       @unique
+  lineId        String?       @unique
   reg_time      DateTime      @default(now())
   role          Role
   userDetail    UserDetail?
