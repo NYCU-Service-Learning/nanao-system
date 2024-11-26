@@ -104,4 +104,34 @@ export class WeekformService {
       }
     })
   }
+  async updateUserId(id: number, userId: number) {
+    // Check if weekform exists
+    const weekform = await this.databaseService.weekForm.findUnique({
+      where:{
+        id: id
+      }
+    })
+    if (!weekform){
+      throw new HttpException(`weekform ${id} not found.`, HttpStatus.BAD_REQUEST);
+    }
+
+    // Check if user exists
+    const user = await this.databaseService.user.findUnique({
+      where:{
+        id: userId
+      }
+    })
+    if (!user){
+      throw new HttpException(`User ${userId} not found.`, HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.databaseService.weekForm.update({
+      where:{
+        id: id
+      },
+      data:{
+        user: {connect: {id: userId}}
+      }
+    })
+  }
 }

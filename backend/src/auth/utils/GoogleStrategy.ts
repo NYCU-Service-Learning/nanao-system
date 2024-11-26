@@ -49,11 +49,12 @@ export class GoogleLinkStrategy extends PassportStrategy(Strategy, 'google-link'
       await this.authService.linkGoogleAccount(currentUser, user);
       req.query.status = 'Success'
     } catch (error) {
-      if (error.name.includes('Conflict')) {
-        req.query.status = 'Conflict'
-      } else {
-        req.query.status = 'Fail'
-      }
+      // if (error.name.includes('Conflict')) {
+      //   req.query.status = 'Conflict'
+      // } else {
+      req.query.status = 'Fail'
+      console.log(error);
+      // }
     }
     done(null, user);
   }
