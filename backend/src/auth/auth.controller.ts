@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { AdminOrSameUserIdGuard, AuthenticatedGuard, LocalAuthGuard } from './utils/guards/LocalGuard';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from './utils/guards/GoogleGuard';
+import { LineAuthGuard } from './utils/guards/LineGuard';
 
 @Controller('auth')
 export class AuthController {
@@ -46,6 +47,37 @@ export class AuthController {
     }
   }
 
+  @Get('line/login')
+  @UseGuards(LineAuthGuard)
+  async lineAuth(@Request() req) {}
+
+  @Get('line/login/callback')
+  @UseGuards(LineAuthGuard)
+  async lineAuthRedirect(@Query('error') error: string, @Request() req, @Res() res: Response) {
+    if (error === 'access_denied') {
+      return res.redirect('http://localhost:5173/login?lineLogin=failed');
+    }
+    console.log(error);
+    try {
+      if (req.user){
+        req.session.user = req.user;
+        await req.session.save(); 
+        res.cookie('user', req.user.username, {
+          maxAge: 60 * 60 * 1000, // 1 hour
+          httpOnly: false,
+          secure: false,
+          path: '/',
+          sameSite: 'lax'
+        });
+        return res.redirect(`http://localhost:5173/login?lineLogin=success&username=${encodeURIComponent(req.user.username)}`);
+      }
+      return res.redirect('http://localhost:5173/login?lineLogin=failed');
+    } catch (error) {
+      console.error('Line callback error:', error);
+      return res.redirect('http://localhost:5173/login?lineLogin=error');
+    }
+  }
+
   @Get('status')
   async checkLoginStatus(@Request() req, @Res() res: Response) {
     if (req.session.user) {
@@ -71,6 +103,17 @@ export class AuthController {
   async googleLinkRedirect(@Request() req, @Res() res: Response){
     const status = req.query.status
     return res.redirect(`http://localhost:5173/profile?googleLink=${status}`);
+  }
+
+  @Get('line/link')
+  @UseGuards(AuthenticatedGuard, AuthGuard('line-link'))
+  async lineLink(@Request() req){}
+
+  @Get('line/link/callback')
+  @UseGuards(AuthenticatedGuard, AuthGuard('line-link'))
+  async lineLinkRedirect(@Request() req, @Res() res: Response){
+    const status = req.query.status
+    return res.redirect(`http://localhost:5173/profile?lineLink=${status}`);
   }
 
   @Delete('logout')

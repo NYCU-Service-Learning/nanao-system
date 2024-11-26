@@ -61,6 +61,11 @@ export class AuthService {
       throw error;
     }
   }
+
+  async validateLineUser(profile: any): Promise<any> {
+    console.log(profile);
+  }
+
   async linkGoogleAccount(user: any, profile: any): Promise<any> {
     // TODO: check if the email is already used by another account
     // if yes, merge two accounts
@@ -92,5 +97,10 @@ export class AuthService {
       await this.userService.remove(existingUser.id);
     }
     await this.userService.update(user.id, {email: profile.email})
+  }
+
+  async linkLineAccount(user: any, profile: any): Promise<any> {
+    console.log(user);
+    console.log(profile);
   }
 }

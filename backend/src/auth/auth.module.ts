@@ -10,6 +10,8 @@ import { GoogleLinkStrategy, GoogleLoginStrategy } from './utils/GoogleStrategy'
 import { HurtformService } from 'src/hurtform/hurtform.service';
 import { WeekformService } from 'src/weekform/weekform.service';
 import { YearformService } from 'src/yearform/yearform.service';
+import { LineLoginStrategy } from './utils/LineStrategy';
+import { LineLinkStrategy } from './utils/LineStrategy';
 
 @Module({
   imports: [DatabaseModule],
@@ -42,7 +44,9 @@ import { YearformService } from 'src/yearform/yearform.service';
     LocalStrategy,
     SessionSerializer,
     GoogleLinkStrategy,
-    GoogleLoginStrategy
+    GoogleLoginStrategy,
+    LineLoginStrategy,
+    LineLinkStrategy
   ],
 })
 export class AuthModule {}
