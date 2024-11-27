@@ -28,6 +28,9 @@ services:
     build:
       context: ./avatar_backend
       dockerfile: Dockerfile
+    volumes:
+      - ./avatar_backend/avatar_styled:/app/avatar_styled
+      - ./avatar_backend/avatar_upload:/app/avatar_upload
     ports:
       - "8001:8001"
 
