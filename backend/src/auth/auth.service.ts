@@ -69,8 +69,10 @@ export class AuthService {
   async linkGoogleAccount(user: any, profile: any): Promise<any> {
     // TODO: check if the email is already used by another account
     // if yes, merge two accounts
-    const existingUser = await this.userService.findOne(await this.userService.findIdByEmail(profile.email));
-    if(existingUser.id != user.id){
+    const existingId = await this.userService.findIdByEmail(profile.email);
+    const existingUser = (existingId) ? await this.userService.findOne(existingId) : null;
+    
+    if(existingUser && existingUser.id != user.id){
       // merge two accounts
       // Note: emotion form should be add when merge to main branch
       
