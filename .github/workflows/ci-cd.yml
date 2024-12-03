@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js Environment for Backend
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 'node'
 
       - name: Install Dependencies for Backend
         working-directory: ./backend
@@ -39,7 +39,7 @@ jobs:
       - name: Set up Node.js Environment for Frontend
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 'node'
 
       - name: Install Dependencies for Frontend
         working-directory: ./frontend
