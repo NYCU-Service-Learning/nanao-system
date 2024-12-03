@@ -106,7 +106,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
         setLinkMsg('');
         break;
     }
-  }, [googleStatus]);
+  }, [googleStatus, lineStatus]);
 
   // 使用 useEffect 根據 userData 和 userId 來更新頭像 URL
   useEffect(() => {
