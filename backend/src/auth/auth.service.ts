@@ -102,7 +102,6 @@ export class AuthService {
   }
 
   async linkLineAccount(user: any, profile: any): Promise<any> {
-    console.log(user);
-    console.log(profile);
+    await this.userService.update(user.id, {lineId: profile.userId})
   }
 }
