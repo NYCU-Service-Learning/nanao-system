@@ -1,4 +1,4 @@
-FROM node:16-alpine AS build
+FROM node:alpine AS build
 WORKDIR /app
 RUN apk add --no-cache --virtual .build-deps build-base python3
 COPY package*.json ./
@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 RUN apk del .build-deps
 
-FROM node:16-alpine
+FROM node:alpine
 WORKDIR /app
 RUN apk add --no-cache bash
 COPY --from=build /app .
