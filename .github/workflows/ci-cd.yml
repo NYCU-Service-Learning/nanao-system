@@ -88,6 +88,13 @@ jobs:
           docker build -t userwei/nycu_service-learning-nanao:frontend .
           docker push userwei/nycu_service-learning-nanao:frontend
 
+      # - name: Build and Push Docker Image for Avatar Frontend
+      #   working-directory: ./avatar_backend
+      #   run: |
+      #     IMAGE_TAG=${{ github.sha }}
+      #     docker build -t userwei/nycu_service-learning-nanao:avatar_backend .
+      #     docker push userwei/nycu_service-learning-nanao:avatar_backend
+
       # - name: Deploy Application via SSH
       #   if: ${{ github.ref == 'refs/heads/main' }}
       #   uses: appleboy/ssh-action@v0.1.7
