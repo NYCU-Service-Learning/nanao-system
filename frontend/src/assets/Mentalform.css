@@ -1,0 +1,36 @@
+/* Center the form on the page */
+.mental-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-color: #f7f7f7; /* Light background color */
+  }
+  
+  /* Add spacing and styling to the form */
+  .mental-form {
+    width: 80%; /* Adjust width as needed */
+    max-width: 1000px; /* Limit the form width */
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #d9d9d9; /* Light border */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  /* Submit button styling */
+  .submit-button {
+    padding: 8px 16px;
+    background-color: #6D972C; /* Green color */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #5b8225; /* Darker green on hover */
+  }
+  
