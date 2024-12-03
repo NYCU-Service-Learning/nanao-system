@@ -23,6 +23,17 @@ services:
       db:
         condition: service_healthy
 
+  avatar_backend:
+    image: userwei/nycu_service-learning-nanao:avatar_backend
+    build:
+      context: ./avatar_backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./avatar_backend/avatar_styled:/app/avatar_styled
+      - ./avatar_backend/avatar_upload:/app/avatar_upload
+    ports:
+      - "8001:8001"
+
   db:
     image: mysql:8.0
     environment:
