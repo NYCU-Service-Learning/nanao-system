@@ -53,6 +53,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [lineCanLink, setLineCanLink] = useState(false);
   const [googleCanLink, setGoogleCanLink] = useState(false);
+  const [canLink, setCanLink] = useState(false);
   const [linkMsg, setLinkMsg] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
@@ -80,6 +81,11 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
         }
       } else {
         fetchUserData(userId);
+        if (fetchedId && userId == fetchedId) {
+          setCanLink(true);
+        } else {
+          setCanLink(false);
+        }
       }
     };
 
@@ -118,10 +124,10 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
 
   useEffect(() => {
     if(users){
-      setGoogleCanLink(users.email ? false : true);
-      setLineCanLink(users.lineId ? false : true);
+      setGoogleCanLink(canLink && !users.email ? true : false);
+      setLineCanLink(canLink && !users.lineId ? true : false);
     }
-  }, [users]);
+  }, [users, canLink]);
 
   // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
