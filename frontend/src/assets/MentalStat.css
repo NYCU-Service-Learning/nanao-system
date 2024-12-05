@@ -1,0 +1,13 @@
+.chart-container {
+  display: flex;
+  flex-direction: column; /* Arrange nav bar on top */
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.nav-bar {
+  align-self: flex-start; /* Align navigation bar to the top-left */
+  margin-bottom: 20px;
+  width: 100%;
+}
