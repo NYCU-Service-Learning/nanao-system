@@ -100,6 +100,7 @@ export class AuthService {
     // if yes, merge two accounts
     const existingId = await this.userService.findIdByEmail(profile.email);
     const existingUser = (existingId) ? await this.userService.findOne(existingId) : null;
+    const existingLine = (existingUser) ? existingUser.lineId : null;
     
     if(existingUser && existingUser.id != user.id && existingUser.role != Role.ADMIN){
       // merge two accounts
@@ -127,10 +128,48 @@ export class AuthService {
       }
       await this.userService.remove(existingUser.id);
     }
-    await this.userService.update(user.id, {email: profile.email})
+    const updateData: any = {email: profile.email};
+    if (existingLine !== null) {
+      updateData.lineId = existingLine;
+    }
+    await this.userService.update(user.id, updateData);
   }
 
   async linkLineAccount(user: any, profile: any): Promise<any> {
-    await this.userService.update(user.id, {lineId: profile.userId})
+    const existingId = await this.userService.findIdByLine(profile.userId);
+    const existingUser = (existingId) ? await this.userService.findOne(existingId) : null;
+    const existingEmail = (existingUser) ? existingUser.email : null;
+    
+    if(existingUser && existingUser.id != user.id && existingUser.role != Role.ADMIN){
+      // merge two accounts
+      // Note: emotion form should be add when merge to main branch
+      
+      const forms = ['hurtform', 'Weekform', 'yearform'];
+      const formServices = {
+        hurtform: this.HurtformService,
+        Weekform: this.WeekformService,
+        yearform: this.YearformService
+      };
+      try{
+        for (const form of forms) {
+          const formService = formServices[form];
+          const existingForms = (await formService.findMany(existingUser.id)).data;
+          if (existingForms) {
+            for (const existingForm of existingForms) {
+              await formService.updateUserId(existingForm.id, user.id);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error in linkLineAccount:', error);
+        throw error;
+      }
+      await this.userService.remove(existingUser.id);
+    }
+    const updateData: any = {lineId: profile.userId};
+    if (existingEmail !== null) {
+      updateData.email = existingEmail;
+    }
+    await this.userService.update(user.id, updateData);
   }
 }
