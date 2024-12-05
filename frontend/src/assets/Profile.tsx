@@ -12,6 +12,7 @@ interface User {
   username: string;
   role: string;
   email: string;
+  lineId: string;
 }
 
 // 定義 UserData 介面，描述使用者詳細資料（如個人資訊）
@@ -45,11 +46,13 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   // 定義組件的狀態
   const query = useQuery();
   const id = query.get('id');
-  const status = query.get('googleLink');
+  const googleStatus = query.get('googleLink');
+  const lineStatus = query.get('lineLink');
   const [users, setUsers] = useState<User | null>(null);
   const [userId, setUserId] = useState<string | null>(id || null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [canLink, setCanLink] = useState(false);
+  const [lineCanLink, setLineCanLink] = useState(false);
+  const [googleCanLink, setGoogleCanLink] = useState(false);
   const [linkMsg, setLinkMsg] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
@@ -74,15 +77,9 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
         if (fetchedId) {
           setUserId(fetchedId);
           fetchUserData(fetchedId);
-          setCanLink(false);
         }
       } else {
         fetchUserData(userId);
-        if (fetchedId && userId == fetchedId) {
-          setCanLink(true);
-        } else {
-          setCanLink(false);
-        }
       }
     };
 
@@ -91,21 +88,21 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   }, [userId, user]);
 
   useEffect(() => {
-    switch(status){
+    switch(googleStatus || lineStatus){
       case 'Success':
-        setLinkMsg('Google帳號連結成功!');
+        setLinkMsg('第三方帳號連結成功!');
         break;
-      case 'Conflict':
-        setLinkMsg('該Google帳號已連結至其他使用者');
-        break;
+      /*case 'Conflict':
+        setLinkMsg('該第三方帳號已連結至其他使用者');
+        break;*/
       case 'Fail':
-        setLinkMsg('Google帳號連結失敗, 請重試');
+        setLinkMsg('帳號連結失敗, 請重試');
         break;
       default:
         setLinkMsg('');
         break;
     }
-  }, [status]);
+  }, [googleStatus, lineStatus]);
 
   // 使用 useEffect 根據 userData 和 userId 來更新頭像 URL
   useEffect(() => {
@@ -118,6 +115,13 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
       }
     }
   }, [userData, userId]);
+
+  useEffect(() => {
+    if(users){
+      setGoogleCanLink(users.email ? false : true);
+      setLineCanLink(users.lineId ? false : true);
+    }
+  }, [users]);
 
   // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
@@ -144,6 +148,10 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
 
   const handleGoogleLink = () => {
     window.location.href = `${url}auth/google/link`;
+  };
+
+  const handleLineLink = () => {
+    window.location.href = `${url}auth/line/link`;
   };
 
   // 定義預設的使用者詳細資料（如果未能取得 userData，則使用該預設值）
@@ -185,9 +193,11 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
         <div><span className="label">地址：</span>{displayData.address || '無'}</div>
         <div><span className="label">過去病史：</span>{displayData.medical_History || '無'}</div>
         {/* Same user */}
-        {canLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleGoogleLink}>連結 Google 帳號</button>}
+        {googleCanLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleGoogleLink}>連結 Google 帳號</button>}
+        &nbsp;
+        {lineCanLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleLineLink}>連結 Line 帳號</button>}
         {/* show google link message */}
-        {linkMsg && <span className="linkmsg" style={{ color: status === 'Success' ? 'green' : 'red' }}>{linkMsg}</span>}
+        {linkMsg && <span className="linkmsg" style={{ color: (googleStatus || lineStatus) === 'Success' ? 'green' : 'red' }}>{linkMsg}</span>}
       </div>
 
       {/* 若有錯誤訊息則顯示 */}

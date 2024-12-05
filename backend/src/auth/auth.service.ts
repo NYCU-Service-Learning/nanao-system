@@ -101,7 +101,7 @@ export class AuthService {
     const existingId = await this.userService.findIdByEmail(profile.email);
     const existingUser = (existingId) ? await this.userService.findOne(existingId) : null;
     
-    if(existingUser && existingUser.id != user.id){
+    if(existingUser && existingUser.id != user.id && existingUser.role != Role.ADMIN){
       // merge two accounts
       // Note: emotion form should be add when merge to main branch
       
@@ -131,7 +131,6 @@ export class AuthService {
   }
 
   async linkLineAccount(user: any, profile: any): Promise<any> {
-    console.log(user);
-    console.log(profile);
+    await this.userService.update(user.id, {lineId: profile.userId})
   }
 }
