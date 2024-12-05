@@ -70,7 +70,7 @@ export class AuthService {
           username: profile.displayName,
           password: "third_party!@#$",
           name: profile.displayName,
-          email: "",
+          email: null,
           role: Role.USER,
           lineId: profile.userId,
           reg_time: new Date(),
