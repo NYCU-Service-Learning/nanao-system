@@ -101,4 +101,16 @@ export class UserService {
       return null
     return user.id
   }
+
+  async findIdByLine(lineId: string){
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        lineId: lineId,
+      }
+    })
+    
+    if(!user)
+      return null
+    return user.id
+  }
 }

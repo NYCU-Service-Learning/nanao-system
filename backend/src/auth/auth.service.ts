@@ -63,7 +63,36 @@ export class AuthService {
   }
 
   async validateLineUser(profile: any): Promise<any> {
-    console.log(profile);
+    try {
+      const userId = await this.userService.findIdByLine(profile.userId);
+      if (!userId) {
+        const newUser = {
+          username: profile.displayName,
+          password: "third_party!@#$",
+          name: profile.displayName,
+          email: "",
+          role: Role.USER,
+          lineId: profile.userId,
+          reg_time: new Date(),
+          userDetail: {
+            create: {
+                gender: null,
+                birthday: "",
+                age: 0,
+                medical_History: "",
+                address: "",
+                phone: "",
+                headshot: "0"
+            }
+          }
+        };
+        return await this.userService.create(newUser);
+      }
+      return await this.userService.findOne(userId);
+    } catch (error) {
+      console.error('Error in validateLineUser:', error);
+      throw error;
+    }
   }
 
   async linkGoogleAccount(user: any, profile: any): Promise<any> {
