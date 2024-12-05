@@ -40,6 +40,25 @@ const Login: React.FC<LoginProps> = ({ url }) => {
     }
   }, [setCookie]);
 
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const lineLogin = urlParams.get('lineLogin');
+    const username = urlParams.get('username');
+
+    if (lineLogin === 'success' && username) {
+      const expires = new Date();
+      expires.setTime(expires.getTime() + 60 * 60 * 1000);
+      setCookie("user", username, { 
+        path: "/", 
+        expires,
+        sameSite: 'lax'
+      });
+      setSuccess(true);
+    } else if (lineLogin === 'failed' || lineLogin === 'error') {
+      setErrMsg('Google 登入失敗，請重試');
+    }
+  }, [setCookie]);
+
   // 添加一個狀態檢查函數
   const checkAuthStatus = async () => {
     try {
