@@ -34,7 +34,7 @@
           dockerfile: Dockerfile
         ports:
           - "5173:80"
-
+      
       backend:
         image: userwei/nycu_service-learning-nanao:backend
         build:
@@ -50,6 +50,17 @@
         depends_on:
           db:
             condition: service_healthy
+
+      avatar_backend:
+        image: userwei/nycu_service-learning-nanao:avatar_backend
+        build:
+          context: ./avatar_backend
+          dockerfile: Dockerfile
+        volumes:
+          - ./avatar_backend/avatar_styled:/app/avatar_styled
+          - ./avatar_backend/avatar_upload:/app/avatar_upload
+        ports:
+          - "8001:8001"
 
       db:
         image: mysql:8.0
@@ -71,6 +82,7 @@
 
     volumes:
       db-data:
+
     ```
 3. **創建 `init-db.sql` 文件**：  
     在專案目錄中創建一個名為 `init-db.sql` 的文件，並填入以下內容：  
@@ -113,3 +125,4 @@
 3. 管理員與使用者的帳號名稱在建立後無法更改。
 4. 登入階段會在登入 1 小時後過期，過期後需重新登入。
 5. 若 AI 頭貼系統無法使用，請稍等約 10 分鐘後重試。
+6. AI 頭貼系統已包進 Docker Compose and Image，由於是使用純 CPU 運算，需要 32 GB 以上的記憶體才能啟動，不然會 exit
