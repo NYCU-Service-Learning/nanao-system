@@ -348,7 +348,10 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             setNewPassword('');
         } catch (error) {
             // 錯誤處理
-            setErrMsg('Error adding user.');
+            message.error('新增用戶時發生錯誤');  
+            setNewName('');
+            setNewUsername('');
+            setNewPassword('');
         }
     };
 
@@ -565,9 +568,11 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                 />
                             </Form.Group>
                             {/*送出按鈕，點擊時調用handleAddUser函數*/}
-                            <Button type="submit" variant="outline-primary" className="mt-3">
-                                送出
-                            </Button>
+                            <div className="d-flex justify-content-end">
+                                <Button type="submit" variant="outline-primary" className="mt-3">
+                                    送出
+                                </Button>
+                            </div>
                         </Form>
                         {/*錯誤訊息顯示區*/}
                         <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</div>
