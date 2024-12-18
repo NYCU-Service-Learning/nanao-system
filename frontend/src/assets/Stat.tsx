@@ -422,6 +422,8 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                             className="me-3"
                             value={searchDatefrom}
                             onChange={e => setSearchDatefrom(e.target.value)}
+                            min="0001-01-01"
+                            max="9999-12-31"
                         />
                         <div className="text-center me-3" style={{ width: '30px' }}>至</div>
                         {/* 查詢日期設定(to) */}
@@ -430,6 +432,8 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                             className="me-3"
                             value={searchDateto}
                             onChange={e => setSearchDateto(e.target.value)}
+                            min="0001-01-01"
+                            max="9999-12-31"
                         />
                         {/* 送出表單按鈕 */}
                         <Button variant="outline-success" type="submit" className="me-3">搜尋</Button>
