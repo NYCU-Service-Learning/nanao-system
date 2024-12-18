@@ -51,14 +51,14 @@
           db:
             condition: service_healthy
 
-      avatar_backend:
-        image: userwei/nycu_service-learning-nanao:avatar_backend
+      backend_avatar:
+        image: userwei/nycu_service-learning-nanao:backend_avatar
         build:
-          context: ./avatar_backend
+          context: ./backend_avatar
           dockerfile: Dockerfile
         volumes:
-          - ./avatar_backend/avatar_styled:/app/avatar_styled
-          - ./avatar_backend/avatar_upload:/app/avatar_upload
+          - ./backend_avatar/avatar_styled:/app/avatar_styled
+          - ./backend_avatar/avatar_upload:/app/avatar_upload
         ports:
           - "8001:8001"
 

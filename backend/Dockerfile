@@ -12,11 +12,11 @@ RUN apk del .build-deps
 
 FROM node:alpine
 WORKDIR /app
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash openssl
 COPY --from=build /app .
 RUN npm install --production
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /usr/wait-for-it.sh
 RUN chmod +x /usr/wait-for-it.sh
 EXPOSE 3000
 ENTRYPOINT ["/usr/wait-for-it.sh", "db:3306", "--strict", "--timeout=300", "--"]
-CMD npx prisma migrate deploy && node /app/initDB.js && node dist/src/main
+CMD ["sh", "-c", "npx prisma migrate deploy && node /app/initDB.js && node dist/src/main"]

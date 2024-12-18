@@ -230,7 +230,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             // 設定上傳狀態為 true
             setUploading(true);
             // 使用 axios 發送 POST 請求到指定 url
-            const response = await axios.post(`https://elk-on-namely.ngrok-free.app/upload?user_id=${editUserID.toString()}`,
+            const response = await axios.post(`http://localhost:8001/upload?user_id=${editUserID.toString()}`,
                 formData
                 , {
                     headers: {
@@ -375,9 +375,9 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         // 根據使用者名稱取得 ID
         const editUserID = await getUserID(username);
         // 設定AI生成的頭像圖片 url
-        setAiImgSrc1(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca1-${editUserID}.jpg`);
-        setAiImgSrc2(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca2-${editUserID}.jpg`);
-        setAiImgSrc3(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca3-${editUserID}.jpg`);
+        setAiImgSrc1(`http://localhost:8001/avatar_styled/styled-ca1-${editUserID}.jpg`);
+        setAiImgSrc2(`http://localhost:8001/avatar_styled/styled-ca2-${editUserID}.jpg`);
+        setAiImgSrc3(`http://localhost:8001/avatar_styled/styled-ca3-${editUserID}.jpg`);
         
         setShowEditAiModal(true);
         setShowEditImgModal(false);

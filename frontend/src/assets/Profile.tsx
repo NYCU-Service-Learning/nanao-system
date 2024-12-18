@@ -86,10 +86,10 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   useEffect(() => {
     if(userData){
       if(userData.headshot !== "0"){
-        setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca${userData.headshot}-${userId}.jpg`);
+        setAvatarUrl(`http://localhost:8001/avatar_styled/styled-ca${userData.headshot}-${userId}.jpg`);
       }
       if(userData.headshot === "4"){
-        setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_original/original-${userId}.jpg`);
+        setAvatarUrl(`http://localhost:8001/avatar_original/original-${userId}.jpg`);
       }
     }
   }, [userData, userId]);
