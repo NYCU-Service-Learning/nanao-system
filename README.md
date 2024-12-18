@@ -108,10 +108,11 @@
     ```
     若顯示以下內容即為正常運行。  
     ```bash=
-    NAME                                     IMAGE                                          COMMAND                  SERVICE    CREATED              STATUS                        PORTS
-    nycu_service-learning-nanao-backend-1    userwei/nycu_service-learning-nanao:backend    "docker-entrypoint.s…"   backend    About a minute ago   Up About a minute             0.0.0.0:3000->3000/tcp
-    nycu_service-learning-nanao-db-1         mysql:8.0                                      "docker-entrypoint.s…"   db         About a minute ago   Up About a minute (healthy)   33060/tcp, 0.0.0.0:3307->3306/tcp
-    nycu_service-learning-nanao-frontend-1   userwei/nycu_service-learning-nanao:frontend   "/docker-entrypoint.…"   frontend   About a minute ago   Up About a minute             0.0.0.0:5173->80/tcp
+    NAME                    IMAGE                                                COMMAND                  SERVICE          CREATED          STATUS                    PORTS
+    test-backend-1          userwei/nycu_service-learning-nanao:backend          "/usr/wait-for-it.sh…"   backend          14 seconds ago   Up 2 seconds              0.0.0.0:3000->3000/tcp
+    test-backend_avatar-1   userwei/nycu_service-learning-nanao:backend_avatar   "uvicorn main:app --…"   backend_avatar   14 seconds ago   Up 14 seconds             0.0.0.0:8001->8001/tcp
+    test-db-1               mysql:8.0                                            "docker-entrypoint.s…"   db               14 seconds ago   Up 14 seconds (healthy)   33060/tcp, 0.0.0.0:3307->3306/tcp
+    test-frontend-1         userwei/nycu_service-learning-nanao:frontend         "/docker-entrypoint.…"   frontend         14 seconds ago   Up 14 seconds             0.0.0.0:5173->80/tcp
     ```
 6. **連接疼痛互動系統**：  
     安裝完成後可以通過瀏覽器訪問 http://localhost:5173 來連接系統。
