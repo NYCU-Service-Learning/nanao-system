@@ -695,6 +695,8 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     type="date"  // 指定輸入類型為日期
                                     value={editUserbirth2}  // 綁定生日值
                                     onChange={(e) => setEditUserbirth2(e.target.value)}  // 當日期改變時更新生日值
+                                    min="0001-01-01"
+                                    max="9999-12-31"
                                 />
                             </Form.Group>
 
