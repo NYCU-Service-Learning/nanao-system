@@ -382,7 +382,6 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         const hasUploadedImage = userData.headshot !== '0';
 
         if (!hasUploadedImage) {
-            // 提示用戶已上傳圖片，是否要覆蓋  
             message.error('尚未上傳用戶頭像');  
             return;
         }
