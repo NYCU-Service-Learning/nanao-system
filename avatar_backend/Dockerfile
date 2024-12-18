@@ -38,6 +38,8 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copy the application code to the working directory
 COPY . .
 
+COPY ./checkpoint/resnet18-5c106cde.pth /root/.cache/torch/hub/checkpoints/resnet18-5c106cde.pth
+
 # Expose the port that the app runs on
 EXPOSE 8001
 
