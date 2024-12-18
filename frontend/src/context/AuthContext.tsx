@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const verifyAuth = async () => {
       try {
         const response = await axios.get(`${url}auth/verify`, { withCredentials: true });
-        console.log('verifyAuth response:', response.data);
+        // console.log('verifyAuth response:', response.data);
         if (response.status === 200 && response.data.id) {
           setUser(response.data);
         }

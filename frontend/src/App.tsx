@@ -10,6 +10,7 @@ import Navig from './assets/Navig';
 import NotFound from './assets/NotFound';
 import Profile from './assets/Profile';
 import Admin from './assets/Admin';
+import Setting from './assets/Setting';
 import Stat from './assets/Stat';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -21,6 +22,7 @@ const InteractWithAuth = withAuthRedirect(Interact);
 const ProfileWithAuth = withAuthRedirect(Profile);
 const AdminWithAuth = withAuthRedirect(Admin);
 const StatWithAuth = withAuthRedirect(Stat);
+const SettingWithAuth = withAuthRedirect(Setting);
 
 function AppRoutes() {
     const { user } = useAuth();
@@ -34,6 +36,7 @@ function AppRoutes() {
             <Route path="/logout" element={<Logout url={url} />} />
             <Route path="/profile" element={<ProfileWithAuth url={url} user={user ? user.username : null} />} />
             <Route path="/admin" element={<AdminWithAuth url={url} />} />
+            <Route path="/setting" element={<SettingWithAuth url={url} />} />
             <Route path="/stat" element={<StatWithAuth url={url} />} />
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="*" element={<NotFound />} />

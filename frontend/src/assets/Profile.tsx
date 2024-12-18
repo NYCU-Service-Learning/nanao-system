@@ -1,9 +1,11 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
+import { Navbar, Container, Nav, Button } from 'react-bootstrap';
 // import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
+import { useNavigate } from 'react-router-dom';
 // import { isNullOrUndef } from 'chart.js/helpers';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
@@ -138,8 +140,18 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     FEMALE: '女',
   };
 
+  const navigate = useNavigate();
+
   return (
     <div className="profile">
+      <Navbar expand="lg">
+          <Container>
+              <Nav className="ms-auto">
+                  {/*新增帳號按鈕，點擊時顯示新增帳號視窗*/}
+                  <Button variant="outline-secondary" onClick={() => navigate("/setting")}>個人帳號設定</Button>
+              </Nav>
+          </Container>
+      </Navbar>
       <div>
 
         {/* 頭像圖片的顯示，如果是預設頭像，則使用預設圖片；否則顯示動態 URL 來強制刷新圖片 */}
