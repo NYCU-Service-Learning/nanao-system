@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Table, Button, Navbar, Nav, Modal, Form } from 'react-bootstrap';
+import { Container, Table, Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import './Admin.css';
+import './Setting.css';
 import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 import { useAuth } from '../context/AuthContext';
 
-// 定義 User 的 interface，指定資料類型
 interface User {
     name: string;
     username: string;
     role: string;
 }
 
-// 定義 Userdata 的 interface，指定資料類型
 interface Userdata {
     gender: string;
     birthday: string;
@@ -28,18 +26,13 @@ interface Userdata {
     headshot: string;
 }
 
-// 定義 AdminProps 的 interface，指定 url 的類型為 string
-interface AdminProps {
+interface SettingProps {
     url: string;
 }
 
-
-
-// 定義 Admin component為一個 React Function Component 類型，傳入參數的interface為 AdminProps
-const Admin: React.FC<AdminProps> = ({ url }) => {
+const Setting: React.FC<SettingProps> = ({ url }) => {
     const { user, loading } = useAuth();
-    // useState 是 React Hooks，用於管理 React component 的狀態，會觸發 component 的重新渲染
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [newUsername, setNewUsername] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -77,10 +70,10 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     // useNavigate 是一個 React Hook，用於導航到其他routes
     const navigate = useNavigate();
 
+
     useEffect(() => {
-        // 當認證狀態加載完成後進行角色檢查
         if (!loading) {
-            if (!user || user.role !== 'ADMIN') {
+            if (!user) {
                 navigate('/home');
             } else {
                 fetchUsers();
@@ -94,19 +87,34 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     }
 
     // 如果用戶未登入或不是 ADMIN，避免渲染 Admin 組件內容
-    if (!user || user.role !== 'ADMIN') {
+    if (!user) {
         return null;
     }
+    
+    // 定義一個異步函數 `getUserID`，根據使用者名稱取得 ID
+    const getUserID = async (username: string) => {
+        // 使用 axios 發送 GET 請求到後端的 /user/find/{username} 路由
+        const response = await axios.get(`${url}user/find/${username}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            withCredentials: true
+        });
+        // 回傳資料
+        return response.data;
+    };
 
     const fetchUsers = async () => {
         try {
+            const UserId = await getUserID(user.username);
             // 使用 axios 發送 GET 請求到後端的 /user 路由
-            const response = await axios.get(`${url}user`, {
+            const response = await axios.get(`${url}user/${UserId}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 withCredentials: true
             });
+            // console.log(response.data);
             // 從 GET 請求 response 中取出用戶資料，更新用戶列表
             const users = response.data;
             setUsers(users);
@@ -126,29 +134,12 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 },
                 withCredentials: true
             });
-            console.log(response.data);
+            // console.log(response.data);
             return response.data;
         } catch (error) {
             // 錯誤處理，return null 表示失敗
             setErrMsg('Error fetching users.');
             return null;
-        }
-    };
-
-    // 定義一個異步函數 `handleDelete`，根據使用者 ID 刪除用戶資料
-    const handleDelete = async (id: number) => {
-        try {
-            // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
-            await axios.delete(`${url}user/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-            // 重新取得用戶列表
-            fetchUsers();
-        } catch (error) {
-            setErrMsg('Error deleting user.');
         }
     };
 
@@ -371,18 +362,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         }
     };
 
-    // 定義一個異步函數 `getUserID`，根據使用者名稱取得 ID
-    const getUserID = async (username: string) => {
-        // 使用 axios 發送 GET 請求到後端的 /user/find/{username} 路由
-        const response = await axios.get(`${url}user/find/${username}`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            withCredentials: true
-        });
-        // 回傳資料
-        return response.data;
-    };
+    
     // 定義一個異步函數 `handleEditUploadImg`，開啟上傳圖片的視窗
     const handleEditUploadImg = async () => {
         setShowEditImgModal(false);
@@ -480,15 +460,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     return (
         <div className="admin">
             <Container>
-                <h1>管理介面</h1>
-                <Navbar expand="lg">
-                    <Container>
-                        <Nav className="ms-auto">
-                            {/*新增帳號按鈕，點擊時顯示新增帳號視窗*/}
-                            <Button variant="outline-success" onClick={() => setShowModal(true)}>新增帳號</Button>
-                        </Nav>
-                    </Container>
-                </Navbar>
+                <h1>個人帳號設定</h1>
                 {/*用戶列表表格*/}
                 <Table striped bordered hover className="mt-4">
                     <thead>
@@ -502,39 +474,34 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                     </thead>
                     <tbody>
                         {/*遍歷users數組，為每個用戶創建一行*/}
-                        {users.map(user => (
-                            <tr key={user.username}>
-                                {/*姓名*/}
-                                <td className="name-column">{user.name}</td>
-                                {/*帳號*/}
-                                <td className="username-column">{user.username}</td>
-                                {/*角色，如果是ADMIN則顯示為管理員，否則顯示為使用者*/}
-                                <td className="role-column">{user.role === "ADMIN" ? "管理員" : "使用者"}</td>
+                        {users && (
+                            <tr key={users.username}>
+                                {/* 姓名 */}
+                                <td className="name-column">{users.name}</td>
+                                {/* 帳號 */}
+                                <td className="username-column">{users.username}</td>
+                                {/* 角色 */}
+                                <td className="role-column">{users.role === "ADMIN" ? "管理員" : "使用者"}</td>
                                 <td className="link-column">
-                                    {/*個人資料按鈕，點擊時導航到用戶個人資料頁面*/}
-                                    <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await getUserID(user.username)}`)}>個人資料</Button>
+                                    {/* 個人資料按鈕 */}
+                                    <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await getUserID(users.username)}`)}>個人資料</Button>
                                     &nbsp;
-                                    {/*疼痛統計按鈕，點擊時導航到用戶疼痛統計頁面*/}
-                                    <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await getUserID(user.username)}`)}>疼痛統計</Button>
+                                    {/* 疼痛統計按鈕 */}
+                                    <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await getUserID(users.username)}`)}>疼痛統計</Button>
                                     &nbsp;
                                 </td>
                                 <td className="actions-column">
-                                    {/*編輯帳密按鈕，點擊時打開編輯帳密視窗*/}
-                                    <Button variant="outline-secondary" onClick={() => handleEditUser(user)}>編輯帳密</Button>
+                                    {/* 編輯帳密按鈕 */}
+                                    <Button variant="outline-secondary" onClick={() => handleEditUser(users)}>編輯帳密</Button>
                                     &nbsp;
-                                    {/*編輯資料按鈕，點擊時打開編輯資料視窗*/}
-                                    <Button variant="outline-secondary" onClick={() => handleEditUser2(user)}>編輯資料</Button>
+                                    {/* 編輯資料按鈕 */}
+                                    <Button variant="outline-secondary" onClick={() => handleEditUser2(users)}>編輯資料</Button>
                                     &nbsp;
-                                    {/*個人頭像按鈕，點擊時打開編輯頭像視窗*/}
-                                    <Button variant="outline-secondary" onClick={() => handleEditImg(user)}>個人頭像</Button>
-                                    &nbsp;
-                                    {/*刪除按鈕，僅對非管理員用戶顯示*/}
-                                    {user.role !== 'ADMIN' && (
-                                        <Button variant="outline-danger" onClick={async () => handleDelete(await getUserID(user.username))}>刪除</Button>
-                                    )}
+                                    {/* 個人頭像按鈕 */}
+                                    <Button variant="outline-secondary" onClick={() => handleEditImg(users)}>個人頭像</Button>
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </Table>
                 {/*點擊新增帳號後的彈出介面*/}
@@ -839,4 +806,4 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     );
 };
 
-export default withAuthRedirect(Admin);
+export default withAuthRedirect(Setting);

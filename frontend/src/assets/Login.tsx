@@ -1,8 +1,8 @@
 import './Login.css';
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { useCookies } from 'react-cookie';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 // 定義 LoginProps 的 interface，指定 url 的類型為 string
 interface LoginProps {
@@ -15,13 +15,10 @@ const Login: React.FC<LoginProps> = ({ url }) => {
   // useRef 和 useState 是 React Hooks，用於管理 React component 的狀態
   // useRef 和 useState 的差別在於，useState 會觸發 component 的重新渲染，而 useRef 不會
   const userRef = useRef<HTMLInputElement>(null);
-  const [user, setUser] = useState('');
+  const { user, setUser } = useAuth();
+  const [ loginUser, setLoginUser] = useState('');
   const [pwd, setPwd] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [success, setSuccess] = useState(false);
-
-  // useCookies 是一個 React Hook，用於管理 cookie
-  const [cookies, setCookie] = useCookies(['user']);
 
   // useNavigate 是一個 React Hook，用於導航到其他routes
   const navigate = useNavigate();
@@ -33,23 +30,13 @@ const Login: React.FC<LoginProps> = ({ url }) => {
     userRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    // 當 success 為 true 時，表示登入成功，將用戶名稱存入 cookie，並導航到首頁
-    if (success) {
-      const expires = new Date();
-      expires.setTime(expires.getTime() + 60 * 60 * 1000); 
-      setCookie("user", user, { path: "/", expires });
-      navigate('/home');  
-    }
-  }, [success, user, navigate, setCookie]);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     // 阻止表單提交的默認行為
     e.preventDefault();
     try {
       // 使用 axios 發送 POST 請求到後端的 /auth/login 路由，並傳入用戶名稱和密碼
       const response = await axios.post(url + 'auth/login', {
-        username: user,
+        username: loginUser,
         password: pwd
       }, {
         headers: {
@@ -59,7 +46,9 @@ const Login: React.FC<LoginProps> = ({ url }) => {
       });
 
       if (response.status === 201) {
-        setSuccess(true); 
+        // setSuccess(true); 
+        setUser(response.data);
+        navigate('/home');  
       } else {
         throw new Error('Login failed');
       }
@@ -74,16 +63,14 @@ const Login: React.FC<LoginProps> = ({ url }) => {
           setErrMsg('登錄失敗，請稍後再試');
         }
       } else {
-        setErrMsg('網絡錯誤，請檢查您的連接');
+        setErrMsg('網路錯誤，請檢查您的連接');
       }
-
-      setSuccess(false); 
     }
   };
 
   return (
     <div className="container">
-      {cookies.user ? (
+      {user ? (
         // 如果已登入，則顯示已登入的畫面
         <div className="logged">
           <div>
@@ -105,8 +92,8 @@ const Login: React.FC<LoginProps> = ({ url }) => {
                 id="username"
                 ref={userRef}
                 autoComplete="off"
-                onChange={(e) => setUser(e.target.value)}
-                value={user}
+                onChange={(e) => setLoginUser(e.target.value)}
+                value={loginUser}
                 required
               />
               <label htmlFor="password">密碼：</label>
