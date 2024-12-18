@@ -513,7 +513,16 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                         <Modal.Title>新增帳號</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form>
+                        <Form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                if (newName && newUsername && newPassword) {
+                                    handleAddUser();
+                                } else {
+                                    setErrMsg("所有欄位皆為必填");
+                                }
+                            }}
+                        >
                             {/*姓名輸入欄位*/}
                             <Form.Group controlId="formName">
                                 <Form.Label>姓名</Form.Label>
@@ -521,6 +530,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     type="text"
                                     value={newName}
                                     onChange={(e) => setNewName(e.target.value)}
+                                    required
                                 />
                             </Form.Group>
                             {/*帳號輸入欄位*/}
@@ -530,6 +540,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     type="text"
                                     value={newUsername}
                                     onChange={(e) => setNewUsername(e.target.value)}
+                                    required
                                 />
                             </Form.Group>
                             {/*密碼輸入欄位*/}
@@ -539,18 +550,19 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     type="password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
+                                    required
                                 />
                             </Form.Group>
+                            {/*送出按鈕，點擊時調用handleAddUser函數*/}
+                            <Button type="submit" variant="outline-primary" className="mt-3">
+                                送出
+                            </Button>
                         </Form>
                         {/*錯誤訊息顯示區*/}
                         <div className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</div>
                     </Modal.Body>
-                    <Modal.Footer>
-                        {/*送出按鈕，點擊時調用handleAddUser函數*/}
-                        <Button variant="outline-primary" onClick={handleAddUser}>
-                            送出
-                        </Button>
-                    </Modal.Footer>
+                    {/* <Modal.Footer>
+                    </Modal.Footer> */}
                 </Modal>
 
                 {/*點擊編輯帳密後的彈出介面*/}
