@@ -684,9 +684,16 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                             <Form.Group controlId="formEditUserage" className="mt-3">
                                 <Form.Label>年齡</Form.Label>
                                 <Form.Control
-                                    type="text"  // 文本輸入框
-                                    value={editUserage2 <= 0 ? "" : editUserage2}  // 如果年齡小於等於0,顯示空字符,否則顯示年齡值
-                                    onChange={(e) => setEditUserage2(Number(e.target.value))}  // 將輸入轉換為數字並更新年齡值
+                                    type="number"
+                                    min="0"
+                                    max="999"
+                                    value={editUserage2}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '' || (/^\d+$/.test(value) && Number(value) <= 999)) {
+                                            setEditUserage2(Number(e.target.value));
+                                        }
+                                    }}
                                 />
                             </Form.Group>
 
