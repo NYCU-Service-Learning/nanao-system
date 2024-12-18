@@ -373,7 +373,19 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     // 定義一個異步函數 `handleEditAiImg`，用於設定 AI 頭像並打開 AI 頭像選擇視窗
     const handleEditAiImg = async (username: string) => {
         // 根據使用者名稱取得 ID
-        const editUserID = await getUserID(username);
+        const editUserID = await getUserID(username);   
+        const userData = await fetchUserdata(editUserID);
+        if (!userData) {
+            message.error('無法取得用戶資料');
+            return;
+        }
+        const hasUploadedImage = userData.headshot !== '0';
+
+        if (!hasUploadedImage) {
+            // 提示用戶已上傳圖片，是否要覆蓋  
+            message.error('尚未上傳用戶頭像');  
+            return;
+        }
         // 設定AI生成的頭像圖片 url
         setAiImgSrc1(`http://localhost:8001/avatar_styled/styled-ca1-${editUserID}.jpg`);
         setAiImgSrc2(`http://localhost:8001/avatar_styled/styled-ca2-${editUserID}.jpg`);
@@ -407,8 +419,8 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         } catch (error) {
             // 錯誤處理，回傳 null
             console.error('Failed to update user avatar:', error);  
-            message.error('無法更新用戶頭像，請檢查網絡連接並重試');  
-            setErrMsg('無法更新用戶頭像，請檢查網絡連接並重試');  
+            message.error('無法更新用戶頭像，請檢查網路連接並重試');  
+            setErrMsg('無法更新用戶頭像，請檢查網路連接並重試');  
             return null;
         }
     }    
