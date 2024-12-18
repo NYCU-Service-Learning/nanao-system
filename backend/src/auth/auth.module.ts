@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DatabaseModule } from 'src/database/database.module';
@@ -8,7 +9,10 @@ import { SessionSerializer } from './utils/SessionSerializer';
 import { DatabaseService } from 'src/database/database.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    PassportModule.register({ session: true }),
+    DatabaseModule
+  ],
   controllers: [AuthController],
   providers: [
     {
@@ -23,6 +27,7 @@ import { DatabaseService } from 'src/database/database.service';
       provide: 'DATABASE_SERVICE',
       useClass: DatabaseService
     },
+    AuthService,
     LocalStrategy,
     SessionSerializer
   ],

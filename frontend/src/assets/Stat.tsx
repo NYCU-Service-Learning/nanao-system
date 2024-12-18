@@ -2,7 +2,6 @@ import './Stat.css';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
 import { Container, Table, Button, Navbar, Form, FormControl, Dropdown, Modal } from 'react-bootstrap';
 import { Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js'; 
@@ -13,6 +12,7 @@ import { Userhurt, Usertime } from './ts/types';
 import { bodyParts } from './ts/constants';
 import withAuthRedirect from './withAuthRedirect';
 import * as XLSX from 'xlsx';
+import { useAuth } from '../context/AuthContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -37,8 +37,7 @@ interface QueryParams {
 const Stat: React.FC<StatProps> = ({ url }) => {
 
     // 使用 cookies Hook 取得當前 user
-    const [cookies] = useCookies(["user"]);
-    const user = cookies.user;
+    const { user } = useAuth();
 
     // 使用 useQuery Hook 取得 URL query string 中的 id
     const query = useQuery();
@@ -98,7 +97,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
     useEffect(() => {
         const fetchUserId = async () => {
             if (!userId && user) {
-                const fetchedId = await getUserID(user);
+                const fetchedId = await getUserID(user.username);
                 if (fetchedId) {
                     setUserId(fetchedId);
                     await fetchUserhurt(fetchedId);
@@ -438,7 +437,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                         {/* 送出表單按鈕 */}
                         <Button variant="outline-success" type="submit" className="me-3">搜尋</Button>
                         {/* admin 的管理及匯出 Excel 功能 */}
-                        {user === 'admin' && (
+                        {user.role === 'ADMIN' && (
                             <>
                             {/* 展示互動介面，可刪除疼痛資料 */}
                             <Button variant="outline-primary" onClick={handleShow} className='me-2'>
@@ -523,7 +522,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                                     <tr key={uh.id}>
                                         <td className="stat-time-column">{moment(uh.fill_time).format('YYYY-MM-DD HH:mm')}</td>
                                         <td className="stat-actions-column">
-                                            {user === 'admin' && (
+                                            {user.role === 'ADMIN' && (
                                                 // 刪除按鈕，並使用 handleDelete 函式處理刪除事件
                                                 <Button variant="outline-danger" onClick={() => handleDelete(uh.id)}>刪除</Button>
                                             )}

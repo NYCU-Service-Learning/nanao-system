@@ -3,10 +3,10 @@ import React from 'react';
 import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
-import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import withAuthRedirect from '../withAuthRedirect';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const url = 'http://localhost:3000/';
 
@@ -29,7 +29,7 @@ interface PainStatusType {
 }
 
 const Interact: React.FC = () => {
-  const [cookies] = useCookies(['user']);
+  const { user } = useAuth();
   const [PainLevel, setPainLevel] = React.useState<PainLevelType>({});
   const [currentPart, setCurrentPart] = React.useState<string>('');
   const [MonthPain, setMonthPain] = React.useState<PainStatusType>({});
@@ -38,7 +38,7 @@ const Interact: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const userid = await getUserID(cookies.user);
+      const userid = await getUserID(user.username);
 
       await Promise.all([
         axios.post(`${url}hurtform/${userid}`, PainLevel, {

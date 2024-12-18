@@ -7,6 +7,7 @@ import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
+import { useAuth } from '../context/AuthContext';
 
 // 定義 User 的 interface，指定資料類型
 interface User {
@@ -36,6 +37,7 @@ interface AdminProps {
 
 // 定義 Admin component為一個 React Function Component 類型，傳入參數的interface為 AdminProps
 const Admin: React.FC<AdminProps> = ({ url }) => {
+    const { user, loading } = useAuth();
     // useState 是 React Hooks，用於管理 React component 的狀態，會觸發 component 的重新渲染
     const [users, setUsers] = useState<User[]>([]);
     const [showModal, setShowModal] = useState(false);
@@ -72,15 +74,31 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     const [aiImgSrc2, setAiImgSrc2] = useState<string>();
     const [aiImgSrc3, setAiImgSrc3] = useState<string>();
 
-    // useEffect 是一個 React Hook，用於在 component render 完成後執行一些副作用的操作
-    // 第二個參數為空陣列，表示只在 component render 完成後執行一次。
-    useEffect(() => {
-        // 當 component render 完成後，call fetchUsers
-        fetchUsers();
-    }, []);
-
     // useNavigate 是一個 React Hook，用於導航到其他routes
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // 當認證狀態加載完成後進行角色檢查
+        if (!loading) {
+            if (!user || user.role !== 'ADMIN') {
+                // 如果用戶未登入或角色不是 ADMIN，重定向到首頁
+                navigate('/home');
+            } else {
+                // 如果用戶是 ADMIN，繼續執行 fetchUsers
+                fetchUsers();
+            }
+        }
+    }, [user, loading, navigate]);
+
+    // 如果正在加載，顯示載入指示
+    if (loading) {
+        return <div>Loading...</div>; // 您可以使用更好的載入指示，例如 Spinner
+    }
+
+    // 如果用戶未登入或不是 ADMIN，避免渲染 Admin 組件內容
+    if (!user || user.role !== 'ADMIN') {
+        return null;
+    }
 
     const fetchUsers = async () => {
         try {

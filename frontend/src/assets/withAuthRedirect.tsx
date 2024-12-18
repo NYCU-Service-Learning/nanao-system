@@ -1,36 +1,48 @@
-import React, { ComponentType, useEffect } from 'react';
+// src/assets/withAuthRedirect.tsx
+import React, { ComponentType, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 interface WithAuthRedirectProps {
-  user: string | null;
+  url: string;
 }
 
-// 定義一個高階的componenet(HOC)，用於當沒有使用者資訊時，重新導向到指定路徑
 const withAuthRedirect = <P extends object>(WrappedComponent: ComponentType<P>) => {
-
-  // 定義component，這個component會檢查是否存在 cookie 中的使用者資訊
   const ComponentWithAuthRedirect = (props: P & WithAuthRedirectProps) => {
-
-    // 使用 useCookies 來取得 'user' 這個 cookie 的值
-    const [cookies] = useCookies(['user']);
-
-    // 使用 useNavigate 來獲取 react-router 的導航功能
+    const { setUser } = useAuth();
     const navigate = useNavigate();
+    const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+    const url = props.url || "http://localhost:3000/";
 
-    // 當組件被渲染時，檢查 cookie 中是否存在使用者資訊，如果不存在則重定向到 '/home'
-    // cookies, navigate變數的改變，都會使useEffect觸發從而檢查cookies是否存在使用者資訊
     useEffect(() => {
-      if (!cookies.user) {
-        navigate('/home');
-      }
-    }, [cookies, navigate]);
+      const verifyAuth = async () => {
+        try {
+          const response = await axios.get(`${url}auth/verify`, { withCredentials: true });
+          if (response.status === 200) {
+            setUser(response.data);
+            setAuthenticated(true);
+          }
+        } catch (error) {
+          console.error('Authentication verification failed', error);
+          setAuthenticated(false);
+          navigate('/home');
+        }
+      };
+      verifyAuth();
+    }, [navigate, url, setUser]);
 
-    // 如果使用者已登入（有 cookie 資訊），則渲染被包裹的元件
-    return <WrappedComponent {...props} />;
+    if (authenticated === null) {
+      return <div>Loading...</div>;
+    }
+
+    if (authenticated) {
+      return <WrappedComponent {...props} />;
+    }
+
+    return null;
   };
 
-  // 返回帶有重新導向邏輯的component
   return ComponentWithAuthRedirect;
 };
 

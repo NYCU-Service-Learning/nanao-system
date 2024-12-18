@@ -1,5 +1,5 @@
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CookiesProvider, useCookies } from 'react-cookie';
 import React from 'react';
 
 import Home from './assets/Home';
@@ -15,40 +15,48 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import withAuthRedirect from './assets/withAuthRedirect';
 
+import { AuthProvider, useAuth } from './context/AuthContext';
+
 const InteractWithAuth = withAuthRedirect(Interact);
 const ProfileWithAuth = withAuthRedirect(Profile);
 const AdminWithAuth = withAuthRedirect(Admin);
 const StatWithAuth = withAuthRedirect(Stat);
 
-function App() {
-  const url = "http://localhost:3000/";
-  const [cookies] = useCookies(["user"]);
+function AppRoutes() {
+    const { user } = useAuth();
+    const url = "http://localhost:3000/";
 
-  return (
-    <CookiesProvider>
-      <Router>
-        <div className="App">
-          <div className="toplb">
-            <Navig user={cookies.user} />
-          </div>
-          
-          <div className="content">          
-            <Routes>
-              <Route path="/home" element={<Home />} />
-              <Route path="/interact" element={<InteractWithAuth user={cookies.user} />} />
-              <Route path="/login" element={<Login url={url} />} />
-              <Route path="/logout" element={<Logout url={url} />} />
-              <Route path="/profile" element={<ProfileWithAuth user={cookies.user} url={url} />} />
-              <Route path="/admin" element={<AdminWithAuth user={cookies.user} url={url} />} />
-              <Route path="/stat" element={<StatWithAuth user={cookies.user} url={url} />} />
-              <Route path="/" element={<Navigate to="/home" />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-        </div>
-      </Router>
-    </CookiesProvider>
-  );
+    return (
+        <Routes>
+            <Route path="/home" element={<Home />} />
+            <Route path="/interact" element={<InteractWithAuth url={url} />} />
+            <Route path="/login" element={<Login url={url} />} />
+            <Route path="/logout" element={<Logout url={url} />} />
+            <Route path="/profile" element={<ProfileWithAuth url={url} user={user ? user.username : null} />} />
+            <Route path="/admin" element={<AdminWithAuth url={url} />} />
+            <Route path="/stat" element={<StatWithAuth url={url} />} />
+            <Route path="/" element={<Navigate to="/home" />} />
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
+}
+
+function App() {
+    return (
+        <AuthProvider>
+            <Router>
+                <div className="App">
+                    <div className="toplb">
+                        <Navig />
+                    </div>
+                    
+                    <div className="content">          
+                        <AppRoutes />
+                    </div>
+                </div>
+            </Router>
+        </AuthProvider>
+    );
 }
 
 export default App;
