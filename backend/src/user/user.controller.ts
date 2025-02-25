@@ -34,6 +34,11 @@ export class UserController {
     return this.userService.findId(username);
   }
 
+  @Get('/find/email/:email')
+  findIdByEmail(@Param('email') email: string) {
+    return this.userService.findIdByEmail(email);
+  }
+
   @UseGuards(AdminOrSameUserIdGuard)
   @UserIdName('id')
   @Patch(':id')
@@ -47,4 +52,5 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
+
 }

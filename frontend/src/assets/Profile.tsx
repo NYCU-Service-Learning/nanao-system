@@ -11,6 +11,8 @@ interface User {
   name: string;
   username: string;
   role: string;
+  email: string;
+  lineId: string;
 }
 
 // 定義 UserData 介面，描述使用者詳細資料（如個人資訊）
@@ -20,7 +22,6 @@ interface UserData {
   age: number;
   medical_History: string;
   address: string;
-  email: string;
   phone: string;
   headshot: string;
 }
@@ -45,9 +46,15 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   // 定義組件的狀態
   const query = useQuery();
   const id = query.get('id');
+  const googleStatus = query.get('googleLink');
+  const lineStatus = query.get('lineLink');
   const [users, setUsers] = useState<User | null>(null);
   const [userId, setUserId] = useState<string | null>(id || null);
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [lineCanLink, setLineCanLink] = useState(false);
+  const [googleCanLink, setGoogleCanLink] = useState(false);
+  const [canLink, setCanLink] = useState(false);
+  const [linkMsg, setLinkMsg] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
   const [key, ] = useState(0);
@@ -66,21 +73,42 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   // 使用 useEffect 用於獲取使用者資料
   useEffect(() => {
     const fetchUserId = async () => {
-
-      if (!userId && user) {
-        const fetchedId = await getUserID(user);
+      const fetchedId = await getUserID(user);
+      if (!userId) {
         if (fetchedId) {
           setUserId(fetchedId);
           fetchUserData(fetchedId);
         }
-      } else if (userId) {
+      } else {
         fetchUserData(userId);
+        if (fetchedId && userId == fetchedId) {
+          setCanLink(true);
+        } else {
+          setCanLink(false);
+        }
       }
     };
 
     fetchUserId();
 
   }, [userId, user]);
+
+  useEffect(() => {
+    switch(googleStatus || lineStatus){
+      case 'Success':
+        setLinkMsg('第三方帳號連結成功!');
+        break;
+      /*case 'Conflict':
+        setLinkMsg('該第三方帳號已連結至其他使用者');
+        break;*/
+      case 'Fail':
+        setLinkMsg('帳號連結失敗, 請重試');
+        break;
+      default:
+        setLinkMsg('');
+        break;
+    }
+  }, [googleStatus, lineStatus]);
 
   // 使用 useEffect 根據 userData 和 userId 來更新頭像 URL
   useEffect(() => {
@@ -93,6 +121,13 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
       }
     }
   }, [userData, userId]);
+
+  useEffect(() => {
+    if(users){
+      setGoogleCanLink(canLink && !users.email ? true : false);
+      setLineCanLink(canLink && !users.lineId ? true : false);
+    }
+  }, [users, canLink]);
 
   // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
@@ -117,6 +152,14 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     }
   };
 
+  const handleGoogleLink = () => {
+    window.location.href = `${url}auth/google/link`;
+  };
+
+  const handleLineLink = () => {
+    window.location.href = `${url}auth/line/link`;
+  };
+
   // 定義預設的使用者詳細資料（如果未能取得 userData，則使用該預設值）
   const defaultData: UserData = {
     gender: '無',
@@ -124,7 +167,6 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
     age: 0,
     medical_History: '無',
     address: '無',
-    email: '無',
     phone: '無',
     headshot: '0'
   };
@@ -153,9 +195,15 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
         <div><span className="label">生日：</span>{displayData.birthday || '無'}</div>
         <div><span className="label">年齡：</span>{displayData.age}</div>
         <div><span className="label">電話：</span>{displayData.phone || '無'}</div>
-        <div><span className="label">電子郵件：</span>{displayData.email || '無'}</div>
+        <div><span className="label">電子郵件：</span>{users?.email || '無'}</div>
         <div><span className="label">地址：</span>{displayData.address || '無'}</div>
         <div><span className="label">過去病史：</span>{displayData.medical_History || '無'}</div>
+        {/* Same user */}
+        {googleCanLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleGoogleLink}>連結 Google 帳號</button>}
+        &nbsp;
+        {lineCanLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleLineLink}>連結 Line 帳號</button>}
+        {/* show google link message */}
+        {linkMsg && <span className="linkmsg" style={{ color: (googleStatus || lineStatus) === 'Success' ? 'green' : 'red' }}>{linkMsg}</span>}
       </div>
 
       {/* 若有錯誤訊息則顯示 */}

@@ -104,4 +104,35 @@ export class YearformService {
       }
     })
   }
+
+  async updateUserId(id: number, userId: number) {
+    // Check if the form exists
+    const yearform = await this.databaseService.yearForm.findUnique({
+      where:{
+        id: id
+      }
+    })
+    if (!yearform){
+      throw new HttpException(`yearform ${id} not found.`, HttpStatus.BAD_REQUEST);
+    }
+
+    // Check if user exists
+    const user = await this.databaseService.user.findUnique({
+      where:{
+        id: userId
+      }
+    })
+    if (!user){
+      throw new HttpException(`User ${userId} not found.`, HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.databaseService.yearForm.update({
+      where:{
+        id: id
+      },
+      data:{
+        user: {connect: {id: userId}}
+      }
+    })
+  }
 }

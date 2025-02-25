@@ -42,8 +42,10 @@ export class UserService {
     try{
       const user = await this.findOne(id)
       let hashedUpdateUser = {
-        ...updateUserDto,
-        password: await bcrypt.hash(updateUserDto.password.toString(), 10)
+        ...updateUserDto
+      }
+      if (updateUserDto.password) {
+        hashedUpdateUser.password = await bcrypt.hash(updateUserDto.password.toString(), 10)
       }
       return await this.databaseService.user.update({
         where:{
@@ -53,7 +55,7 @@ export class UserService {
       });
     } catch(error){
       if (error.message.includes('Unique constraint')) {
-        throw new ConflictException('username already exists')
+        throw new ConflictException('username or email already exists')
       } else if(error.message.includes('Unknown argument')){
         throw new BadRequestException('bad request, unknown labels is included')
       } else {
@@ -85,6 +87,30 @@ export class UserService {
 
     if(!user)
       throw new HttpException('user does not exist', HttpStatus.BAD_REQUEST)
+    return user.id
+  }
+
+  async findIdByEmail(email: string){
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        email: email,
+      }
+    })
+    
+    if(!user)
+      return null
+    return user.id
+  }
+
+  async findIdByLine(lineId: string){
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        lineId: lineId,
+      }
+    })
+    
+    if(!user)
+      return null
     return user.id
   }
 }
