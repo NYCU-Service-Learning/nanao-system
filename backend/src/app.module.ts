@@ -13,6 +13,7 @@ import { PassportModule } from '@nestjs/passport';
 import configuration from 'config/configuration';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core'
+import { MentalformModule } from './mentalform/mentalform.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { APP_GUARD } from '@nestjs/core'
       name: 'long',
       ttl: 60000,
       limit: 100,
-    }])
+    }]),
+    MentalformModule
   ],
   controllers: [AppController],
   providers: [AppService, 

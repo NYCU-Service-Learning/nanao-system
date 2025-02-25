@@ -25,6 +25,7 @@ model User{
   hurtForms     HurtForm[]
   weekForms     WeekForm[]
   yearForms     YearForm[]
+  mentalFroms   MentalForm[]
   
 }
 model UserDetail{
@@ -178,6 +179,22 @@ model WeekForm{
   butt                  Boolean   @default(false)
   right_upper_shoulder  Boolean   @default(false)
 }
+
+model MentalForm{
+  id                    Int       @id @default(autoincrement())
+  user                  User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id               Int
+  fill_time             DateTime  @default(now())
+  problem1              Int
+  problem2              Int
+  problem3              Int
+  problem4              Int
+  problem5              Int
+  problem6              Int
+}
+
+
+
 
 enum Gender{
   MALE
