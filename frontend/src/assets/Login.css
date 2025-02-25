@@ -1,59 +1,67 @@
-.center{
-    position:absolute;
-    width:400px;
-    height:400px;
-    top:50%;
-    left:50%;
-    margin-left:-200px;
-    margin-top:-200px;
-    display:flex;
+.center {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    margin-left: -200px;
+    margin-top: -200px;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding:30px;
-    color:#333;
-    
-    input{
-      width:100%;
-      padding:15px;
-      margin:5px;
-      border-radius:1px;
-      border:1px solid #ccc;
-      font-family:inherit;
-    }
-}
-.login {
-    position:relative;
+    padding: 30px;
+    color: #333;
+  }
+  
+  .center input {
+    width: 100%;
+    padding: 15px;
+    margin: 5px;
+    border-radius: 1px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+  }
+  
+  .login {
+    position: relative;
     width: 350px;
     margin: 0 auto;
     padding: 10px;
     padding-top: 20px;
     padding-bottom: 40px;
     border-radius: 10px;
-}
-.login label {
-    position:relative;
+  }
+  
+  .login label {
+    position: relative;
     text-align: left;
-    display:inline-block;
-}
-.login p{
-    display:inline-block;
+    display: inline-block;
+  }
+  
+  .login p {
+    display: inline-block;
     float: right;
-}
-.login h2 {
+  }
+  
+  .login h2 {
     font-size: 20px;
     color: #1f2e6b;
     margin-bottom: 30px;
-}
-.login input, .login textarea, .login select {
+  }
+  
+  .login input, 
+  .login textarea, 
+  .login select {
     width: 100%;
     padding: 6px 10px;
     margin: 10px 0;
     border: 1px solid #ddd;
     box-sizing: border-box;
     display: block;
-}
-.login button {
+  }
+  
+  .login button {
     margin-bottom: 10%;
     width: 100%;
     margin: 10px 0;
@@ -64,28 +72,254 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
-}
-
-.login button:hover {
+  }
+  
+  .login button:hover {
     background-color: #505050;
-}
-
-.errmsg {
+  }
+  
+  .errmsg {
     color: red;
-    font-size: 16px; /* Example of additional style */
-}
-
-.offscreen {
+    text-align: center;
+    font-size: 16px;
+  }
+  
+  .offscreen {
     display: none;
-}
-
-.logged{
-    /* position:absolute; */
-    width:100%;
-    display:flex;
+  }
+  
+  .logged {
+    width: 100%;
+    display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding:30px;
-    color:#333;
-}
+    padding: 30px;
+    color: #333;
+  }
+  
+  .divider {
+    margin: 20px 0;
+    text-align: center;
+    position: relative;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background-color: #ddd;
+  }
+  
+  .divider::before {
+    left: 0;
+  }
+  
+  .divider::after {
+    right: 0;
+  }
+  
+  .divider span {
+    background-color: 666;
+    padding: 0 10px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .gsi-material-button {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-appearance: none;
+    background-color: WHITE;
+    background-image: none;
+    border: 1px solid #747775;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #1f1f1f;
+    cursor: pointer;
+    font-family: 'Roboto', arial, sans-serif;
+    font-size: 14px;
+    height: 40px;
+    letter-spacing: 0.25px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 12px;
+    position: relative;
+    text-align: center;
+    -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+    transition: background-color .218s, border-color .218s, box-shadow .218s;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 400px;
+    min-width: min-content;
+    margin-top: 10px;
+  }
+  
+  .gsi-material-button .gsi-material-button-icon {
+    height: 20px;
+    margin-right: 12px;
+    min-width: 20px;
+    width: 20px;
+  }
+  
+  .gsi-material-button .gsi-material-button-content-wrapper {
+    -webkit-align-items: center;
+    align-items: center;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    height: 100%;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+  
+  .gsi-material-button .gsi-material-button-contents {
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+    font-family: 'Google Sans', arial, sans-serif;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+  }
+  
+  .gsi-material-button .gsi-material-button-state {
+    -webkit-transition: opacity .218s;
+    transition: opacity .218s;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  
+  .gsi-material-button:disabled {
+    cursor: default;
+    background-color: #ffffff61;
+    border-color: #1f1f1f1f;
+  }
+  
+  .gsi-material-button:disabled .gsi-material-button-contents {
+    opacity: 38%;
+  }
+  
+  .gsi-material-button:disabled .gsi-material-button-icon {
+    opacity: 38%;
+  }
+  
+  .gsi-material-button:not(:disabled):active .gsi-material-button-state,
+  .gsi-material-button:not(:disabled):focus .gsi-material-button-state {
+    background-color: #303030;
+    opacity: 12%;
+  }
+  
+  .gsi-material-button:not(:disabled):hover {
+    -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  }
+  
+  .gsi-material-button:not(:disabled):hover .gsi-material-button-state {
+    background-color: #303030;
+    opacity: 8%;
+  }
+
+  .line-login-button {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-appearance: none;
+    background-color: WHITE;
+    background-image: none;
+    border: 1px solid #747775;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #1f1f1f;
+    cursor: pointer;
+    font-family: 'Roboto', arial, sans-serif;
+    font-size: 14px;
+    height: 40px;
+    letter-spacing: 0.25px;
+    outline: none;
+    overflow: hidden;
+    padding: 0 12px;
+    position: relative;
+    text-align: center;
+    -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+    transition: background-color .218s, border-color .218s, box-shadow .218s;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 400px;
+    min-width: min-content;
+    margin-top: 10px;
+  }
+  
+  .line-login-button .line-button-icon {
+    height: 20px;
+    margin-right: 12px;
+    min-width: 20px;
+    width: 20px;
+  }
+  
+  .line-button-content-wrapper {
+    -webkit-align-items: center;
+    align-items: center;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    height: 100%;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+  
+  .line-button-contents {
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+    font-family: 'Google Sans', arial, sans-serif;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    color: #1f1f1f;
+  }
+  
+  .line-login-button:disabled {
+    cursor: default;
+    background-color: #ffffff61;
+    border-color: #1f1f1f1f;
+  }
+  
+  .line-login-button:disabled .line-button-contents {
+    opacity: 38%;
+  }
+  
+  .line-login-button:disabled .line-button-icon {
+    opacity: 38%;
+  }
+  
+  .line-login-button:not(:disabled):active,
+  .line-login-button:not(:disabled):focus {
+    background-color: #f8f8f8;
+  }
+  
+  .line-login-button:not(:disabled):hover {
+    -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+    background-color: #f8f8f8;
+  }

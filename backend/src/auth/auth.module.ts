@@ -6,6 +6,12 @@ import { UserService } from 'src/user/user.service';
 import { LocalStrategy } from './utils/LocalStrategy';
 import { SessionSerializer } from './utils/SessionSerializer';
 import { DatabaseService } from 'src/database/database.service';
+import { GoogleLinkStrategy, GoogleLoginStrategy } from './utils/GoogleStrategy';
+import { HurtformService } from 'src/hurtform/hurtform.service';
+import { WeekformService } from 'src/weekform/weekform.service';
+import { YearformService } from 'src/yearform/yearform.service';
+import { LineLoginStrategy } from './utils/LineStrategy';
+import { LineLinkStrategy } from './utils/LineStrategy';
 
 @Module({
   imports: [DatabaseModule],
@@ -23,8 +29,24 @@ import { DatabaseService } from 'src/database/database.service';
       provide: 'DATABASE_SERVICE',
       useClass: DatabaseService
     },
+    {
+      provide: 'HURTFORM_SERVICE',
+      useClass: HurtformService
+    },
+    {
+      provide: 'WEEKFORM_SERVICE',
+      useClass: WeekformService
+    },
+    {
+      provide: 'YEARFORM_SERVICE',
+      useClass: YearformService
+    },
     LocalStrategy,
-    SessionSerializer
+    SessionSerializer,
+    GoogleLinkStrategy,
+    GoogleLoginStrategy,
+    LineLoginStrategy,
+    LineLinkStrategy
   ],
 })
 export class AuthModule {}

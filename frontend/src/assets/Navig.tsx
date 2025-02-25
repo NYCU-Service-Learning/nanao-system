@@ -37,6 +37,8 @@ const Navig: React.FC<NavigProps> = ({ user }) => {
                   <>
                     <Nav.Link as={Link} to="/interact">疼痛回報</Nav.Link>
                     <Nav.Link as={Link} to="/stat">疼痛統計</Nav.Link>
+                    <Nav.Link as={Link} to="/mentalform">心理問卷</Nav.Link>
+                    <Nav.Link as={Link} to="/mentalstat">心理統計</Nav.Link>
                   </>
                 )}
                 <Nav.Link as={Link} to="/profile">{user}</Nav.Link>

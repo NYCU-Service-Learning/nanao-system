@@ -110,3 +110,14 @@ export class FormDeleteGuard implements CanActivate{
         return false;
     }
 }
+
+@Injectable()
+export class AuthenticatedGuard implements CanActivate{
+    constructor(private readonly reflector: Reflector,){}
+    async canActivate(context: ExecutionContext){
+        const req = context.switchToHttp().getRequest<Request>();
+        if(!req.isAuthenticated())
+            throw new HttpException("please login first", HttpStatus.UNAUTHORIZED);
+        return true;
+    }
+}
