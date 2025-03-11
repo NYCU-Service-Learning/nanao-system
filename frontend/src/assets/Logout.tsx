@@ -20,7 +20,7 @@ const Logout = ({ url }) => {
       try {
 
         // 使用 axios 向後端發送登出請求，通知伺服器移除登入狀態
-        await axios.delete(url + 'auth/logout', {
+        await axios.post(url + 'auth/logout', {
           headers: {
             'Content-Type': 'application/json'
           },
