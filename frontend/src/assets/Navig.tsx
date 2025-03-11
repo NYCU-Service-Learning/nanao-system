@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import React from 'react';
-import { useCookies } from 'react-cookie';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -12,7 +11,6 @@ interface NavigProps {
 // 定義一個 Functional Component（函數式組件）Navig，接收 NavigProps 作為參數
 const Navig: React.FC<NavigProps> = ({ user }) => {
   // 使用useCookies hook來從cookie中讀取名為'user'的cookie值
-   const [cookies] = useCookies(['user']);
   return (
 
     // 使用 React-Bootstrap 的 Navbar 組件來創建導航欄
@@ -26,7 +24,7 @@ const Navig: React.FC<NavigProps> = ({ user }) => {
             <Nav.Link as={Link} to="/home">首頁</Nav.Link>
 
             {/* 如果沒有user cookie，顯示登入按鈕，否則顯示使用者相關選項 */}
-            {!cookies.user ? (
+            {user == null || user == '' ? (
 
               // 未登入時顯示的導航鏈接
               <Nav.Link as={Link} to="/login">登入</Nav.Link>
