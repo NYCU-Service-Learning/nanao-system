@@ -116,7 +116,7 @@ export class AuthController {
     return res.redirect(`http://localhost:5173/profile?lineLink=${status}`);
   }
 
-  @Delete('logout')
+  @Post('logout')
   logout(@Request() req){
       req.logout((err) => {
           if(err){
