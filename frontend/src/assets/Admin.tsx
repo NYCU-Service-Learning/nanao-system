@@ -16,8 +16,8 @@ interface User {
     email: string;
 }
 
-// 定義 Userdata 的 interface，指定資料類型
-interface Userdata {
+// 定義 UserData 的 interface，指定資料類型
+interface UserData {
     gender: string;
     birthday: string;
     age: number;
@@ -91,12 +91,12 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             setErrMsg('請填寫所有必填欄位');
             return;
         }
-        
+
         // 如果驗證通過，調用原本的 handleAddUser
         handleAddUser();
         setShowValidation(false);
     };
-    
+
     const fetchUsers = async () => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user 路由
@@ -116,7 +116,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     };
 
     // 定義一個異步函數 `fetchUserdata`，根據使用者 ID 取得詳細用戶資料
-    const fetchUserdata = async (id: number): Promise<Userdata | null> => {
+    const fetchUserdata = async (id: number): Promise<UserData | null> => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user-detail/{ID} 路由
             const response = await axios.get(`${url}user-detail/${id}`, {
@@ -210,7 +210,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             setEditUseraddr2(userdata.address);
             setEditUsermhis2(userdata.medical_History);
             setEditUserhs2(userdata.headshot)
-            
+
         } else {
             setEditGender2('');
             setEditUserbirth2('');
@@ -240,7 +240,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             if (fileList.length > 0) {
                 // 取得上傳的第一個文件，append 到 formData
                 const file = fileList[0] as unknown as File;
-                formData.append('file', file); 
+                formData.append('file', file);
             }
             // 設定上傳狀態為 true
             setUploading(true);
@@ -392,14 +392,14 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
         setAiImgSrc1(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca1-${editUserID}.jpg`);
         setAiImgSrc2(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca2-${editUserID}.jpg`);
         setAiImgSrc3(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca3-${editUserID}.jpg`);
-        
+
         setShowEditAiModal(true);
         setShowEditImgModal(false);
     }
 
     // 定義一個異步函數 `handleAiClick`，根據使用者名稱設定 AI 頭像
     const handleAiClick = async (username: string, imgNum: string) => {
-        message.info('正在設定用戶頭像，請耐心等待');  
+        message.info('正在設定用戶頭像，請耐心等待');
         // 根據使用者名稱取得 ID
         const editUserID = await getUserID(username);
         try {
@@ -420,12 +420,12 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
             }, 3000);
         } catch (error) {
             // 錯誤處理，回傳 null
-            console.error('Failed to update user avatar:', error);  
-            message.error('無法更新用戶頭像，請檢查網絡連接並重試');  
-            setErrMsg('無法更新用戶頭像，請檢查網絡連接並重試');  
+            console.error('Failed to update user avatar:', error);
+            message.error('無法更新用戶頭像，請檢查網絡連接並重試');
+            setErrMsg('無法更新用戶頭像，請檢查網絡連接並重試');
             return null;
         }
-    }    
+    }
 
     // 定義 uploadProps 物件，設定上傳圖片的相關屬性
     const uploadProps: UploadProps = {
@@ -626,7 +626,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                                     value={editPassword}
                                     onChange={(e) => setEditPassword(e.target.value)}
                                     required
-                                /> 
+                                />
                             </Form.Group>
                         </Form>
                         {/*錯誤訊息顯示區*/}
