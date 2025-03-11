@@ -55,7 +55,7 @@ const Login: React.FC<LoginProps> = ({ url }) => {
       });
       setSuccess(true);
     } else if (lineLogin === 'failed' || lineLogin === 'error') {
-      setErrMsg('Google 登入失敗，請重試');
+      setErrMsg('Line 登入失敗，請重試');
     }
   }, [setCookie]);
 
