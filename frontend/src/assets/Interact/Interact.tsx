@@ -7,9 +7,7 @@ import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import withAuthRedirect from '../withAuthRedirect';
 import { useNavigate } from 'react-router-dom';
-
-// 定義後端 API 的基礎 URL
-const url = 'http://localhost:3000/';
+import { API_URL } from '../../config';
 
 /**
  * getUserID - 根據使用者名稱請求使用者 ID 的異步函數
@@ -18,7 +16,7 @@ const url = 'http://localhost:3000/';
  */
 
 const getUserID = async (username: string): Promise<string> => {
-  const response = await axios.get(`${url}user/find/${username}`, {
+  const response = await axios.get(`${API_URL}user/find/${username}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -57,19 +55,19 @@ const Interact: React.FC = () => {
 
       // 發送多個 POST 請求，分別提交每年、每週疼痛狀態和疼痛等級
       await Promise.all([
-        axios.post(`${url}hurtform/${userid}`, PainLevel, {
+        axios.post(`${API_URL}hurtform/${userid}`, PainLevel, {
           headers: {
             'Content-Type': 'application/json',
           },
           withCredentials: true, // 向請求中包含憑證
         }),
-        axios.post(`${url}weekform/${userid}`, WeekPain, {
+        axios.post(`${API_URL}weekform/${userid}`, WeekPain, {
           headers: {
             'Content-Type': 'application/json',
           },
           withCredentials: true,
         }),
-        axios.post(`${url}yearform/${userid}`, MonthPain, {
+        axios.post(`${API_URL}yearform/${userid}`, MonthPain, {
           headers: {
             'Content-Type': 'application/json',
           },

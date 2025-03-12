@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Container, Table, Button, Navbar, Nav, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Admin.css';
+import { API_URL } from '../config';
 import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
@@ -28,15 +29,8 @@ interface UserData {
     headshot: string;
 }
 
-// 定義 AdminProps 的 interface，指定 url 的類型為 string
-interface AdminProps {
-    url: string;
-}
-
-
-
-// 定義 Admin component為一個 React Function Component 類型，傳入參數的interface為 AdminProps
-const Admin: React.FC<AdminProps> = ({ url }) => {
+// 定義 Admin component為一個 React Function Component 類型
+const Admin: React.FC = () => {
     // useState 是 React Hooks，用於管理 React component 的狀態，會觸發 component 的重新渲染
     const [showValidation, setShowValidation] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
@@ -100,7 +94,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     const fetchUsers = async () => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user 路由
-            const response = await axios.get(`${url}user`, {
+            const response = await axios.get(`${API_URL}user`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -119,7 +113,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     const fetchUserdata = async (id: number): Promise<UserData | null> => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user-detail/{ID} 路由
-            const response = await axios.get(`${url}user-detail/${id}`, {
+            const response = await axios.get(`${API_URL}user-detail/${id}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -138,7 +132,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     const handleDelete = async (id: number) => {
         try {
             // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
-            await axios.delete(`${url}user/${id}`, {
+            await axios.delete(`${API_URL}user/${id}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -174,7 +168,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 role: role
             };
             // 使用 axios 發送 PATCH 請求到後端的 /user/{editUserID} 路由
-            await axios.patch(`${url}user/${editUserId}`, updatedUser, {
+            await axios.patch(`${API_URL}user/${editUserId}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -262,7 +256,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                     headshot: '4'
                 };
                 // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-                await axios.patch(`${url}user-detail/${editUserID}`, updatedUser, {
+                await axios.patch(`${API_URL}user-detail/${editUserID}`, updatedUser, {
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -298,7 +292,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 headshot: editUserhs2
             };
             // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-            await axios.patch(`${url}user-detail/${editUserId}`, updatedUser, {
+            await axios.patch(`${API_URL}user-detail/${editUserId}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -347,7 +341,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 }
             };
             // 使用 axios 發送 POST 請求到後端的 /user 路由
-            await axios.post(`${url}user`, newUser, {
+            await axios.post(`${API_URL}user`, newUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -369,7 +363,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
     // 定義一個異步函數 `getUserID`，根據使用者名稱取得 ID
     const getUserID = async (username: string) => {
         // 使用 axios 發送 GET 請求到後端的 /user/find/{username} 路由
-        const response = await axios.get(`${url}user/find/${username}`, {
+        const response = await axios.get(`${API_URL}user/find/${username}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -408,7 +402,7 @@ const Admin: React.FC<AdminProps> = ({ url }) => {
                 headshot: imgNum
             };
             // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-            await axios.patch(`${url}user-detail/${editUserID}`, updatedUser, {
+            await axios.patch(`${API_URL}user-detail/${editUserID}`, updatedUser, {
                 headers: {
                     'Content-Type': 'application/json'
                 },

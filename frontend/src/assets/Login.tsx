@@ -1,19 +1,15 @@
 import './Login.css';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
+import { API_URL } from '../config';
 
-interface LoginProps {
-  url: string;
-}
-
-const Login: React.FC<LoginProps> = ({ url }) => {
+const Login: React.FC = () => {
   const userRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState('');
   const [pwd, setPwd] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [success, setSuccess] = useState(false);
   const [cookies, setCookie] = useCookies(['user']);
   const navigate = useNavigate();
 
@@ -21,24 +17,24 @@ const Login: React.FC<LoginProps> = ({ url }) => {
     userRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    const setUserCookie = (username: string) => {
-      const expires = new Date();
-      expires.setTime(expires.getTime() + 60 * 60 * 1000);
-      setCookie('user', username, {
-        path: '/',
-        expires,
-        sameSite: 'lax',
-      });
-    }
+  const setUserCookie = useCallback((username: string) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + 60 * 60 * 1000);
+    setCookie('user', username, {
+      path: '/',
+      expires,
+      sameSite: 'lax',
+    });
+  }, [setCookie]);
 
+  useEffect(() => {
     const handleOAuthLogin = (loginType: string, failureMessage: string) => {
       const urlParams = new URLSearchParams(window.location.search);
       const loginStatus = urlParams.get(loginType);
       const username = urlParams.get('username');
       if (loginStatus === 'success' && username) {
         setUserCookie(username);
-        setSuccess(true);
+        navigate('/home');
       } else if (loginStatus === 'failed' || loginStatus === 'error') {
         setErrMsg(failureMessage);
       }
@@ -46,46 +42,34 @@ const Login: React.FC<LoginProps> = ({ url }) => {
 
     handleOAuthLogin('googleLogin', 'Google 登入失敗，請重試');
     handleOAuthLogin('lineLogin', 'Line 登入失敗，請重試');
-  }, [setCookie]);
-
-  // 添加一個狀態檢查函數
-  const checkAuthStatus = async () => {
-    try {
-      const response = await axios.get(`${url}auth/status`, {
-        withCredentials: true
-      });
-
-      if (response.data.status === 'success') {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + 60 * 60 * 1000);
-        setCookie("user", response.data.user.username, {
-          path: "/",
-          expires,
-          sameSite: 'lax'
-        });
-        setSuccess(true);
-      }
-    } catch (error) {
-      console.error('Auth status check failed:', error);
-    }
-  };
+  }, [navigate, setUserCookie]);
 
   // 在組件掛載時檢查狀態
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
+    // 添加一個狀態檢查函數
+    const checkAuthStatus = async () => {
+      try {
+        const response = await axios.get(`${API_URL}auth/status`, {
+          withCredentials: true
+        });
 
-  useEffect(() => {
-    if (success) {
-      navigate('/home');
-    }
-  }, [success, navigate]);
+        if (response.data.status === 'success') {
+          setUserCookie(response.data.user.username);
+          navigate('/home');
+        }
+      } catch (error) {
+        console.error('Auth status check failed:', error);
+      }
+    };
+
+    checkAuthStatus();
+  }, [navigate, setUserCookie]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        url + 'auth/login',
+        `${API_URL}auth/login`,
         {
           username: user,
           password: pwd,
@@ -99,7 +83,8 @@ const Login: React.FC<LoginProps> = ({ url }) => {
       );
 
       if (response.status === 201) {
-        setSuccess(true);
+        setUserCookie(user);
+        navigate('/home');
       } else {
         throw new Error('Login failed');
       }
@@ -115,16 +100,15 @@ const Login: React.FC<LoginProps> = ({ url }) => {
       } else {
         setErrMsg('網絡錯誤，請檢查您的連接');
       }
-      setSuccess(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${url}auth/google/login`;
+    window.location.href = `${API_URL}auth/google/login`;
   };
 
   const handleLineLogin = () => {
-    window.location.href = `${url}auth/line/login`;
+    window.location.href = `${API_URL}auth/line/login`;
   };
 
   return (

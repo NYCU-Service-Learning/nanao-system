@@ -25,6 +25,7 @@ const dataSource = [
 ];
 
 import { ColumnsType } from "antd/es/table";
+import { API_URL } from "../config";
 
 const columns: ColumnsType<QuestionData> = [
   {
@@ -95,22 +96,21 @@ const columns: ColumnsType<QuestionData> = [
     render: (_, record) => (
       <Form.Item name={`response-${record.key}`} style={{ margin: 0 }}>
         <Radio.Group>
-          <Radio value={4}/>
+          <Radio value={4} />
         </Radio.Group>
       </Form.Item>
     ),
   },
 ];
-const url = 'http://localhost:3000/';
 
 /**
  * getUserID - 根據使用者名稱請求使用者 ID 的異步函數
  * @param username 使用者名稱
  * @returns 包含使用者 ID 的 Promise
  */
-  
+
 const getUserID = async (username: string): Promise<string> => {
-  const response = await axios.get(`${url}user/find/${username}`, {
+  const response = await axios.get(`${API_URL}user/find/${username}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -135,11 +135,11 @@ const MentalForm = () => {
     const data: MentalFormProps = {
       problem: [],
     };
-    for(const key in values) {
+    for (const key in values) {
       data["problem"].push(values[key]);
     }
     console.log(data);
-    axios.post(`${url}mentalform/${userID}`, data, {
+    axios.post(`${API_URL}mentalform/${userID}`, data, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -148,7 +148,7 @@ const MentalForm = () => {
       navigate("/home");
     }
     );
-    
+
   };
 
   return (

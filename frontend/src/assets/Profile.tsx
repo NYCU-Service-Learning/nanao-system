@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
+import { API_URL } from '../config';
 // import { isNullOrUndef } from 'chart.js/helpers';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
@@ -37,11 +38,10 @@ const useQuery = () => {
 // 定義 ProfileProps 介面，描述 Profile 組件所需的屬性
 interface ProfileProps {
   user: string | null;
-  url: string;
 }
 
 // Profile 組件，這是一個 functional component，接收 `user` 和 `url` 作為接收的參數類型
-const Profile: React.FC<ProfileProps> = ({ user, url }) => {
+const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   // 定義組件的狀態
   const query = useQuery();
@@ -57,11 +57,11 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   const [linkMsg, setLinkMsg] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
-  const [key, ] = useState(0);
+  const [key,] = useState(0);
 
   // 定義一個異步函數 `getUserID`，根據使用者名稱從伺服器取得使用者 ID
   const getUserID = async (username: string) => {
-    const response = await axios.get(url + `user/find/${username}`, {
+    const response = await axios.get(`${API_URL}user/find/${username}`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -94,7 +94,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   }, [userId, user]);
 
   useEffect(() => {
-    switch(googleStatus || lineStatus){
+    switch (googleStatus || lineStatus) {
       case 'Success':
         setLinkMsg('第三方帳號連結成功!');
         break;
@@ -112,18 +112,18 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
 
   // 使用 useEffect 根據 userData 和 userId 來更新頭像 URL
   useEffect(() => {
-    if(userData){
-      if(userData.headshot !== "0"){
+    if (userData) {
+      if (userData.headshot !== "0") {
         setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca${userData.headshot}-${userId}.jpg`);
       }
-      if(userData.headshot === "4"){
+      if (userData.headshot === "4") {
         setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_original/original-${userId}.jpg`);
       }
     }
   }, [userData, userId]);
 
   useEffect(() => {
-    if(users){
+    if (users) {
       setGoogleCanLink(canLink && !users.email ? true : false);
       setLineCanLink(canLink && !users.lineId ? true : false);
     }
@@ -132,14 +132,14 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
     try {
-      const response1 = await axios.get(`${url}user/${id}`, {
+      const response1 = await axios.get(`${API_URL}user/${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
         withCredentials: true,
       });
       setUsers(response1.data);
-      const response2 = await axios.get(`${url}user-detail/${id}`, {
+      const response2 = await axios.get(`${API_URL}user-detail/${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -153,11 +153,11 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
   };
 
   const handleGoogleLink = () => {
-    window.location.href = `${url}auth/google/link`;
+    window.location.href = `${API_URL}auth/google/link`;
   };
 
   const handleLineLink = () => {
-    window.location.href = `${url}auth/line/link`;
+    window.location.href = `${API_URL}auth/line/link`;
   };
 
   // 定義預設的使用者詳細資料（如果未能取得 userData，則使用該預設值）
@@ -185,7 +185,7 @@ const Profile: React.FC<ProfileProps> = ({ user, url }) => {
       <div>
 
         {/* 頭像圖片的顯示，如果是預設頭像，則使用預設圖片；否則顯示動態 URL 來強制刷新圖片 */}
-        <img key={key} src={avatarUrl === '/default_avatar.jpg' ? '/default_avatar.jpg' :   `${avatarUrl}?${new Date().getTime()}`} alt="Profile Picture" />
+        <img key={key} src={avatarUrl === '/default_avatar.jpg' ? '/default_avatar.jpg' : `${avatarUrl}?${new Date().getTime()}`} alt="Profile Picture" />
       </div>
       <div className="info">
 

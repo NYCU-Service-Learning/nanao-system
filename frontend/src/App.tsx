@@ -25,7 +25,6 @@ const StatWithAuth = withAuthRedirect(Stat);
 const MentalStatWithAuth = withAuthRedirect(MentalStat);
 
 function App() {
-  const url = "http://localhost:3000/";
   const [cookies] = useCookies(["user"]);
 
   return (
@@ -35,18 +34,18 @@ function App() {
           <div className="toplb">
             <Navig user={cookies.user} />
           </div>
-          
-          <div className="content">          
+
+          <div className="content">
             <Routes>
               <Route path="/home" element={<Home />} />
               <Route path="/interact" element={<InteractWithAuth user={cookies.user} />} />
               <Route path="/mentalform" element={<MentalformWithAuth user={cookies.user} />} />
               <Route path="/mentalstat" element={<MentalStatWithAuth user={cookies.user} />} />
-              <Route path="/login" element={<Login url={url} />} />
-              <Route path="/logout" element={<Logout url={url} />} />
-              <Route path="/profile" element={<ProfileWithAuth user={cookies.user} url={url} />} />
-              <Route path="/admin" element={<AdminWithAuth user={cookies.user} url={url} />} />
-              <Route path="/stat" element={<StatWithAuth user={cookies.user} url={url} />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/logout" element={<Logout />} />
+              <Route path="/profile" element={<ProfileWithAuth user={cookies.user} />} />
+              <Route path="/admin" element={<AdminWithAuth user={cookies.user} />} />
+              <Route path="/stat" element={<StatWithAuth user={cookies.user} />} />
               <Route path="/" element={<Navigate to="/home" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

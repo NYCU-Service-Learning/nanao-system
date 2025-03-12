@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Container, Table, Button, Navbar, Form, FormControl, Dropdown, Modal } from 'react-bootstrap';
 import { Bar, Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js'; 
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import 'chart.js/auto';
 import moment from 'moment';
 import 'moment-timezone';
@@ -13,6 +13,7 @@ import { Userhurt, Usertime } from './ts/types';
 import { bodyParts } from './ts/constants';
 import withAuthRedirect from './withAuthRedirect';
 import * as XLSX from 'xlsx';
+import { API_URL } from '../config';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -21,20 +22,15 @@ const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 };
 
-// 定義 StatProps 的 interface，指定 url 的類型為 string
-interface StatProps {
-  url: string;
-}
-
 // Define a type for the query parameters
 interface QueryParams {
     start?: string;
     end?: string;
-  }
-  
+}
+
 
 // 定義 Stat component 為一個 React Function Component，傳入參數的 interface 為 StatProps
-const Stat: React.FC<StatProps> = ({ url }) => {
+const Stat: React.FC = () => {
 
     // 使用 cookies Hook 取得當前 user
     const [cookies] = useCookies(["user"]);
@@ -85,7 +81,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
 
     // 使用 async function getUserID 以及 username 來取得 userId
     const getUserID = async (username: string) => {
-        const response = await axios.get(url + `user/find/${username}`, {
+        const response = await axios.get(`${API_URL}user/find/${username}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -120,10 +116,10 @@ const Stat: React.FC<StatProps> = ({ url }) => {
         // 設定圖表類型
         if (selectedBodyPart && selectedBodyPart !== 'default') {
             setChartType('line');
-        } else {  
+        } else {
             setChartType('bar');
         }
-        
+
         const painData = calculatePainAverage(userhurt, selectedBodyPart);
         const individualPainData = calculatePainData(userhurt);
 
@@ -232,8 +228,8 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                 params.end = moment.tz(searchDateto, 'Asia/Taipei').endOf('day').toISOString();
                 console.log(params.end);
             }
-            
-            const response = await axios.get(`${url}hurtform/${id}`, {
+
+            const response = await axios.get(`${API_URL}hurtform/${id}`, {
                 params,
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -264,7 +260,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                 params.end = moment.tz(searchDateto, 'Asia/Taipei').endOf('day').toISOString();
             }
 
-            const response = await axios.get(`${url}weekform/${id}`, {
+            const response = await axios.get(`${API_URL}weekform/${id}`, {
                 params,
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -295,7 +291,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                 params.end = moment.tz(searchDateto, 'Asia/Taipei').endOf('day').toISOString();
             }
 
-            const response = await axios.get(`${url}yearform/${id}`, {
+            const response = await axios.get(`${API_URL}yearform/${id}`, {
                 params,
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -317,15 +313,15 @@ const Stat: React.FC<StatProps> = ({ url }) => {
 
     // admin 管理介面刪除使用者疼痛資料
     const handleDelete = async (formId: string) => {
-        await axios.delete(`${url}hurtform/${formId}`, {
+        await axios.delete(`${API_URL}hurtform/${formId}`, {
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true
         });
-        await axios.delete(`${url}weekform/${formId}`, {
+        await axios.delete(`${API_URL}weekform/${formId}`, {
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true
         });
-        await axios.delete(`${url}yearform/${formId}`, {
+        await axios.delete(`${API_URL}yearform/${formId}`, {
             headers: { 'Content-Type': 'application/json' },
             withCredentials: true
         });
@@ -344,7 +340,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
             fetchUserweek(userId);
             fetchUseryear(userId);
         }
-    };  
+    };
 
     // 渲染下拉選單
     const renderDropdownItems = (parts: typeof bodyParts, setSelectedBodyPart: React.Dispatch<React.SetStateAction<string>>) => {
@@ -361,8 +357,8 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     {parts.filter(part => part.category === category).map(part => (
-                                        <Dropdown.Item 
-                                            key={part.value} 
+                                        <Dropdown.Item
+                                            key={part.value}
                                             onClick={() => setSelectedBodyPart(part.value)}
                                         >
                                             {part.label}
@@ -379,7 +375,7 @@ const Stat: React.FC<StatProps> = ({ url }) => {
 
     // 使用 userId 獲得 username
     const getUsername = async (uid: string) => {
-        const response = await axios.get(url + `user/${uid}`, {
+        const response = await axios.get(`${API_URL}user/${uid}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -436,18 +432,18 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                         {/* admin 的管理及匯出 Excel 功能 */}
                         {user === 'admin' && (
                             <>
-                            {/* 展示互動介面，可刪除疼痛資料 */}
-                            <Button variant="outline-primary" onClick={handleShow} className='me-2'>
-                                管理
-                            </Button>
-                            {/* 匯出 Excel */}
-                            <Button 
-                                variant="outline-primary" 
-                                onClick={() => exportToExcel(userhurt[0].user_id)} 
-                                className='me-2'
-                            >
-                                匯出 Excel
-                            </Button>
+                                {/* 展示互動介面，可刪除疼痛資料 */}
+                                <Button variant="outline-primary" onClick={handleShow} className='me-2'>
+                                    管理
+                                </Button>
+                                {/* 匯出 Excel */}
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={() => exportToExcel(userhurt[0].user_id)}
+                                    className='me-2'
+                                >
+                                    匯出 Excel
+                                </Button>
                             </>
                         )}
                     </Form>
@@ -458,8 +454,8 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                         // 根據圖表類型渲染不同的圖表
                         chartType === 'bar' ? (
                             // 長條圖
-                            <Bar 
-                                data={chartData} 
+                            <Bar
+                                data={chartData}
                                 options={{
                                     scales: {
                                         y1: {
@@ -469,12 +465,12 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                                             max: 10
                                         }
                                     }
-                                }} 
+                                }}
                             />
                         ) : (
                             // 折線圖
-                            <Line 
-                                data={chartData} 
+                            <Line
+                                data={chartData}
                                 options={{
                                     scales: {
                                         y1: {
@@ -487,19 +483,19 @@ const Stat: React.FC<StatProps> = ({ url }) => {
                                             type: 'linear',
                                             position: 'right',
                                             beginAtZero: true,
-                                            display: false, 
+                                            display: false,
                                             max: 4,
                                             grid: {
-                                                drawOnChartArea: false 
+                                                drawOnChartArea: false
                                             }
                                         }
                                     }
-                                }} 
+                                }}
                             />
                         )
                     )}
                 </div>
-                
+
                 {/* admin 管理用 Modal */}
                 <Modal show={showModal} onHide={handleClose} size="lg">
                     <Modal.Header closeButton>
