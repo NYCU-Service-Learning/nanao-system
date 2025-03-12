@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import axios from 'axios';
 import { API_URL } from '../config';
+import { httpPost } from '../api/APIUtils';
+import { requestLogout } from '../api/authAPI';
 
 const Logout = () => {
 
@@ -21,12 +22,7 @@ const Logout = () => {
       try {
 
         // 使用 axios 向後端發送登出請求，通知伺服器移除登入狀態
-        await axios.post(`${API_URL}auth/logout`, {}, {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true
-        });
+        await requestLogout();
 
         // 成功登出後，移除 'user' 的 cookie，表示前端不再保存使用者狀態
         removeCookie('user');

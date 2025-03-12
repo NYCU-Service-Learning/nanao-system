@@ -1,11 +1,11 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
 // import Button from 'react-bootstrap/Button';
-import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
 import { API_URL } from '../config';
-import { fetchIdByUsername } from '../api/userAPI';
+import { getIdByUsername } from '../api/userAPI';
+import { httpGet } from '../api/APIUtils';
 // import { isNullOrUndef } from 'chart.js/helpers';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
@@ -63,7 +63,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   // 使用 useEffect 用於獲取使用者資料
   useEffect(() => {
     const fetchUserId = async () => {
-      const fetchedId = await fetchIdByUsername(user);
+      const fetchedId = await getIdByUsername(user);
       if (!userId) {
         if (fetchedId) {
           setUserId(fetchedId);
@@ -122,20 +122,10 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
     try {
-      const response1 = await axios.get(`${API_URL}user/${id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-      setUsers(response1.data);
-      const response2 = await axios.get(`${API_URL}user-detail/${id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true,
-      });
-      setUserData(response2.data);
+      const user1 = await httpGet(`${API_URL}user/${id}`);
+      setUsers(user1);
+      const data2 = await httpGet(`${API_URL}user-detail/${id}`);
+      setUserData(data2);
     } catch (error) {
       console.log(error)
       setErrMsg('Error fetching user data.');

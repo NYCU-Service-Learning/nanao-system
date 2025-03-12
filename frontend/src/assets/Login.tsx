@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import axios from 'axios';
 import { API_URL } from '../config';
+import { getStatus } from '../api/authAPI';
 
 const Login: React.FC = () => {
   const userRef = useRef<HTMLInputElement>(null);
@@ -49,12 +50,10 @@ const Login: React.FC = () => {
     // 添加一個狀態檢查函數
     const checkAuthStatus = async () => {
       try {
-        const response = await axios.get(`${API_URL}auth/status`, {
-          withCredentials: true
-        });
+        const data = await getStatus();
 
-        if (response.data.status === 'success') {
-          setUserCookie(response.data.user.username);
+        if (data.status === 'success') {
+          setUserCookie(data.user.username);
           navigate('/home');
         }
       } catch (error) {

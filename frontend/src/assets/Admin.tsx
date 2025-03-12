@@ -3,12 +3,12 @@ import axios from 'axios';
 import { Container, Table, Button, Navbar, Nav, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Admin.css';
-import { API_URL } from '../config';
 import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
-import { fetchIdByUsername } from '../api/userAPI';
+import { createNewUser, deleteUserById, getAllUsers, getIdByUsername, patchUserById } from '../api/userAPI';
+import { fetchUserDetailById, patchUserDetailById } from '../api/userDetailAPI';
 
 // 定義 User 的 interface，指定資料類型
 interface User {
@@ -95,14 +95,8 @@ const Admin: React.FC = () => {
     const fetchUsers = async () => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user 路由
-            const response = await axios.get(`${API_URL}user`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
             // 從 GET 請求 response 中取出用戶資料，更新用戶列表
-            const users = response.data;
+            const users = await getAllUsers();
             setUsers(users);
         } catch (error) {
             // 錯誤處理
@@ -114,14 +108,9 @@ const Admin: React.FC = () => {
     const fetchUserdata = async (id: string): Promise<UserData | null> => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user-detail/{ID} 路由
-            const response = await axios.get(`${API_URL}user-detail/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
-            console.log(response.data);
-            return response.data;
+            const userData = await fetchUserDetailById(id);
+            console.log(userData);
+            return userData;
         } catch (error) {
             // 錯誤處理，return null 表示失敗
             setErrMsg('Error fetching users.');
@@ -133,12 +122,7 @@ const Admin: React.FC = () => {
     const handleDelete = async (id: string) => {
         try {
             // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
-            await axios.delete(`${API_URL}user/${id}`, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+            await deleteUserById(id);
             // 重新取得用戶列表
             fetchUsers();
         } catch (error) {
@@ -159,7 +143,7 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleUpdate`，根據使用者名稱和 role 更新用戶資料
     const handleUpdate = async (username: string, role: string) => {
         // 根據用戶名稱取得用戶 ID
-        const editUserId = await fetchIdByUsername(username);
+        const editUserId = await getIdByUsername(username);
         try {
             // 建立更新的用戶資料
             const updatedUser = {
@@ -169,12 +153,7 @@ const Admin: React.FC = () => {
                 role: role
             };
             // 使用 axios 發送 PATCH 請求到後端的 /user/{editUserID} 路由
-            await axios.patch(`${API_URL}user/${editUserId}`, updatedUser, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+            await patchUserById(editUserId, updatedUser);
             // 重新取得用戶列表
             fetchUsers();
             // 關閉編輯視窗，清空表單
@@ -192,7 +171,7 @@ const Admin: React.FC = () => {
         // 設定編輯表單中的用戶資料，根據使用者名稱取得 ID 及詳細資料
         setEditUsername2(user.username);
         setEditName2(user.name);
-        const editUserId = await fetchIdByUsername(user.username);
+        const editUserId = await getIdByUsername(user.username);
         const userdata = await fetchUserdata(editUserId);
 
         if (userdata) {
@@ -230,7 +209,7 @@ const Admin: React.FC = () => {
     const handleUploadImg = async (username: string) => {
         // 建立 FormData 來處理資料，根據使用者名稱取得 ID
         const formData = new FormData();
-        const editUserID = await fetchIdByUsername(username);
+        const editUserID = await getIdByUsername(username);
         try {
             if (fileList.length > 0) {
                 // 取得上傳的第一個文件，append 到 formData
@@ -257,12 +236,7 @@ const Admin: React.FC = () => {
                     headshot: '4'
                 };
                 // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-                await axios.patch(`${API_URL}user-detail/${editUserID}`, updatedUser, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    withCredentials: true
-                });
+                await patchUserDetailById(editUserID, updatedUser);
             } else {
                 // 錯誤處理
                 message.error('上傳失敗');
@@ -279,7 +253,7 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleUpdate2`，根據使用者名稱更新使用者詳細資料
     const handleUpdate2 = async (username: string) => {
         // 根據使用者名稱取得 ID
-        const editUserId = await fetchIdByUsername(username);
+        const editUserId = await getIdByUsername(username);
         try {
             // 建立更新的用戶詳細資料
             const updatedUser = {
@@ -293,12 +267,7 @@ const Admin: React.FC = () => {
                 headshot: editUserhs2
             };
             // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-            await axios.patch(`${API_URL}user-detail/${editUserId}`, updatedUser, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+            await patchUserDetailById(editUserId, updatedUser);
             // 重新取得用戶列表
             fetchUsers();
             // 關閉編輯視窗，清空表單
@@ -342,12 +311,7 @@ const Admin: React.FC = () => {
                 }
             };
             // 使用 axios 發送 POST 請求到後端的 /user 路由
-            await axios.post(`${API_URL}user`, newUser, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+            await createNewUser(newUser);
             // 重新取得用戶列表
             fetchUsers();
             // 關閉視窗，清除資料
@@ -370,7 +334,7 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleEditAiImg`，用於設定 AI 頭像並打開 AI 頭像選擇視窗
     const handleEditAiImg = async (username: string) => {
         // 根據使用者名稱取得 ID
-        const editUserID = await fetchIdByUsername(username);
+        const editUserID = await getIdByUsername(username);
         // 設定AI生成的頭像圖片 url
         setAiImgSrc1(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca1-${editUserID}.jpg`);
         setAiImgSrc2(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca2-${editUserID}.jpg`);
@@ -384,19 +348,14 @@ const Admin: React.FC = () => {
     const handleAiClick = async (username: string, imgNum: string) => {
         message.info('正在設定用戶頭像，請耐心等待');
         // 根據使用者名稱取得 ID
-        const editUserID = await fetchIdByUsername(username);
+        const editUserID = await getIdByUsername(username);
         try {
             // 建立更新的用戶頭像資料，設定頭像為選取之 AI 頭像編號
             const updatedUser = {
                 headshot: imgNum
             };
             // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-            await axios.patch(`${API_URL}user-detail/${editUserID}`, updatedUser, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+            await patchUserDetailById(editUserID, updatedUser);
             // 3秒處理時間，顯示成功訊息
             setTimeout(() => {
                 message.success('用戶頭像更新成功');
@@ -479,10 +438,10 @@ const Admin: React.FC = () => {
                                 <td className="role-column">{user.role === "ADMIN" ? "管理員" : "使用者"}</td>
                                 <td className="link-column">
                                     {/*個人資料按鈕，點擊時導航到用戶個人資料頁面*/}
-                                    <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await fetchIdByUsername(user.username)}`)}>個人資料</Button>
+                                    <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await getIdByUsername(user.username)}`)}>個人資料</Button>
                                     &nbsp;
                                     {/*疼痛統計按鈕，點擊時導航到用戶疼痛統計頁面*/}
-                                    <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await fetchIdByUsername(user.username)}`)}>疼痛統計</Button>
+                                    <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await getIdByUsername(user.username)}`)}>疼痛統計</Button>
                                     &nbsp;
                                 </td>
                                 <td className="actions-column">
@@ -497,7 +456,7 @@ const Admin: React.FC = () => {
                                     &nbsp;
                                     {/*刪除按鈕，僅對非管理員用戶顯示*/}
                                     {user.role !== 'ADMIN' && (
-                                        <Button variant="outline-danger" onClick={async () => handleDelete(await fetchIdByUsername(user.username))}>刪除</Button>
+                                        <Button variant="outline-danger" onClick={async () => handleDelete(await getIdByUsername(user.username))}>刪除</Button>
                                     )}
                                 </td>
                             </tr>

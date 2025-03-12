@@ -14,7 +14,8 @@ import { bodyParts } from './ts/constants';
 import withAuthRedirect from './withAuthRedirect';
 import * as XLSX from 'xlsx';
 import { API_URL } from '../config';
-import { fetchIdByUsername } from '../api/userAPI';
+import { getIdByUsername } from '../api/userAPI';
+import { deleteHurtformById, deleteWeekformById, deleteYearformById } from '../api/fromAPI';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -84,7 +85,7 @@ const Stat: React.FC = () => {
     useEffect(() => {
         const fetchUserId = async () => {
             if (!userId && user) {
-                const fetchedId = await fetchIdByUsername(user);
+                const fetchedId = await getIdByUsername(user);
                 if (fetchedId) {
                     setUserId(fetchedId);
                     await fetchUserhurt(fetchedId);
@@ -303,18 +304,9 @@ const Stat: React.FC = () => {
 
     // admin 管理介面刪除使用者疼痛資料
     const handleDelete = async (formId: string) => {
-        await axios.delete(`${API_URL}hurtform/${formId}`, {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true
-        });
-        await axios.delete(`${API_URL}weekform/${formId}`, {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true
-        });
-        await axios.delete(`${API_URL}yearform/${formId}`, {
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true
-        });
+        await deleteHurtformById(formId);
+        await deleteWeekformById(formId);
+        await deleteYearformById(formId);
         if (userId) {
             fetchUserhurt(userId);
             fetchUserweek(userId);

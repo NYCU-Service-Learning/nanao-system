@@ -4,11 +4,11 @@ import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import axios from 'axios';
 import withAuthRedirect from '../withAuthRedirect';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
-import { fetchIdByUsername } from '../../api/userAPI';
+import { getIdByUsername } from '../../api/userAPI';
+import { httpPost } from '../../api/APIUtils';
 
 // 定義 PainLevelType 和 PainStatusType 介面，用於描述疼痛狀態的數據結構
 interface PainLevelType {
@@ -36,28 +36,13 @@ const Interact: React.FC = () => {
   const handleSubmit = async () => {
     try {
       // 根據 cookies 中的使用者名稱取得使用者 ID
-      const userid = await fetchIdByUsername(cookies.user);
+      const userid = await getIdByUsername(cookies.user);
 
       // 發送多個 POST 請求，分別提交每年、每週疼痛狀態和疼痛等級
       await Promise.all([
-        axios.post(`${API_URL}hurtform/${userid}`, PainLevel, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true, // 向請求中包含憑證
-        }),
-        axios.post(`${API_URL}weekform/${userid}`, WeekPain, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }),
-        axios.post(`${API_URL}yearform/${userid}`, MonthPain, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }),
+        httpPost(`${API_URL}hurtform/${userid}`, PainLevel),
+        httpPost(`${API_URL}weekform/${userid}`, WeekPain),
+        httpPost(`${API_URL}yearform/${userid}`, MonthPain),
       ]);
       // 成功提交後導航至統計頁面
       navigate('/stat');

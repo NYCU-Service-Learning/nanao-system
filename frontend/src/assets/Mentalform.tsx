@@ -2,7 +2,6 @@ import { Form, Table, Radio } from "antd";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import React from "react";
-import axios from 'axios';
 import "./Mentalform.css"; // Import the CSS file
 type QuestionData = {
   key: string; // Assuming keys are strings
@@ -26,7 +25,8 @@ const dataSource = [
 
 import { ColumnsType } from "antd/es/table";
 import { API_URL } from "../config";
-import { fetchIdByUsername } from "../api/userAPI";
+import { getIdByUsername } from "../api/userAPI";
+import { httpPost } from "../api/APIUtils";
 
 const columns: ColumnsType<QuestionData> = [
   {
@@ -111,13 +111,13 @@ const MentalForm = () => {
 
   React.useEffect(() => {
     const fetchUserID = async () => {
-      const id = await fetchIdByUsername(cookies.user);
+      const id = await getIdByUsername(cookies.user);
       setUserID(id);
     };
     fetchUserID();
   }, [cookies.user]);
 
-  const onFinish = (values: FormValues) => {
+  const onFinish = async (values: FormValues) => {
     const data: MentalFormProps = {
       problem: [],
     };
@@ -125,16 +125,8 @@ const MentalForm = () => {
       data["problem"].push(values[key]);
     }
     console.log(data);
-    axios.post(`${API_URL}mentalform/${userID}`, data, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
-    }).then(() => {
-      navigate("/home");
-    }
-    );
-
+    await httpPost(`${API_URL}mentalform/${userID}`, data);
+    navigate('/home');
   };
 
   return (

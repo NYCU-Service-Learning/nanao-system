@@ -10,7 +10,7 @@ const instance = axios.create({
     timeout: 10 * 1000,
 });
 
-const get = async (url: string) => {
+const httpGet = async (url: string) => {
     try {
         const response = await instance.get(url);
         return response.data;
@@ -20,9 +20,9 @@ const get = async (url: string) => {
     }
 }
 
-const post = async (url: string, data) => {
+const httpPost = async (url: string, data) => {
     try {
-        const response = await instance.post(url,data);
+        const response = await instance.post(url, data);
         return response.data;
     } catch (err) {
         console.error(`POST error:\n${err}`);
@@ -30,4 +30,24 @@ const post = async (url: string, data) => {
     }
 }
 
-export { instance, get, post };
+const httpDelete = async (url: string) => {
+    try {
+        const response = await instance.delete(url);
+        return response.data;
+    } catch (err) {
+        console.error(`DELETE error:\n${err}`);
+        throw err;
+    }
+}
+
+const httpPatch = async (url: string, data) => {
+    try {
+        const response = await instance.patch(url, data);
+        return response.data;
+    } catch (err) {
+        console.error(`POST error:\n${err}`);
+        throw err;
+    }
+}
+
+export { instance, httpGet , httpPost, httpDelete, httpPatch };

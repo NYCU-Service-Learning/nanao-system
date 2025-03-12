@@ -1,22 +1,17 @@
-import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import * as React from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { Select } from 'antd';
 import './MentalStat.css';
 import { API_URL } from '../config';
-import { fetchIdByUsername } from '../api/userAPI';
+import { getIdByUsername } from '../api/userAPI';
+import { httpGet } from '../api/APIUtils';
 
 const { Option } = Select;
 
 const getMentalStat = async (userID) => {
-  const response = await axios.get(`${API_URL}mentalform/${userID}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true,
-  });
-  return response.data;
+  const mentalStat = await httpGet(`${API_URL}mentalform/${userID}`);
+  return mentalStat;
 };
 
 const parseISOToLocal = (isoString) => {
@@ -35,7 +30,7 @@ const MentalStat = () => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const userID = await fetchIdByUsername(cookies.user);
+      const userID = await getIdByUsername(cookies.user);
       const mentalStat = await getMentalStat(userID);
       console.log(mentalStat);
       const mentalStatData = mentalStat.map((item) => ({
