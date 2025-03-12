@@ -1,10 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { Prisma } from '@prisma/client';
 import { AdminOrSameUserIdGuard } from 'src/auth/utils/guards/LocalGuard';
 import { UserIdName } from 'src/auth/utils/metadata/GuardMetadata';
-
 
 @Controller('user')
 export class UserController {
@@ -28,9 +36,9 @@ export class UserController {
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
-  
+
   @Get('/find/:username')
-  findId(@Param('username') username: string){
+  findId(@Param('username') username: string) {
     return this.userService.findId(username);
   }
 
@@ -42,7 +50,10 @@ export class UserController {
   @UseGuards(AdminOrSameUserIdGuard)
   @UserIdName('id')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: Prisma.UserUpdateInput) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: Prisma.UserUpdateInput,
+  ) {
     return this.userService.update(+id, updateUserDto);
   }
 
@@ -52,5 +63,4 @@ export class UserController {
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
   }
-
 }

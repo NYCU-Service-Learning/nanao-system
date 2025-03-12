@@ -4,7 +4,7 @@ import { UserDetailController } from './user-detail.controller';
 import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
-  imports:[DatabaseModule],
+  imports: [DatabaseModule],
   controllers: [UserDetailController],
   providers: [UserDetailService],
 })
