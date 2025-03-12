@@ -5,21 +5,12 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import { Select } from 'antd';
 import './MentalStat.css';
 import { API_URL } from '../config';
+import { fetchIdByUsername } from '../api/userAPI';
 
 const { Option } = Select;
 
 const getMentalStat = async (userID) => {
   const response = await axios.get(`${API_URL}mentalform/${userID}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true,
-  });
-  return response.data;
-};
-
-const getUserID = async (username) => {
-  const response = await axios.get(`${API_URL}user/find/${username}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -44,7 +35,7 @@ const MentalStat = () => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const userID = await getUserID(cookies.user);
+      const userID = await fetchIdByUsername(cookies.user);
       const mentalStat = await getMentalStat(userID);
       console.log(mentalStat);
       const mentalStatData = mentalStat.map((item) => ({

@@ -14,6 +14,7 @@ import { bodyParts } from './ts/constants';
 import withAuthRedirect from './withAuthRedirect';
 import * as XLSX from 'xlsx';
 import { API_URL } from '../config';
+import { fetchIdByUsername } from '../api/userAPI';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -79,22 +80,11 @@ const Stat: React.FC = () => {
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
 
-    // 使用 async function getUserID 以及 username 來取得 userId
-    const getUserID = async (username: string) => {
-        const response = await axios.get(`${API_URL}user/find/${username}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            withCredentials: true
-        });
-        return response.data;
-    };
-
     // 若 userId 或 user 更新時，更新 userhurt、userweek、useryear 的資料
     useEffect(() => {
         const fetchUserId = async () => {
             if (!userId && user) {
-                const fetchedId = await getUserID(user);
+                const fetchedId = await fetchIdByUsername(user);
                 if (fetchedId) {
                     setUserId(fetchedId);
                     await fetchUserhurt(fetchedId);

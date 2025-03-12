@@ -8,22 +8,7 @@ import axios from 'axios';
 import withAuthRedirect from '../withAuthRedirect';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
-
-/**
- * getUserID - 根據使用者名稱請求使用者 ID 的異步函數
- * @param username 使用者名稱
- * @returns 包含使用者 ID 的 Promise
- */
-
-const getUserID = async (username: string): Promise<string> => {
-  const response = await axios.get(`${API_URL}user/find/${username}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true, // 向請求中包含憑證 (如 cookies)
-  });
-  return response.data; // 返回使用者 ID
-};
+import { fetchIdByUsername } from '../../api/userAPI';
 
 // 定義 PainLevelType 和 PainStatusType 介面，用於描述疼痛狀態的數據結構
 interface PainLevelType {
@@ -51,7 +36,7 @@ const Interact: React.FC = () => {
   const handleSubmit = async () => {
     try {
       // 根據 cookies 中的使用者名稱取得使用者 ID
-      const userid = await getUserID(cookies.user);
+      const userid = await fetchIdByUsername(cookies.user);
 
       // 發送多個 POST 請求，分別提交每年、每週疼痛狀態和疼痛等級
       await Promise.all([

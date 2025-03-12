@@ -8,6 +8,7 @@ import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
+import { fetchIdByUsername } from '../api/userAPI';
 
 // 定義 User 的 interface，指定資料類型
 interface User {
@@ -110,7 +111,7 @@ const Admin: React.FC = () => {
     };
 
     // 定義一個異步函數 `fetchUserdata`，根據使用者 ID 取得詳細用戶資料
-    const fetchUserdata = async (id: number): Promise<UserData | null> => {
+    const fetchUserdata = async (id: string): Promise<UserData | null> => {
         try {
             // 使用 axios 發送 GET 請求到後端的 /user-detail/{ID} 路由
             const response = await axios.get(`${API_URL}user-detail/${id}`, {
@@ -129,7 +130,7 @@ const Admin: React.FC = () => {
     };
 
     // 定義一個異步函數 `handleDelete`，根據使用者 ID 刪除用戶資料
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         try {
             // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
             await axios.delete(`${API_URL}user/${id}`, {
@@ -158,7 +159,7 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleUpdate`，根據使用者名稱和 role 更新用戶資料
     const handleUpdate = async (username: string, role: string) => {
         // 根據用戶名稱取得用戶 ID
-        const editUserId = await getUserID(username);
+        const editUserId = await fetchIdByUsername(username);
         try {
             // 建立更新的用戶資料
             const updatedUser = {
@@ -191,7 +192,7 @@ const Admin: React.FC = () => {
         // 設定編輯表單中的用戶資料，根據使用者名稱取得 ID 及詳細資料
         setEditUsername2(user.username);
         setEditName2(user.name);
-        const editUserId = await getUserID(user.username);
+        const editUserId = await fetchIdByUsername(user.username);
         const userdata = await fetchUserdata(editUserId);
 
         if (userdata) {
@@ -229,7 +230,7 @@ const Admin: React.FC = () => {
     const handleUploadImg = async (username: string) => {
         // 建立 FormData 來處理資料，根據使用者名稱取得 ID
         const formData = new FormData();
-        const editUserID = await getUserID(username);
+        const editUserID = await fetchIdByUsername(username);
         try {
             if (fileList.length > 0) {
                 // 取得上傳的第一個文件，append 到 formData
@@ -278,7 +279,7 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleUpdate2`，根據使用者名稱更新使用者詳細資料
     const handleUpdate2 = async (username: string) => {
         // 根據使用者名稱取得 ID
-        const editUserId = await getUserID(username);
+        const editUserId = await fetchIdByUsername(username);
         try {
             // 建立更新的用戶詳細資料
             const updatedUser = {
@@ -360,18 +361,6 @@ const Admin: React.FC = () => {
         }
     };
 
-    // 定義一個異步函數 `getUserID`，根據使用者名稱取得 ID
-    const getUserID = async (username: string) => {
-        // 使用 axios 發送 GET 請求到後端的 /user/find/{username} 路由
-        const response = await axios.get(`${API_URL}user/find/${username}`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            withCredentials: true
-        });
-        // 回傳資料
-        return response.data;
-    };
     // 定義一個異步函數 `handleEditUploadImg`，開啟上傳圖片的視窗
     const handleEditUploadImg = async () => {
         setShowEditImgModal(false);
@@ -381,7 +370,7 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleEditAiImg`，用於設定 AI 頭像並打開 AI 頭像選擇視窗
     const handleEditAiImg = async (username: string) => {
         // 根據使用者名稱取得 ID
-        const editUserID = await getUserID(username);
+        const editUserID = await fetchIdByUsername(username);
         // 設定AI生成的頭像圖片 url
         setAiImgSrc1(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca1-${editUserID}.jpg`);
         setAiImgSrc2(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca2-${editUserID}.jpg`);
@@ -395,7 +384,7 @@ const Admin: React.FC = () => {
     const handleAiClick = async (username: string, imgNum: string) => {
         message.info('正在設定用戶頭像，請耐心等待');
         // 根據使用者名稱取得 ID
-        const editUserID = await getUserID(username);
+        const editUserID = await fetchIdByUsername(username);
         try {
             // 建立更新的用戶頭像資料，設定頭像為選取之 AI 頭像編號
             const updatedUser = {
@@ -490,10 +479,10 @@ const Admin: React.FC = () => {
                                 <td className="role-column">{user.role === "ADMIN" ? "管理員" : "使用者"}</td>
                                 <td className="link-column">
                                     {/*個人資料按鈕，點擊時導航到用戶個人資料頁面*/}
-                                    <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await getUserID(user.username)}`)}>個人資料</Button>
+                                    <Button variant="outline-secondary" onClick={async () => navigate(`/profile?id=${await fetchIdByUsername(user.username)}`)}>個人資料</Button>
                                     &nbsp;
                                     {/*疼痛統計按鈕，點擊時導航到用戶疼痛統計頁面*/}
-                                    <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await getUserID(user.username)}`)}>疼痛統計</Button>
+                                    <Button variant="outline-secondary" onClick={async () => navigate(`/stat?id=${await fetchIdByUsername(user.username)}`)}>疼痛統計</Button>
                                     &nbsp;
                                 </td>
                                 <td className="actions-column">
@@ -508,7 +497,7 @@ const Admin: React.FC = () => {
                                     &nbsp;
                                     {/*刪除按鈕，僅對非管理員用戶顯示*/}
                                     {user.role !== 'ADMIN' && (
-                                        <Button variant="outline-danger" onClick={async () => handleDelete(await getUserID(user.username))}>刪除</Button>
+                                        <Button variant="outline-danger" onClick={async () => handleDelete(await fetchIdByUsername(user.username))}>刪除</Button>
                                     )}
                                 </td>
                             </tr>

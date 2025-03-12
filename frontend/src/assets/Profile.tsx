@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
 import { API_URL } from '../config';
+import { fetchIdByUsername } from '../api/userAPI';
 // import { isNullOrUndef } from 'chart.js/helpers';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
@@ -59,21 +60,10 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
   const [key,] = useState(0);
 
-  // 定義一個異步函數 `getUserID`，根據使用者名稱從伺服器取得使用者 ID
-  const getUserID = async (username: string) => {
-    const response = await axios.get(`${API_URL}user/find/${username}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
-    });
-    return response.data;
-  };
-
   // 使用 useEffect 用於獲取使用者資料
   useEffect(() => {
     const fetchUserId = async () => {
-      const fetchedId = await getUserID(user);
+      const fetchedId = await fetchIdByUsername(user);
       if (!userId) {
         if (fetchedId) {
           setUserId(fetchedId);

@@ -26,6 +26,7 @@ const dataSource = [
 
 import { ColumnsType } from "antd/es/table";
 import { API_URL } from "../config";
+import { fetchIdByUsername } from "../api/userAPI";
 
 const columns: ColumnsType<QuestionData> = [
   {
@@ -103,21 +104,6 @@ const columns: ColumnsType<QuestionData> = [
   },
 ];
 
-/**
- * getUserID - 根據使用者名稱請求使用者 ID 的異步函數
- * @param username 使用者名稱
- * @returns 包含使用者 ID 的 Promise
- */
-
-const getUserID = async (username: string): Promise<string> => {
-  const response = await axios.get(`${API_URL}user/find/${username}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true, // 向請求中包含憑證 (如 cookies)
-  });
-  return response.data; // 返回使用者 ID
-};
 const MentalForm = () => {
   const [cookies] = useCookies(['user']); // 取得 cookies 中的使用者資訊
   const navigate = useNavigate(); // 用於導航的 hook
@@ -125,7 +111,7 @@ const MentalForm = () => {
 
   React.useEffect(() => {
     const fetchUserID = async () => {
-      const id = await getUserID(cookies.user);
+      const id = await fetchIdByUsername(cookies.user);
       setUserID(id);
     };
     fetchUserID();
