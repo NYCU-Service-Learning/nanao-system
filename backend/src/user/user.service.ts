@@ -9,11 +9,17 @@ import {
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
+
+  private hashPassword = async (password: string): Promise<string> => {
+    return await bcrypt.hash(password, 10);
+  };
+
   async create(createUserDto: Prisma.UserCreateInput) {
-    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
+    createUserDto.password = await this.hashPassword(createUserDto.password);
     try {
       return await this.databaseService.user.create({
         data: createUserDto,
@@ -27,9 +33,8 @@ export class UserService {
         error.message.includes('Unknown argument')
       ) {
         throw new BadRequestException('bad request, json format is incorrect');
-      } else {
-        throw error;
       }
+      throw error;
     }
   }
 
@@ -56,9 +61,8 @@ export class UserService {
         ...updateUserDto,
       };
       if (updateUserDto.password) {
-        hashedUpdateUser.password = await bcrypt.hash(
+        hashedUpdateUser.password = await this.hashPassword(
           updateUserDto.password.toString(),
-          10,
         );
       }
       return await this.databaseService.user.update({
@@ -74,9 +78,8 @@ export class UserService {
         throw new BadRequestException(
           'bad request, unknown labels is included',
         );
-      } else {
-        throw error;
       }
+      throw error;
     }
   }
 
@@ -111,9 +114,7 @@ export class UserService {
         email: email,
       },
     });
-
-    if (!user) return null;
-    return user.id;
+    return user ? user.id : null;
   }
 
   async findIdByLine(lineId: string) {
@@ -122,8 +123,6 @@ export class UserService {
         lineId: lineId,
       },
     });
-
-    if (!user) return null;
-    return user.id;
+    return user ? user.id : null;
   }
 }
