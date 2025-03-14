@@ -34,7 +34,7 @@ export class UserController {
   @UserIdName('id')
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(Number(id));
   }
 
   @Get('/find/:username')
@@ -54,13 +54,13 @@ export class UserController {
     @Param('id') id: string,
     @Body() updateUserDto: Prisma.UserUpdateInput,
   ) {
-    return this.userService.update(+id, updateUserDto);
+    return this.userService.update(Number(id), updateUserDto);
   }
 
   @UseGuards(AdminOrSameUserIdGuard)
   @UserIdName('id')
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.remove(Number(id));
   }
 }
