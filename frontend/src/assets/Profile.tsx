@@ -50,8 +50,6 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [users, setUsers] = useState<User | null>(null);
   const [userId, setUserId] = useState<string | null>(id || null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [lineCanLink, setLineCanLink] = useState(false);
-  const [googleCanLink, setGoogleCanLink] = useState(false);
   const [canLink, setCanLink] = useState(false);
   const [linkMsg, setLinkMsg] = useState('');
   const [errMsg, setErrMsg] = useState('');
@@ -104,8 +102,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   useEffect(() => {
     if (users) {
-      setGoogleCanLink(canLink && !users.email ? true : false);
-      setLineCanLink(canLink && !users.lineId ? true : false);
+      setCanLink(canLink && true);
     }
   }, [users, canLink]);
 
@@ -169,9 +166,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         <div><span className="label">地址：</span>{displayData.address || '無'}</div>
         <div><span className="label">過去病史：</span>{displayData.medical_History || '無'}</div>
         {/* Same user */}
-        {googleCanLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleGoogleLink}>連結 Google 帳號</button>}
+        {canLink && !errMsg && !users?.email && <button className="btn btn-outline-primary" onClick={handleGoogleLink}>連結 Google 帳號</button>}
         &nbsp;
-        {lineCanLink && !errMsg && <button className="btn btn-outline-primary" onClick={handleLineLink}>連結 Line 帳號</button>}
+        {canLink && !errMsg && users?.lineId && <button className="btn btn-outline-primary" onClick={handleLineLink}>連結 Line 帳號</button>}
         {/* show google link message */}
         {linkMsg && <span className="linkmsg" style={{ color: (googleStatus || lineStatus) === 'Success' ? 'green' : 'red' }}>{linkMsg}</span>}
       </div>
