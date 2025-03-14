@@ -1,12 +1,10 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
-// import Button from 'react-bootstrap/Button';
 import { useLocation } from 'react-router-dom';
 import withAuthRedirect from './withAuthRedirect';
 import { API_URL } from '../config';
-import { getIdByUsername } from '../api/userAPI';
-import { httpGet } from '../api/APIUtils';
-// import { isNullOrUndef } from 'chart.js/helpers';
+import { getIdByUsername, getUserById } from '../api/userAPI';
+import { getUserDetailById } from '../api/userDetailAPI';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
 interface User {
@@ -84,30 +82,22 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   }, [userId, user]);
 
   useEffect(() => {
-    switch (googleStatus || lineStatus) {
-      case 'Success':
-        setLinkMsg('第三方帳號連結成功!');
-        break;
-      /*case 'Conflict':
-        setLinkMsg('該第三方帳號已連結至其他使用者');
-        break;*/
-      case 'Fail':
-        setLinkMsg('帳號連結失敗, 請重試');
-        break;
-      default:
-        setLinkMsg('');
-        break;
+    if (googleStatus === 'Success' || lineStatus === 'Success') {
+      setLinkMsg('第三方帳號連結成功!');
+    } else if (googleStatus === 'Fail' || lineStatus === 'Fail') {
+      setLinkMsg('帳號連結失敗, 請重試');
+    } else {
+      setLinkMsg('');
     }
   }, [googleStatus, lineStatus]);
 
   // 使用 useEffect 根據 userData 和 userId 來更新頭像 URL
   useEffect(() => {
-    if (userData) {
-      if (userData.headshot !== "0") {
-        setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca${userData.headshot}-${userId}.jpg`);
-      }
+    if (userData && userId) {
       if (userData.headshot === "4") {
         setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_original/original-${userId}.jpg`);
+      } else if (userData.headshot !== "0") {
+        setAvatarUrl(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca${userData.headshot}-${userId}.jpg`);
       }
     }
   }, [userData, userId]);
@@ -122,9 +112,9 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   // 定義一個異步函數 `fetchUserData`，根據 userId 獲取使用者詳細資料
   const fetchUserData = async (id: string) => {
     try {
-      const user1 = await httpGet(`${API_URL}user/${id}`);
+      const user1 = await getUserById(id);
       setUsers(user1);
-      const data2 = await httpGet(`${API_URL}user-detail/${id}`);
+      const data2 = await getUserDetailById(id);
       setUserData(data2);
     } catch (error) {
       console.log(error)
