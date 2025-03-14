@@ -1,6 +1,6 @@
 import './Stat.css';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Container, Table, Button, Navbar, Form, FormControl, Dropdown, Modal } from 'react-bootstrap';
@@ -67,9 +67,8 @@ const Stat: React.FC = () => {
     const [searchDatefrom, setSearchDatefrom] = useState('');
     const [searchDateto, setSearchDateto] = useState('');
 
-    // 設定圖表的類型為 bar (長條圖)
-    const [chartType, setChartType] = useState('bar');
-    // const [filteredBodyParts, setFilteredBodyParts] = useState(bodyParts);
+    // 圖表類型根據選取部位判斷
+    const chartType = useMemo(() => (selectedBodyPart !== 'default' ? 'line' : 'bar'), [selectedBodyPart]);
 
     // chartData 用來儲存圖表的資料，包含 labels 和 datasets
     const [chartData, setChartData] = useState({
@@ -115,14 +114,6 @@ const Stat: React.FC = () => {
 
     // 當圖表相關資料(userhurt, selectedBodyPart, chartType, userweek, useryear)更新時，更新圖表(chartData)
     useEffect(() => {
-
-        // 設定圖表類型
-        if (selectedBodyPart && selectedBodyPart !== 'default') {
-            setChartType('line');
-        } else {
-            setChartType('bar');
-        }
-
         const painData = calculatePainAverage(userhurt, selectedBodyPart);
         const individualPainData = calculatePainData(userhurt);
 
