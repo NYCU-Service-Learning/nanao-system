@@ -1,6 +1,6 @@
 import './Stat.css';
 import axios from 'axios';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Container, Table, Button, Navbar, Form, FormControl, Dropdown, Modal } from 'react-bootstrap';
@@ -14,7 +14,7 @@ import { bodyParts } from './ts/constants';
 import withAuthRedirect from './withAuthRedirect';
 import * as XLSX from 'xlsx';
 import { API_URL } from '../config';
-import { getIdByUsername } from '../api/userAPI';
+import { getIdByUsername, getUserById } from '../api/userAPI';
 import { deleteHurtformById, deleteWeekformById, deleteYearformById } from '../api/fromAPI';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
@@ -41,7 +41,6 @@ const generateQueryParams = (from: string, to: string) => {
     }
     return params;
 }
-
 
 // 定義 Stat component 為一個 React Function Component，傳入參數的 interface 為 StatProps
 const Stat: React.FC = () => {
@@ -92,6 +91,55 @@ const Stat: React.FC = () => {
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
 
+    // 使用後端API取得使用者的疼痛資料
+    const fetchUserhurt = useCallback(async (id: string) => {
+        try {
+            // params 為查詢時間區間
+            const params = generateQueryParams(searchDatefrom, searchDateto);
+            const { data } = await axios.get(`${API_URL}hurtform/${id}`, {
+                params,
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            });
+            setUserhurt(Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []));
+        } catch (error) {
+            console.error("Error fetching user hurt data:", error);
+            setUserhurt([]);
+        }
+    }, [searchDatefrom, searchDateto]);
+
+    // 使用後端API取得使用者的一週內是否疼痛資料
+    const fetchUserweek = useCallback(async (id: string) => {
+        try {
+            const params = generateQueryParams(searchDatefrom, searchDateto);
+            const { data } = await axios.get(`${API_URL}weekform/${id}`, {
+                params,
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            });
+            setUserweek(Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []));
+        } catch (error) {
+            console.error("Error fetching user week data:", error);
+            setUserweek([]);
+        }
+    }, [searchDatefrom, searchDateto]);
+
+    // 使用後端API取得使用者的一年內是否影響正常生活資料
+    const fetchUseryear = useCallback(async (id: string) => {
+        try {
+            const params = generateQueryParams(searchDatefrom, searchDateto);
+            const { data } = await axios.get(`${API_URL}yearform/${id}`, {
+                params,
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
+            });
+            setUseryear(Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []));
+        } catch (error) {
+            console.error("Error fetching user year data:", error);
+            setUseryear([]);
+        }
+    }, [searchDatefrom, searchDateto]);
+
     // 若 userId 或 user 更新時，更新 userhurt、userweek、useryear 的資料
     useEffect(() => {
         const fetchUserId = async () => {
@@ -99,21 +147,56 @@ const Stat: React.FC = () => {
                 const fetchedId = await getIdByUsername(user);
                 if (fetchedId) {
                     setUserId(fetchedId);
-                    await fetchUserhurt(fetchedId);
-                    await fetchUserweek(fetchedId);
-                    await fetchUseryear(fetchedId);
+                    await Promise.all([
+                        fetchUserhurt(fetchedId),
+                        fetchUserweek(fetchedId),
+                        fetchUseryear(fetchedId)
+                    ])
                 }
             } else if (userId) {
-                await fetchUserhurt(userId);
-                await fetchUserweek(userId);
-                await fetchUseryear(userId);
+                await Promise.all([
+                    fetchUserhurt(userId),
+                    fetchUserweek(userId),
+                    fetchUseryear(userId)
+                ]);
             }
         };
         fetchUserId();
-    }, [userId, user]);
+    }, [userId, user, fetchUserhurt, fetchUserweek, fetchUseryear]);
 
     // 當圖表相關資料(userhurt, selectedBodyPart, chartType, userweek, useryear)更新時，更新圖表(chartData)
     useEffect(() => {
+        // 取得特定部位的疼痛指數，並依時間排序
+        const calculatePainData = (data: Userhurt[]) => {
+            return data.map(item => ({
+                name: item.fill_time,
+                pain: item[selectedBodyPart]
+            })).sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+        };
+
+        // 計算 全部/指定 部位平均疼痛指數
+        const calculatePainAverage = (data: Userhurt[], selectedPart: string) => {
+            if (selectedPart && selectedPart !== 'default') {
+                const totalPain = data.reduce((acc, curr) => acc + curr[selectedPart], 0);
+                const averagePain = totalPain / data.length;
+                return [{
+                    name: bodyParts.find(bp => bp.value === selectedPart)?.label || '',
+                    pain: averagePain
+                }];
+            } else {
+                const partKeys = bodyParts.filter(part => part.value !== 'default').map(part => part.value);
+                const averages = partKeys.map(part => {
+                    const totalPain = data.reduce((acc, curr) => acc + curr[part], 0);
+                    const averagePain = totalPain / data.length;
+                    return {
+                        name: bodyParts.find(bp => bp.value === part)?.label || '',
+                        pain: averagePain
+                    };
+                });
+                return averages;
+            }
+        };
+
         const painData = calculatePainAverage(userhurt, selectedBodyPart);
         const individualPainData = calculatePainData(userhurt);
 
@@ -178,129 +261,31 @@ const Stat: React.FC = () => {
         setChartData(chartType === 'bar' ? barChartData : lineChartData);
     }, [userhurt, selectedBodyPart, chartType, userweek, useryear]);
 
-    // 取得特定部位的疼痛指數，並依時間排序
-    const calculatePainData = (data: Userhurt[]) => {
-        return data.map(item => ({
-            name: item.fill_time,
-            pain: item[selectedBodyPart]
-        })).sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
-    };
-
-    // 計算 全部/指定 部位平均疼痛指數
-    const calculatePainAverage = (data: Userhurt[], selectedPart: string) => {
-        if (selectedPart && selectedPart !== 'default') {
-            const totalPain = data.reduce((acc, curr) => acc + curr[selectedPart], 0);
-            const averagePain = totalPain / data.length;
-            return [{
-                name: bodyParts.find(bp => bp.value === selectedPart)?.label || '',
-                pain: averagePain
-            }];
-        } else {
-            const partKeys = bodyParts.filter(part => part.value !== 'default').map(part => part.value);
-            const averages = partKeys.map(part => {
-                const totalPain = data.reduce((acc, curr) => acc + curr[part], 0);
-                const averagePain = totalPain / data.length;
-                return {
-                    name: bodyParts.find(bp => bp.value === part)?.label || '',
-                    pain: averagePain
-                };
-            });
-            return averages;
-        }
-    };
-
-    // 使用後端API取得使用者的疼痛資料
-    const fetchUserhurt = async (id: string) => {
-        try {
-            // params 為查詢時間區間
-            const params = generateQueryParams(searchDatefrom, searchDateto);
-            const response = await axios.get(`${API_URL}hurtform/${id}`, {
-                params,
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
-            const data = response.data;
-
-            if (Array.isArray(data)) {
-                setUserhurt(data);
-            } else if (Array.isArray(data.data)) {
-                setUserhurt(data.data);
-            } else {
-                setUserhurt([]);
-            }
-        } catch (error) {
-            console.error("Error fetching user hurt data:", error);
-            setUserhurt([]);
-        }
-    };
-
-    // 使用後端API取得使用者的一週內是否疼痛資料
-    const fetchUserweek = async (id: string) => {
-        try {
-            const params = generateQueryParams(searchDatefrom, searchDateto);
-            const response = await axios.get(`${API_URL}weekform/${id}`, {
-                params,
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
-            const data = response.data;
-
-            if (Array.isArray(data)) {
-                setUserweek(data);
-            } else if (Array.isArray(data.data)) {
-                setUserweek(data.data);
-            } else {
-                setUserweek([]);
-            }
-        } catch (error) {
-            console.error("Error fetching user week data:", error);
-            setUserweek([]);
-        }
-    };
-
-    // 使用後端API取得使用者的一年內是否影響正常生活資料
-    const fetchUseryear = async (id: string) => {
-        try {
-            const params = generateQueryParams(searchDatefrom, searchDateto);
-            const response = await axios.get(`${API_URL}yearform/${id}`, {
-                params,
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
-            const data = response.data;
-
-            if (Array.isArray(data)) {
-                setUseryear(data);
-            } else if (Array.isArray(data.data)) {
-                setUseryear(data.data);
-            } else {
-                setUseryear([]);
-            }
-        } catch (error) {
-            console.error("Error fetching user year data:", error);
-            setUseryear([]);
-        }
-    };
-
     // admin 管理介面刪除使用者疼痛資料
     const handleDelete = async (formId: string) => {
-        await deleteHurtformById(formId);
-        await deleteWeekformById(formId);
-        await deleteYearformById(formId);
+        await Promise.all([
+            deleteHurtformById(formId),
+            deleteWeekformById(formId),
+            deleteYearformById(formId),
+        ]);
         if (userId) {
-            fetchUserhurt(userId);
-            fetchUserweek(userId);
-            fetchUseryear(userId);
+            await Promise.all([
+                fetchUserhurt(userId),
+                fetchUserweek(userId),
+                fetchUseryear(userId)
+            ]);
         }
     };
 
     // 搜尋使用者疼痛資料(即搜尋按鈕的事件處理函式)
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (userId) {
-            fetchUserhurt(userId);
-            fetchUserweek(userId);
-            fetchUseryear(userId);
+            await Promise.all([
+                fetchUserhurt(userId),
+                fetchUserweek(userId),
+                fetchUseryear(userId)
+            ]);
         }
     };
 
@@ -335,24 +320,13 @@ const Stat: React.FC = () => {
         );
     };
 
-    // 使用 userId 獲得 username
-    const getUsername = async (uid: string) => {
-        const response = await axios.get(`${API_URL}user/${uid}`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            withCredentials: true
-        });
-        return response.data;
-    };
-
     // 匯出 Excel
     const exportToExcel = async (uid: string) => {
-        const response = await getUsername(uid);
+        const user = await getUserById(uid);
         const worksheet = XLSX.utils.json_to_sheet(userhurt);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "疼痛資料");
-        XLSX.writeFile(workbook, `疼痛資料_${response.username}.xlsx`);
+        XLSX.writeFile(workbook, `疼痛資料_${user.username}.xlsx`);
     };
 
     return (

@@ -6,6 +6,11 @@ const getIdByUsername = async (username: string): Promise<string> => {
     return id;
 };
 
+const getUserById = async (id: string | number) => {
+    const user = await httpGet(`${API_URL}user/${id}`);
+    return user;
+}
+
 const getAllUsers = async () => {
     const users = await httpGet(`${API_URL}user`);
     return users;
@@ -23,4 +28,4 @@ const createNewUser = async (data) => {
     await httpPost(`${API_URL}user/`, data);
 };
 
-export { getIdByUsername, getAllUsers, deleteUserById, patchUserById, createNewUser };
+export { getIdByUsername, getAllUsers, deleteUserById, patchUserById, createNewUser,  getUserById };
