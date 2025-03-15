@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { Prisma } from '@prisma/client';
 import { AdminOrSameUserIdGuard } from 'src/auth/utils/guards/LocalGuard';
 import { UserIdName } from 'src/auth/utils/metadata/GuardMetadata';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -20,6 +21,7 @@ export class UserController {
 
   @UseGuards(AdminOrSameUserIdGuard)
   @Post()
+  @ApiOperation({ summary: '創建用戶', description: '' })
   create(@Body() createUserDto: Prisma.UserCreateInput) {
     return this.userService.create(createUserDto);
   }
