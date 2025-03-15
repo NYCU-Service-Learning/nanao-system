@@ -6,8 +6,8 @@ import './Admin.css';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
-import { createNewUser, deleteUserById, getAllUsers, getIdByUsername, patchUserById } from '../api/userAPI';
-import { getUserDetailById, patchUserDetailById } from '../api/userDetailAPI';
+import { createNewUser, deleteUserById, getAllUsers, getIdByUsername, patchUserById } from '../../api/userAPI';
+import { getUserDetailById, patchUserDetailById } from '../../api/userDetailAPI';
 
 // 定義 User 的 interface，指定資料類型
 interface User {

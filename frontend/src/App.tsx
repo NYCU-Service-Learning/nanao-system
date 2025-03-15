@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CookiesProvider, useCookies } from 'react-cookie';
 
-import Home from './assets/Home';
+import Home from './pages/Home/Home';
 import Interact from './assets/Interact/Interact';
 import Login from './pages/Login/Login';
-import Logout from './assets/Logout';
+import Logout from './pages/Logout/Logout';
 import Navig from './assets/Navig';
-import NotFound from './assets/NotFound';
-import Profile from './assets/Profile';
-import Admin from './assets/Admin';
-import Stat from './assets/Stat';
-import MentalStat from './assets/MentalStat';
-import Mentalform from './assets/Mentalform'
+import NotFound from './pages/NotFound/NotFound';
+import Profile from './pages/Profile/Profile';
+import Admin from './pages/Admin/Admin';
+import Stat from './pages/Stat/Stat';
+import MentalStat from './pages/MentalStat/MentalStat';
+import Mentalform from './pages/Mentalform/Mentalform'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import withAuthRedirect from './assets/withAuthRedirect';

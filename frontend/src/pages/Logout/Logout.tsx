@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { API_URL } from '../config';
-import { httpPost } from '../api/APIUtils';
-import { requestLogout } from '../api/authAPI';
+import { requestLogout } from '../../api/authAPI';
 
 const Logout = () => {
 

@@ -3,9 +3,9 @@ import * as React from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { Select } from 'antd';
 import './MentalStat.css';
-import { API_URL } from '../config';
-import { getIdByUsername } from '../api/userAPI';
-import { httpGet } from '../api/APIUtils';
+import { API_URL } from '../../config';
+import { getIdByUsername } from '../../api/userAPI';
+import { httpGet } from '../../api/APIUtils';
 
 const { Option } = Select;
 

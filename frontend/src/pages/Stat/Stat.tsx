@@ -9,12 +9,12 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, 
 import 'chart.js/auto';
 import moment from 'moment';
 import 'moment-timezone';
-import { Userhurt, Usertime } from './ts/types';
-import { bodyParts } from './ts/constants';
+import { Userhurt, Usertime } from '../../assets/ts/types';
+import { bodyParts } from '../../assets/ts/constants';
 import * as XLSX from 'xlsx';
-import { API_URL } from '../config';
-import { getIdByUsername, getUserById } from '../api/userAPI';
-import { deleteHurtformById, deleteWeekformById, deleteYearformById } from '../api/fromAPI';
+import { API_URL } from '../../config';
+import { getIdByUsername, getUserById } from '../../api/userAPI';
+import { deleteHurtformById, deleteWeekformById, deleteYearformById } from '../../api/fromAPI';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 

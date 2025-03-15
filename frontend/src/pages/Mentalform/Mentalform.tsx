@@ -24,9 +24,9 @@ const dataSource = [
 ];
 
 import { ColumnsType } from "antd/es/table";
-import { API_URL } from "../config";
-import { getIdByUsername } from "../api/userAPI";
-import { httpPost } from "../api/APIUtils";
+import { API_URL } from "../../config";
+import { getIdByUsername } from "../../api/userAPI";
+import { httpPost } from "../../api/APIUtils";
 
 const columns: ColumnsType<QuestionData> = [
   {

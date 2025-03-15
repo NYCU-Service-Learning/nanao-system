@@ -1,9 +1,9 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { API_URL } from '../config';
-import { getIdByUsername, getUserById } from '../api/userAPI';
-import { getUserDetailById } from '../api/userDetailAPI';
+import { API_URL } from '../../config';
+import { getIdByUsername, getUserById } from '../../api/userAPI';
+import { getUserDetailById } from '../../api/userDetailAPI';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
 interface User {
