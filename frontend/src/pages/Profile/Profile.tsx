@@ -93,7 +93,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   useEffect(() => {
     if (users) {
-      setCanLink(canLink && true);
+      setCanLink(canLink);
     }
   }, [users, canLink]);
 
@@ -140,7 +140,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   return (
     <div className="profile">
-      <Avatar avatarUrl={avatarUrl}/>
+      <Avatar avatarUrl={avatarUrl} />
       <div className="info">
         {/* 顯示使用者的基本和詳細資訊，若資料不存在則顯示 '無' */}
         <div><span className="label">姓名：</span>{users?.name || '無'}</div>

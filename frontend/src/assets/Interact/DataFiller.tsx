@@ -23,12 +23,12 @@ interface DataFillerProps {
 
 const DataFiller: React.FC<DataFillerProps> = (props) => {
   // Weekvalue 狀態：用於追蹤該部位過去一週的疼痛狀態
-  const [Weekvalue, setWeekValue] = useState(false); // 更新 Weekvalue 狀態
+  const [WeekValue, setWeekValue] = useState(false); // 更新 Weekvalue 狀態
   const onChangeWeek = (e: RadioChangeEvent) => {
     setWeekValue(e.target.value);
   };
   // Monthvalue 狀態：用於追蹤該部位過去一年的疼痛狀態
-  const [Monthvalue, setMonthValue] = useState(false);
+  const [MonthValue, setMonthValue] = useState(false);
 
   /**
    * 處理 Monthvalue 變更的函數
@@ -42,52 +42,50 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
   // value 狀態：記錄疼痛等級
   const [value, setValue] = useState(0);
   //處理疼痛等級滑塊值變更的函數
-   
+
   const onChangeValue = (value: number) => {
     setValue(value);
   };
-// 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
+  // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
   return (
-    <>
-      <Modal
-        title="填寫疼痛資料"
-        visible={props.currentPart !== ''} // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
-        onOk={() => {
-          // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
-          props.MonthPain[props.currentPart] = Monthvalue;
-          props.WeekPain[props.currentPart] = Weekvalue;
-          props.PainLevel[props.currentPart] = value;
-          // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
-          props.setCurrentPart('');
-          setMonthValue(false);
-          setWeekValue(false);
-          setValue(0);
-        }}
-        onCancel={() => { props.setCurrentPart(''); }}// 按下 Cancel 後清除當前選擇的部位
-        mask={false}// 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
-      > {/* 表單，用於填寫疼痛資料 */}
-        <Form>
-          {/* 疼痛等級滑塊，範圍從 0 到 10 */}
-          <Form.Item label="過去一年有無疼痛？">
-            <Slider onChange={onChangeValue} value={value} max={10} min={0} />
-          </Form.Item>
-          {/* 是否在過去一年影響正常生活的 Radio 選項 */}
-          <Form.Item label="此部位過去一年此部位的疼痛是否影響正常生活？">
-            <Radio.Group onChange={onChangeMonth} value={Monthvalue}>
-              <Radio value={true}>Yes</Radio>
-              <Radio value={false}>No</Radio>
-            </Radio.Group>
-          </Form.Item>
-          {/* 是否在過去一年影響正常生活的 Radio 選項 */}
-          <Form.Item label="過去一星期中，此部位是否還疼痛？">
-            <Radio.Group onChange={onChangeWeek} value={Weekvalue}>
-              <Radio value={true}>Yes</Radio> {/* 是的，過去一週有疼痛 */}
-              <Radio value={false}>No</Radio> {/* 否，過去一週無疼痛 */}
-            </Radio.Group>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+    <Modal
+      title="填寫疼痛資料"
+      open={props.currentPart !== ''} // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
+      onOk={() => {
+        // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
+        props.MonthPain[props.currentPart] = MonthValue;
+        props.WeekPain[props.currentPart] = WeekValue;
+        props.PainLevel[props.currentPart] = value;
+        // 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
+        props.setCurrentPart('');
+        setMonthValue(false);
+        setWeekValue(false);
+        setValue(0);
+      }}
+      onCancel={() => { props.setCurrentPart(''); }}// 按下 Cancel 後清除當前選擇的部位
+      mask={false}// 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
+    > {/* 表單，用於填寫疼痛資料 */}
+      <Form>
+        {/* 疼痛等級滑塊，範圍從 0 到 10 */}
+        <Form.Item label="過去一年有無疼痛？">
+          <Slider onChange={onChangeValue} value={value} max={10} min={0} />
+        </Form.Item>
+        {/* 是否在過去一年影響正常生活的 Radio 選項 */}
+        <Form.Item label="此部位過去一年此部位的疼痛是否影響正常生活？">
+          <Radio.Group onChange={onChangeMonth} value={MonthValue}>
+            <Radio value={true}>Yes</Radio>
+            <Radio value={false}>No</Radio>
+          </Radio.Group>
+        </Form.Item>
+        {/* 是否在過去一年影響正常生活的 Radio 選項 */}
+        <Form.Item label="過去一星期中，此部位是否還疼痛？">
+          <Radio.Group onChange={onChangeWeek} value={WeekValue}>
+            <Radio value={true}>Yes</Radio> {/* 是的，過去一週有疼痛 */}
+            <Radio value={false}>No</Radio> {/* 否，過去一週無疼痛 */}
+          </Radio.Group>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 };
 
