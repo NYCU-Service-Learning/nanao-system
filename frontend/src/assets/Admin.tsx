@@ -30,42 +30,78 @@ interface UserData {
     headshot: string;
 }
 
+interface NewUserForm {
+    name: string;
+    username: string;
+    password: string;
+    email: string;
+}
+
+interface EditUserForm {
+    name: string;
+    username: string;
+    password: string;
+    role: string;
+}
+
+interface EditUserDetailForm {
+    gender: string;
+    birthday: string;
+    age: number;
+    phone: string;
+    email: string;
+    address: string;
+    medical_History: string;
+    headshot: string;
+}
+
 // 定義 Admin component為一個 React Function Component 類型
 const Admin: React.FC = () => {
     // useState 是 React Hooks，用於管理 React component 的狀態，會觸發 component 的重新渲染
-    const [showValidation, setShowValidation] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
-    const [showModal, setShowModal] = useState(false);
-    const [newUsername, setNewUsername] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [newName, setNewName] = useState('');
-    const [newEmail, setNewemail] = useState('');
-
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [editName, setEditName] = useState('');
-    const [editUsername, setEditUsername] = useState('');
-    const [editPassword, setEditPassword] = useState('');
-    const [editUserrole, setEditUserrole] = useState('');
-
-    const [showEditModal2, setShowEditModal2] = useState(false);
-    const [editUsername2, setEditUsername2] = useState('');
-    const [editName2, setEditName2] = useState('');
-    const [editGender2, setEditGender2] = useState('');
-    const [editUserbirth2, setEditUserbirth2] = useState('');
-    const [editUserage2, setEditUserage2] = useState(0);
-    const [editUserphone2, setEditUserphone2] = useState('');
-    const [editUseremail2, setEditUseremail2] = useState('');
-    const [editUseraddr2, setEditUseraddr2] = useState('');
-    const [editUsermhis2, setEditUsermhis2] = useState('');
-    const [editUserhs2, setEditUserhs2] = useState('0');
     const [errMsg, setErrMsg] = useState('');
 
+    // Modal顯示管理
+    const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showEditModal2, setShowEditModal2] = useState(false);
     const [showEditImgModal, setShowEditImgModal] = useState(false);
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [uploading, setUploading] = useState(false);
-    const [editNameImg, setEditNameImg] = useState('');
     const [showUploadImgModal, setShowUploadImgModal] = useState(false);
     const [showEditAiModal, setShowEditAiModal] = useState(false);
+
+    // 新增用戶
+    const [newUserForm, setNewUserForm] = useState<NewUserForm>({
+        name: '',
+        username: '',
+        password: '',
+        email: ''
+    });
+    const [showValidation, setShowValidation] = useState(false);
+
+    // 編輯用戶
+    const [editUserForm, setEditUserForm] = useState<EditUserForm>({
+        name: '',
+        username: '',
+        password: '',
+        role: '',
+    });
+
+    // 編輯用戶詳細資料
+    const [editUserDetailForm, setEditUserDetailForm] = useState<EditUserDetailForm>({
+        gender: '',
+        birthday: '',
+        age: 0,
+        phone: '',
+        email: '',
+        address: '',
+        medical_History: '',
+        headshot: '0',
+    })
+
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [uploading, setUploading] = useState(false);
+
+    const [currentEditUser, setCurrentEditUser] = useState('');
     const [aiImgSrc1, setAiImgSrc1] = useState<string>();
     const [aiImgSrc2, setAiImgSrc2] = useState<string>();
     const [aiImgSrc3, setAiImgSrc3] = useState<string>();
@@ -79,17 +115,70 @@ const Admin: React.FC = () => {
 
     // useNavigate 是一個 React Hook，用於導航到其他routes
     const navigate = useNavigate();
-    const handleValidateAndSubmit = () => {
+
+    const clearNewUserForm = () => {
+        setNewUserForm({ name: '', username: '', password: '', email: '' });
+        setShowValidation(false);
+    };
+
+    const clearEditUserForm = () => {
+        setEditUserForm({ name: '', username: '', password: '', role: '' });
+    };
+
+    const clearEditUserDetailForm = () => {
+        setEditUserDetailForm({
+            gender: '',
+            birthday: '',
+            age: 0,
+            phone: '',
+            email: '',
+            address: '',
+            medical_History: '',
+            headshot: '0'
+        });
+    };
+
+    useEffect(() => {
+        if (newUserForm.name && newUserForm.username && newUserForm.password) {
+            setShowValidation(false);
+            setErrMsg(null);
+        }
+    }, [newUserForm]);
+
+    const handleAddUser = async () => {
         // 檢查必填欄位
-        if (!newName || !newUsername || !newPassword) {
+        if (!newUserForm.name || !newUserForm.username || !newUserForm.password) {
             setShowValidation(true);
             setErrMsg('請填寫所有必填欄位');
             return;
         }
-
         // 如果驗證通過，調用原本的 handleAddUser
-        handleAddUser();
-        setShowValidation(false);
+        try {
+            // 使用 axios 發送 POST 請求到後端的 /user 路由
+            await createNewUser({
+                ...newUserForm,
+                role: "USER",
+                userDetail: {
+                    create: {
+                        gender: null,
+                        birthday: "",
+                        age: 0,
+                        medical_History: "",
+                        address: "",
+                        phone: "",
+                        headshot: "0"
+                    }
+                }
+            });
+            // 重新取得用戶列表
+            await fetchUsers();
+            // 關閉視窗，清除資料
+            setShowModal(false);
+            clearNewUserForm();
+        } catch (error) {
+            // 錯誤處理
+            setErrMsg('Error adding user.');
+        }
     };
 
     const fetchUsers = async () => {
@@ -124,42 +213,37 @@ const Admin: React.FC = () => {
             // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
             await deleteUserById(id);
             // 重新取得用戶列表
-            fetchUsers();
+            await fetchUsers();
         } catch (error) {
             setErrMsg('Error deleting user.');
         }
     };
 
     // 定義函數 handleEditUser，用於打開編輯用戶帳密的編輯表單
-    const handleEditUser = (user: User) => {
+    const openEditUserForm = (user: User) => {
         // 設定編輯表單中的用戶資料
-        setEditName(user.name);
-        setEditUsername(user.username);
-        setEditUserrole(user.role);
+        setEditUserForm({
+            name: user.name,
+            username: user.username,
+            password: '',
+            role: user.role
+        })
         // 打開編輯視窗
         setShowEditModal(true);
     };
 
     // 定義一個異步函數 `handleUpdate`，根據使用者名稱和 role 更新用戶資料
-    const handleUpdate = async (username: string, role: string) => {
+    const handleEditUserForm = async () => {
         // 根據用戶名稱取得用戶 ID
-        const editUserId = await getIdByUsername(username);
+        const editUserId = await getIdByUsername(editUserForm.username);
         try {
-            // 建立更新的用戶資料
-            const updatedUser = {
-                name: editName,
-                username: editUsername,
-                password: editPassword,
-                role: role
-            };
             // 使用 axios 發送 PATCH 請求到後端的 /user/{editUserID} 路由
-            await patchUserById(editUserId, updatedUser);
+            await patchUserById(editUserId, editUserForm);
             // 重新取得用戶列表
             fetchUsers();
             // 關閉編輯視窗，清空表單
             setShowEditModal(false);
-            setEditUsername('');
-            setEditPassword('');
+            clearEditUserForm();
         } catch (error) {
             // 錯誤處理
             setErrMsg('Error updating user.');
@@ -167,41 +251,26 @@ const Admin: React.FC = () => {
     };
 
     // 定義一個異步函數 `handleEditUser2`，編輯使用者詳細資料
-    const handleEditUser2 = async (user: User) => {
+    const openEditUserDetailForm = async (user: User) => {
+        setCurrentEditUser(user.username);
+        setEditUserForm((prev) => ({ ...prev, username: user.username, name: user.name }));
         // 設定編輯表單中的用戶資料，根據使用者名稱取得 ID 及詳細資料
-        setEditUsername2(user.username);
-        setEditName2(user.name);
         const editUserId = await getIdByUsername(user.username);
         const userdata = await fetchUserdata(editUserId);
 
         if (userdata) {
             // 如果取得用戶資料，將其設定到編輯表單中
-            setEditGender2(userdata.gender);
-            setEditUserbirth2(userdata.birthday);
-            setEditUserage2(userdata.age);
-            setEditUserphone2(userdata.phone);
-            setEditUseremail2(userdata.email);
-            setEditUseraddr2(userdata.address);
-            setEditUsermhis2(userdata.medical_History);
-            setEditUserhs2(userdata.headshot)
+            setEditUserDetailForm(userdata);
 
         } else {
-            setEditGender2('');
-            setEditUserbirth2('');
-            setEditUserage2(0);
-            setEditUserphone2('');
-            setEditUseremail2('');
-            setEditUseraddr2('');
-            setEditUsermhis2('');
-            setEditUserhs2('0');
+            clearEditUserDetailForm();
         }
-
-        // 打開編輯資料的視窗
         setShowEditModal2(true);
     };
+
     // 定義一個異步函數 `handleEditImg`，開啟編輯使用者頭像的視窗
     const handleEditImg = async (user: User) => {
-        setEditNameImg(user.username);
+        setCurrentEditUser(user.username);
         setShowEditImgModal(true);
     };
 
@@ -251,77 +320,20 @@ const Admin: React.FC = () => {
     };
 
     // 定義一個異步函數 `handleUpdate2`，根據使用者名稱更新使用者詳細資料
-    const handleUpdate2 = async (username: string) => {
+    const handleEditUserDetailForm = async () => {
         // 根據使用者名稱取得 ID
-        const editUserId = await getIdByUsername(username);
+        const editUserId = await getIdByUsername(currentEditUser);
         try {
-            // 建立更新的用戶詳細資料
-            const updatedUser = {
-                gender: editGender2,
-                birthday: editUserbirth2,
-                age: editUserage2,
-                medical_History: editUsermhis2,
-                address: editUseraddr2,
-                email: editUseremail2,
-                phone: editUserphone2,
-                headshot: editUserhs2
-            };
             // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-            await patchUserDetailById(editUserId, updatedUser);
+            await patchUserDetailById(editUserId, editUserDetailForm);
             // 重新取得用戶列表
             fetchUsers();
             // 關閉編輯視窗，清空表單
             setShowEditModal2(false);
-            setEditUsername2('');
-            setEditName2('');
-            setEditGender2('');
-            setEditUserbirth2('');
-            setEditUserage2(0);
-            setEditUserphone2('');
-            setEditUseremail2('');
-            setEditUseraddr2('');
-            setEditUsermhis2('');
-            setEditUserhs2('0');
+            clearEditUserDetailForm();
         } catch (error) {
             // 錯誤處理
             setErrMsg('Error updating user.');
-        }
-    };
-
-    // 定義一個異步函數 `handleAddUser`，用於新增用戶
-    const handleAddUser = async () => {
-        try {
-            // 建立新用戶資料
-            const newUser = {
-                name: newName,
-                username: newUsername,
-                password: newPassword,
-                email: newEmail || null,
-                role: "USER",
-                userDetail: {
-                    create: {
-                        gender: null,
-                        birthday: "",
-                        age: 0,
-                        medical_History: "",
-                        address: "",
-                        phone: "",
-                        headshot: "0"
-                    }
-                }
-            };
-            // 使用 axios 發送 POST 請求到後端的 /user 路由
-            await createNewUser(newUser);
-            // 重新取得用戶列表
-            fetchUsers();
-            // 關閉視窗，清除資料
-            setShowModal(false);
-            setNewName('');
-            setNewUsername('');
-            setNewPassword('');
-        } catch (error) {
-            // 錯誤處理
-            setErrMsg('Error adding user.');
         }
     };
 
@@ -446,10 +458,10 @@ const Admin: React.FC = () => {
                                 </td>
                                 <td className="actions-column">
                                     {/*編輯帳密按鈕，點擊時打開編輯帳密視窗*/}
-                                    <Button variant="outline-secondary" onClick={() => handleEditUser(user)}>編輯帳密</Button>
+                                    <Button variant="outline-secondary" onClick={() => openEditUserForm(user)}>編輯帳密</Button>
                                     &nbsp;
                                     {/*編輯資料按鈕，點擊時打開編輯資料視窗*/}
-                                    <Button variant="outline-secondary" onClick={() => handleEditUser2(user)}>編輯資料</Button>
+                                    <Button variant="outline-secondary" onClick={() => openEditUserDetailForm(user)}>編輯資料</Button>
                                     &nbsp;
                                     {/*個人頭像按鈕，點擊時打開編輯頭像視窗*/}
                                     <Button variant="outline-secondary" onClick={() => handleEditImg(user)}>個人頭像</Button>
@@ -475,10 +487,10 @@ const Admin: React.FC = () => {
                                 <Form.Label>姓名 <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={newName}
-                                    onChange={(e) => setNewName(e.target.value)}
+                                    value={newUserForm.name}
+                                    onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
                                     required
-                                    isInvalid={!newName && showValidation}
+                                    isInvalid={!newUserForm.name && showValidation}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     請輸入姓名
@@ -489,10 +501,10 @@ const Admin: React.FC = () => {
                                 <Form.Label>帳號 <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={newUsername}
-                                    onChange={(e) => setNewUsername(e.target.value)}
+                                    value={newUserForm.username}
+                                    onChange={(e) => setNewUserForm({ ...newUserForm, username: e.target.value })}
                                     required
-                                    isInvalid={!newUsername && showValidation}
+                                    isInvalid={!newUserForm.username && showValidation}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     請輸入帳號
@@ -503,10 +515,10 @@ const Admin: React.FC = () => {
                                 <Form.Label>密碼 <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    value={newUserForm.password}
+                                    onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
                                     required
-                                    isInvalid={!newPassword && showValidation}
+                                    isInvalid={!newUserForm.password && showValidation}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     請輸入密碼
@@ -517,8 +529,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>電子郵件</Form.Label>
                                 <Form.Control
                                     type="email"
-                                    value={newEmail}
-                                    onChange={(e) => setNewemail(e.target.value)}
+                                    value={newUserForm.email}
+                                    onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
                                 />
                             </Form.Group>
                         </Form>
@@ -527,7 +539,7 @@ const Admin: React.FC = () => {
                     </Modal.Body>
                     <Modal.Footer>
                         {/*送出按鈕，點擊時調用handleAddUser函數*/}
-                        <Button variant="outline-primary" onClick={handleValidateAndSubmit}>
+                        <Button variant="outline-primary" onClick={handleAddUser}>
                             送出
                         </Button>
                     </Modal.Footer>
@@ -541,12 +553,12 @@ const Admin: React.FC = () => {
                     <Modal.Body className="modal-body">
                         <Form>
                             {/*姓名編輯欄位*/}
-                            <Form.Group controlId="formEditUsername" className="mt-3">
+                            <Form.Group controlId="formEditName" className="mt-3">
                                 <Form.Label>姓名</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={editName}
-                                    onChange={(e) => setEditName(e.target.value)}
+                                    value={editUserForm.name}
+                                    onChange={(e) => setEditUserForm({ ...editUserForm, name: e.target.value })}
                                     required
                                 />
                             </Form.Group>
@@ -555,18 +567,17 @@ const Admin: React.FC = () => {
                                 <Form.Label>帳號</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={editUsername}
-                                    onChange={(e) => setEditUsername(e.target.value)}
+                                    value={editUserForm.username}
                                     disabled
                                 />
                             </Form.Group>
                             {/*密碼編輯欄位*/}
-                            <Form.Group controlId="formEditName" className="mt-3">
+                            <Form.Group controlId="formEditPassword" className="mt-3">
                                 <Form.Label>密碼</Form.Label>
                                 <Form.Control
                                     type="password"
-                                    value={editPassword}
-                                    onChange={(e) => setEditPassword(e.target.value)}
+                                    value={editUserForm.password}
+                                    onChange={(e) => setEditUserForm({ ...editUserForm, password: e.target.value })}
                                     required
                                 />
                             </Form.Group>
@@ -576,7 +587,7 @@ const Admin: React.FC = () => {
                     </Modal.Body>
                     <Modal.Footer className="modal-footer">
                         {/*送出按鈕，點擊時調用handleUpdate函數*/}
-                        <Button variant="outline-primary" onClick={() => handleUpdate(editUsername, editUserrole)}>
+                        <Button variant="outline-primary" onClick={handleEditUserForm}>
                             送出
                         </Button>
                     </Modal.Footer>
@@ -594,7 +605,7 @@ const Admin: React.FC = () => {
                                 <Form.Label>姓名</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={editName2}
+                                    value={editUserForm.name}
                                     disabled
                                 />
                             </Form.Group>
@@ -603,7 +614,7 @@ const Admin: React.FC = () => {
                                 <Form.Label>帳號</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    value={editUsername2}
+                                    value={editUserForm.username}
                                     disabled
                                 />
                             </Form.Group>
@@ -612,8 +623,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>性別</Form.Label>
                                 <Form.Control
                                     as="select"  // 將輸入框渲染為下拉選擇框
-                                    value={editGender2 || ""}  // 綁定性別值,如果為空則顯示空字符串
-                                    onChange={(e) => setEditGender2(e.target.value)}  // 當選擇改變時更新性別值
+                                    value={editUserDetailForm.gender}  // 綁定性別值,如果為空則顯示空字符串
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, gender: e.target.value })}  // 當選擇改變時更新性別值
                                 >
                                     <option value="">選擇</option>  // 默認選項
                                     <option value="MALE">男</option>  // 男性選項
@@ -627,8 +638,8 @@ const Admin: React.FC = () => {
                                 <Form.Control
                                     as="input"  // 渲染為輸入框
                                     type="date"  // 指定輸入類型為日期
-                                    value={editUserbirth2}  // 綁定生日值
-                                    onChange={(e) => setEditUserbirth2(e.target.value)}  // 當日期改變時更新生日值
+                                    value={editUserDetailForm.birthday}  // 綁定生日值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, birthday: e.target.value })}  // 當日期改變時更新生日值
                                 />
                             </Form.Group>
 
@@ -637,8 +648,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>年齡</Form.Label>
                                 <Form.Control
                                     type="text"  // 文本輸入框
-                                    value={editUserage2 <= 0 ? "" : editUserage2}  // 如果年齡小於等於0,顯示空字符,否則顯示年齡值
-                                    onChange={(e) => setEditUserage2(Number(e.target.value))}  // 將輸入轉換為數字並更新年齡值
+                                    value={editUserDetailForm.age <= 0 ? "" : editUserDetailForm.age}  // 如果年齡小於等於0,顯示空字符,否則顯示年齡值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, age: Number(e.target.value) })}  // 將輸入轉換為數字並更新年齡值
                                 />
                             </Form.Group>
 
@@ -647,8 +658,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>電話</Form.Label>
                                 <Form.Control
                                     type="text"  // 文本輸入框
-                                    value={editUserphone2}  // 綁定電話號碼值
-                                    onChange={(e) => setEditUserphone2(e.target.value)}  // 當輸入改變時更新電話號碼
+                                    value={editUserDetailForm.phone}  // 綁定電話號碼值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, phone: e.target.value })}  // 當輸入改變時更新電話號碼
                                 />
                             </Form.Group>
 
@@ -657,8 +668,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>電子郵件</Form.Label>
                                 <Form.Control
                                     type="email"  // 電子郵件輸入框,提供基本的郵件格式驗證
-                                    value={editUseremail2}  // 綁定電子郵件值
-                                    onChange={(e) => setEditUseremail2(e.target.value)}  // 當輸入改變時更新電子郵件
+                                    value={editUserDetailForm.email}  // 綁定電子郵件值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, email: e.target.value })}  // 當輸入改變時更新電子郵件
                                 />
                             </Form.Group>
 
@@ -667,8 +678,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>地址</Form.Label>
                                 <Form.Control
                                     type="text"  // 文本輸入框
-                                    value={editUseraddr2}  // 綁定地址值
-                                    onChange={(e) => setEditUseraddr2(e.target.value)}  // 當輸入改變時更新地址
+                                    value={editUserDetailForm.address}  // 綁定地址值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, address: e.target.value })}  // 當輸入改變時更新地址
                                 />
                             </Form.Group>
 
@@ -677,8 +688,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>過去病史 (以、分隔)</Form.Label>
                                 <Form.Control
                                     type="text"  // 文本輸入框
-                                    value={editUsermhis2}  // 綁定病史值
-                                    onChange={(e) => setEditUsermhis2(e.target.value)}  // 當輸入改變時更新病史
+                                    value={editUserDetailForm.medical_History}  // 綁定病史值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, medical_History: e.target.value })}  // 當輸入改變時更新病史
                                 />
                             </Form.Group>
                         </Form>
@@ -686,7 +697,7 @@ const Admin: React.FC = () => {
                     </Modal.Body>
                     <Modal.Footer className="modal-footer">
                         {/*送出按鈕，點擊時調用handleUpdate2函數*/}
-                        <Button variant="outline-primary" onClick={() => handleUpdate2(editUsername2)}>
+                        <Button variant="outline-primary" onClick={() => handleEditUserDetailForm()}>
                             送出
                         </Button>
                     </Modal.Footer>
@@ -700,7 +711,7 @@ const Admin: React.FC = () => {
                         {/*上傳圖片按鈕*/}
                         <Button variant="outline-secondary" style={{ width: '80%' }} onClick={() => handleEditUploadImg()}>上傳圖片</Button>
                         {/*使用AI生成頭像按鈕*/}
-                        <Button variant="outline-secondary" style={{ width: '80%' }} onClick={() => handleEditAiImg(editNameImg)}>使用AI頭貼</Button>
+                        <Button variant="outline-secondary" style={{ width: '80%' }} onClick={() => handleEditAiImg(currentEditUser)}>使用AI頭貼</Button>
                     </Modal.Body>
                 </Modal>
 
@@ -717,7 +728,7 @@ const Admin: React.FC = () => {
                         {/*開始上傳按鈕*/}
                         <AntButton
                             type="primary"
-                            onClick={() => handleUploadImg(editNameImg)}
+                            onClick={() => handleUploadImg(currentEditUser)}
                             disabled={fileList.length === 0}  // 如果沒有選擇文件則禁用按鈕
                             loading={uploading}  // 上傳中顯示加載狀態
                             style={{ marginTop: 16 }}
@@ -737,19 +748,19 @@ const Admin: React.FC = () => {
                     <Modal.Body>
                         {/*AI生成的第一張圖片選項*/}
                         <div>
-                            <button onClick={() => handleAiClick(editNameImg, "1")} style={{ cursor: 'pointer' }}>
+                            <button onClick={() => handleAiClick(currentEditUser, "1")} style={{ cursor: 'pointer' }}>
                                 <img src={aiImgSrc1} style={{ maxWidth: '100%' }} />
                             </button>
                         </div>
                         {/*AI生成的第二張圖片選項*/}
                         <div>
-                            <button onClick={() => handleAiClick(editNameImg, "2")} style={{ cursor: 'pointer' }}>
+                            <button onClick={() => handleAiClick(currentEditUser, "2")} style={{ cursor: 'pointer' }}>
                                 <img src={aiImgSrc2} style={{ maxWidth: '100%' }} />
                             </button>
                         </div>
                         {/*AI生成的第三張圖片選項*/}
                         <div>
-                            <button onClick={() => handleAiClick(editNameImg, "3")} style={{ cursor: 'pointer' }}>
+                            <button onClick={() => handleAiClick(currentEditUser, "3")} style={{ cursor: 'pointer' }}>
                                 <img src={aiImgSrc3} style={{ maxWidth: '100%' }} />
                             </button>
                         </div>
