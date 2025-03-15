@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +28,15 @@ async function bootstrap() {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     methods: 'GET,HEAD,PATCH,POST,DELETE',
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('南澳資料庫系統API文件')
+    .setDescription('')
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, documentFactory);
+
   await app.listen(3000);
 }
 bootstrap();
