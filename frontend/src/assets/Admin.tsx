@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Container, Table, Button, Navbar, Nav, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import './Admin.css';
-import withAuthRedirect from './withAuthRedirect';
 import { UploadOutlined } from '@ant-design/icons';
 import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
@@ -782,4 +781,4 @@ const Admin: React.FC = () => {
     );
 };
 
-export default withAuthRedirect(Admin);
+export default Admin;

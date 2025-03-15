@@ -11,7 +11,6 @@ import moment from 'moment';
 import 'moment-timezone';
 import { Userhurt, Usertime } from './ts/types';
 import { bodyParts } from './ts/constants';
-import withAuthRedirect from './withAuthRedirect';
 import * as XLSX from 'xlsx';
 import { API_URL } from '../config';
 import { getIdByUsername, getUserById } from '../api/userAPI';
@@ -467,4 +466,4 @@ const Stat: React.FC = () => {
     );
 };
 
-export default withAuthRedirect(Stat);
+export default Stat;

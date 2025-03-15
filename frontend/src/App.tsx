@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CookiesProvider, useCookies } from 'react-cookie';
-import React from 'react';
 
 import Home from './assets/Home';
 import Interact from './assets/Interact/Interact';

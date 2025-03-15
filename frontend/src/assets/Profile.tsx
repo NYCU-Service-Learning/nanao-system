@@ -1,7 +1,6 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import withAuthRedirect from './withAuthRedirect';
 import { API_URL } from '../config';
 import { getIdByUsername, getUserById } from '../api/userAPI';
 import { getUserDetailById } from '../api/userDetailAPI';
@@ -179,5 +178,4 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   );
 };
 
-// 使用 withAuthRedirect 高階組件包裹 Profile 組件
-export default withAuthRedirect(Profile);
+export default Profile;

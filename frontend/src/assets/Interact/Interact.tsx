@@ -4,7 +4,6 @@ import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import withAuthRedirect from '../withAuthRedirect';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
@@ -80,4 +79,4 @@ const Interact: React.FC = () => {
   );
 };
 
-export default withAuthRedirect(Interact);
+export default Interact;
