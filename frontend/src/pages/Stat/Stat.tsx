@@ -1,7 +1,6 @@
 import './Stat.css';
 import axios from 'axios';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { Container, Table, Button, Navbar, Form, FormControl, Dropdown, Modal } from 'react-bootstrap';
 import { Bar, Line } from 'react-chartjs-2';
@@ -15,13 +14,9 @@ import * as XLSX from 'xlsx';
 import { API_URL } from '../../config';
 import { getIdByUsername, getUserById } from '../../api/userAPI';
 import { deleteHurtformById, deleteWeekformById, deleteYearformById } from '../../api/fromAPI';
+import useQuery from '../../hooks/useQuery';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
-
-// 使用自定義 Hook 取得 URL query string
-const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-};
 
 // Define a type for the query parameters
 interface QueryParams {

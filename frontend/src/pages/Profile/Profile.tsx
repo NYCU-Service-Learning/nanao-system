@@ -1,9 +1,10 @@
 import './Profile.css';
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { getIdByUsername, getUserById } from '../../api/userAPI';
 import { getUserDetailById } from '../../api/userDetailAPI';
+import Avatar from '../../components/Avatar';
+import useQuery from '../../hooks/useQuery';
 
 // 定義 User 介面，描述從後端獲取的使用者基本信息
 interface User {
@@ -25,14 +26,6 @@ interface UserData {
   headshot: string;
 }
 
-// 自定義的 hook，用 `use` 開頭
-// `useQuery` 用於從當前網址中解析查詢的參數
-const useQuery = () => {
-
-  // 使用 `useLocation` 來獲取當前的網址，並返回查詢參數物件
-  return new URLSearchParams(useLocation().search);
-};
-
 // 定義 ProfileProps 介面，描述 Profile 組件所需的屬性
 interface ProfileProps {
   user: string | null;
@@ -53,7 +46,6 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [linkMsg, setLinkMsg] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default_avatar.jpg');
-  const [key,] = useState(0);
 
   // 使用 useEffect 用於獲取使用者資料
   useEffect(() => {
@@ -148,13 +140,8 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
 
   return (
     <div className="profile">
-      <div>
-
-        {/* 頭像圖片的顯示，如果是預設頭像，則使用預設圖片；否則顯示動態 URL 來強制刷新圖片 */}
-        <img key={key} src={avatarUrl === '/default_avatar.jpg' ? '/default_avatar.jpg' : `${avatarUrl}?${new Date().getTime()}`} alt="Profile Picture" />
-      </div>
+      <Avatar avatarUrl={avatarUrl}/>
       <div className="info">
-
         {/* 顯示使用者的基本和詳細資訊，若資料不存在則顯示 '無' */}
         <div><span className="label">姓名：</span>{users?.name || '無'}</div>
         <div><span className="label">性別：</span>{genderMap[displayData.gender] || '無'}</div>

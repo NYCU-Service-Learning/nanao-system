@@ -1,105 +1,39 @@
 import './Login.css';
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import axios from 'axios';
 import { API_URL } from '../../config';
-import { getStatus } from '../../api/authAPI';
+import { useAuthHelper } from '../../utils/authUtils';
 
 const Login: React.FC = () => {
   const userRef = useRef<HTMLInputElement>(null);
   const [user, setUser] = useState('');
   const [pwd, setPwd] = useState('');
   const [errMsg, setErrMsg] = useState('');
-  const [cookies, setCookie] = useCookies(['user']);
-  const navigate = useNavigate();
+  const [cookies] = useCookies(['user']);
+
+  const { handleOAuthLogin, checkAuthStatus, loginWithPwd } = useAuthHelper();
 
   useEffect(() => {
     userRef.current?.focus();
   }, []);
 
-  const setUserCookie = useCallback((username: string) => {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + 60 * 60 * 1000);
-    setCookie('user', username, {
-      path: '/',
-      expires,
-      sameSite: 'lax',
-    });
-  }, [setCookie]);
-
   useEffect(() => {
-    const handleOAuthLogin = (loginType: string, failureMessage: string) => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const loginStatus = urlParams.get(loginType);
-      const username = urlParams.get('username');
-      if (loginStatus === 'success' && username) {
-        setUserCookie(username);
-        navigate('/home');
-      } else if (loginStatus === 'failed' || loginStatus === 'error') {
-        setErrMsg(failureMessage);
-      }
-    }
-
-    handleOAuthLogin('googleLogin', 'Google 登入失敗，請重試');
-    handleOAuthLogin('lineLogin', 'Line 登入失敗，請重試');
-  }, [navigate, setUserCookie]);
+    const msgGoogle = handleOAuthLogin('googleLogin', 'Google 登入失敗，請重試');
+    const msgLine = handleOAuthLogin('lineLogin', 'Line 登入失敗，請重試');
+    if (msgGoogle) setErrMsg(msgGoogle);
+    if (msgLine) setErrMsg(msgLine);
+  }, [handleOAuthLogin]);
 
   // 在組件掛載時檢查狀態
   useEffect(() => {
-    // 添加一個狀態檢查函數
-    const checkAuthStatus = async () => {
-      try {
-        const data = await getStatus();
-
-        if (data.status === 'success') {
-          setUserCookie(data.user.username);
-          navigate('/home');
-        }
-      } catch (error) {
-        console.error('Auth status check failed:', error);
-      }
-    };
-
     checkAuthStatus();
-  }, [navigate, setUserCookie]);
+  }, [checkAuthStatus]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${API_URL}auth/login`,
-        {
-          username: user,
-          password: pwd,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.status === 201) {
-        setUserCookie(user);
-        navigate('/home');
-      } else {
-        throw new Error('Login failed');
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        if (error.response.status === 400) {
-          setErrMsg('用戶不存在');
-        } else if (error.response.status === 401) {
-          setErrMsg('密碼錯誤');
-        } else {
-          setErrMsg('登錄失敗，請稍後再試');
-        }
-      } else {
-        setErrMsg('網絡錯誤，請檢查您的連接');
-      }
-    }
+    const err = await loginWithPwd(user, pwd);
+    if (err) setErrMsg(err);
   };
 
   const handleGoogleLogin = () => {
