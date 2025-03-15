@@ -3,7 +3,7 @@ import { CookiesProvider, useCookies } from 'react-cookie';
 
 import Home from './assets/Home';
 import Interact from './assets/Interact/Interact';
-import Login from './assets/Login';
+import Login from './pages/Login/Login';
 import Logout from './assets/Logout';
 import Navig from './assets/Navig';
 import NotFound from './assets/NotFound';
