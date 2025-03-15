@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Container, Table, Button, Navbar, Nav, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -62,12 +62,17 @@ const Admin: React.FC = () => {
     const [errMsg, setErrMsg] = useState('');
 
     // Modal顯示管理
-    const [showModal, setShowModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [showEditModal2, setShowEditModal2] = useState(false);
-    const [showEditImgModal, setShowEditImgModal] = useState(false);
-    const [showUploadImgModal, setShowUploadImgModal] = useState(false);
-    const [showEditAiModal, setShowEditAiModal] = useState(false);
+    const [modals, setModals] = useState({
+        addUser: false,
+        editUser: false,
+        editUserDetail: false,
+        editImg: false,
+        uploadImg: false,
+        editAi: false,
+    });
+    const toggleModal = useCallback((modalName: keyof typeof modals, value: boolean) => {
+        setModals(prev => ({ ...prev, [modalName]: value }));
+    }, []);
 
     // 新增用戶
     const [newUserForm, setNewUserForm] = useState<NewUserForm>({
@@ -173,7 +178,7 @@ const Admin: React.FC = () => {
             // 重新取得用戶列表
             await fetchUsers();
             // 關閉視窗，清除資料
-            setShowModal(false);
+            toggleModal('addUser', false);
             clearNewUserForm();
         } catch (error) {
             // 錯誤處理
@@ -229,7 +234,7 @@ const Admin: React.FC = () => {
             role: user.role
         })
         // 打開編輯視窗
-        setShowEditModal(true);
+        toggleModal('editUser', true);
     };
 
     // 定義一個異步函數 `handleUpdate`，根據使用者名稱和 role 更新用戶資料
@@ -242,7 +247,7 @@ const Admin: React.FC = () => {
             // 重新取得用戶列表
             fetchUsers();
             // 關閉編輯視窗，清空表單
-            setShowEditModal(false);
+            toggleModal('editUser', false);
             clearEditUserForm();
         } catch (error) {
             // 錯誤處理
@@ -265,13 +270,13 @@ const Admin: React.FC = () => {
         } else {
             clearEditUserDetailForm();
         }
-        setShowEditModal2(true);
+        toggleModal('editUserDetail', true);
     };
 
     // 定義一個異步函數 `handleEditImg`，開啟編輯使用者頭像的視窗
-    const handleEditImg = async (user: User) => {
+    const openEditImg = async (user: User) => {
         setCurrentEditUser(user.username);
-        setShowEditImgModal(true);
+        toggleModal('editImg', true);
     };
 
     // 定義一個異步函數 `handleUploadImg`，根據使用者名稱更改使用者頭像圖片
@@ -329,7 +334,7 @@ const Admin: React.FC = () => {
             // 重新取得用戶列表
             fetchUsers();
             // 關閉編輯視窗，清空表單
-            setShowEditModal2(false);
+            toggleModal('editUserDetail', false);
             clearEditUserDetailForm();
         } catch (error) {
             // 錯誤處理
@@ -339,8 +344,8 @@ const Admin: React.FC = () => {
 
     // 定義一個異步函數 `handleEditUploadImg`，開啟上傳圖片的視窗
     const handleEditUploadImg = async () => {
-        setShowEditImgModal(false);
-        setShowUploadImgModal(true);
+        toggleModal('editImg', false);
+        toggleModal('uploadImg', true);
     }
 
     // 定義一個異步函數 `handleEditAiImg`，用於設定 AI 頭像並打開 AI 頭像選擇視窗
@@ -352,8 +357,8 @@ const Admin: React.FC = () => {
         setAiImgSrc2(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca2-${editUserID}.jpg`);
         setAiImgSrc3(`https://elk-on-namely.ngrok-free.app/avatar_styled/styled-ca3-${editUserID}.jpg`);
 
-        setShowEditAiModal(true);
-        setShowEditImgModal(false);
+        toggleModal('editAi', true);
+        toggleModal('editImg', false);
     }
 
     // 定義一個異步函數 `handleAiClick`，根據使用者名稱設定 AI 頭像
@@ -423,7 +428,7 @@ const Admin: React.FC = () => {
                     <Container>
                         <Nav className="ms-auto">
                             {/*新增帳號按鈕，點擊時顯示新增帳號視窗*/}
-                            <Button variant="outline-success" onClick={() => setShowModal(true)}>新增帳號</Button>
+                            <Button variant="outline-success" onClick={() => toggleModal('addUser', true)}>新增帳號</Button>
                         </Nav>
                     </Container>
                 </Navbar>
@@ -464,7 +469,7 @@ const Admin: React.FC = () => {
                                     <Button variant="outline-secondary" onClick={() => openEditUserDetailForm(user)}>編輯資料</Button>
                                     &nbsp;
                                     {/*個人頭像按鈕，點擊時打開編輯頭像視窗*/}
-                                    <Button variant="outline-secondary" onClick={() => handleEditImg(user)}>個人頭像</Button>
+                                    <Button variant="outline-secondary" onClick={() => openEditImg(user)}>個人頭像</Button>
                                     &nbsp;
                                     {/*刪除按鈕，僅對非管理員用戶顯示*/}
                                     {user.role !== 'ADMIN' && (
@@ -476,7 +481,7 @@ const Admin: React.FC = () => {
                     </tbody>
                 </Table>
                 {/*點擊新增帳號後的彈出介面*/}
-                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal show={modals.addUser} onHide={() => toggleModal('addUser', false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>新增帳號</Modal.Title>
                     </Modal.Header>
@@ -546,7 +551,7 @@ const Admin: React.FC = () => {
                 </Modal>
 
                 {/*點擊編輯帳密後的彈出介面*/}
-                <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal show={modals.editUser} onHide={() => toggleModal('editUser', false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>編輯帳密</Modal.Title>
                     </Modal.Header>
@@ -594,7 +599,7 @@ const Admin: React.FC = () => {
                 </Modal>
 
                 {/*點擊編輯資料後的彈出介面*/}
-                <Modal show={showEditModal2} onHide={() => setShowEditModal2(false)}>
+                <Modal show={modals.editUserDetail} onHide={() => toggleModal('editUserDetail', false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>編輯資料</Modal.Title>
                     </Modal.Header>
@@ -703,7 +708,7 @@ const Admin: React.FC = () => {
                     </Modal.Footer>
                 </Modal>
                 {/*點擊編輯頭像後的彈出介面*/}
-                <Modal show={showEditImgModal} onHide={() => setShowEditImgModal(false)} className="edit-avatar-modal">
+                <Modal show={modals.editImg} onHide={() => toggleModal('editImg', false)} className="edit-avatar-modal">
                     <Modal.Header closeButton>
                         <Modal.Title>個人頭像</Modal.Title>
                     </Modal.Header>
@@ -716,7 +721,7 @@ const Admin: React.FC = () => {
                 </Modal>
 
                 {/*點擊上傳圖片後的彈出介面*/}
-                <Modal show={showUploadImgModal} onHide={() => setShowUploadImgModal(false)}>
+                <Modal show={modals.uploadImg} onHide={() => toggleModal('uploadImg', false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>上傳圖片</Modal.Title>
                     </Modal.Header>
@@ -741,7 +746,7 @@ const Admin: React.FC = () => {
                 </Modal>
 
                 {/*點擊使用AI頭貼後的彈出介面*/}
-                <Modal show={showEditAiModal} onHide={() => setShowEditAiModal(false)} className='ai-modal'>
+                <Modal show={modals.editAi} onHide={() => toggleModal('editAi', false)} className='ai-modal'>
                     <Modal.Header closeButton>
                         <Modal.Title>選擇一張圖片作為頭像</Modal.Title>
                     </Modal.Header>
