@@ -1,6 +1,5 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
-import { Request } from "express";
+import { ExecutionContext, Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard('google-login') {
@@ -14,12 +13,12 @@ export class GoogleAuthGuard extends AuthGuard('google-login') {
 
     try {
       const result = (await super.canActivate(context)) as boolean;
-      
+
       // 只在認證成功時執行登入
       if (result) {
         await super.logIn(request);
       }
-      
+
       return result;
     } catch (error) {
       // 如果是用戶取消登入，不拋出錯誤
