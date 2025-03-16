@@ -13,8 +13,8 @@ import { Prisma } from '@prisma/client';
 import {
   AdminOrSameUserIdGuard,
   UserDetailCreateGuard,
-} from 'src/auth/utils/guards/LocalGuard';
-import { UserIdName } from 'src/auth/utils/metadata/GuardMetadata';
+} from '../auth/utils/guards/LocalGuard';
+import { UserIdName } from '../auth/utils/metadata/GuardMetadata';
 
 @Controller('user-detail')
 export class UserDetailController {

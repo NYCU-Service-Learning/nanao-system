@@ -14,11 +14,11 @@ import { Prisma } from '@prisma/client';
 import {
   AdminOrSameUserIdGuard,
   FormDeleteGuard,
-} from 'src/auth/utils/guards/LocalGuard';
+} from '../auth/utils/guards/LocalGuard';
 import {
   SetFormMetaData,
   UserIdName,
-} from 'src/auth/utils/metadata/GuardMetadata';
+} from '../auth/utils/metadata/GuardMetadata';
 
 @Controller('yearform')
 export class YearformController {

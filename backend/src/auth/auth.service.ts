@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { DatabaseService } from 'src/database/database.service';
-import { UserService } from 'src/user/user.service';
-import { HurtformService } from 'src/hurtform/hurtform.service';
-import { WeekformService } from 'src/weekform/weekform.service';
-import { YearformService } from 'src/yearform/yearform.service';
+import { DatabaseService } from '../database/database.service';
+import { UserService } from '../user/user.service';
+import { HurtformService } from '../hurtform/hurtform.service';
+import { WeekformService } from '../weekform/weekform.service';
+import { YearformService } from '../yearform/yearform.service';
 
 import { Role } from '@prisma/client';
 

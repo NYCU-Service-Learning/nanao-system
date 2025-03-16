@@ -11,8 +11,8 @@ import {
 
 import { UserService } from './user.service';
 import { Prisma } from '@prisma/client';
-import { AdminOrSameUserIdGuard } from 'src/auth/utils/guards/LocalGuard';
-import { UserIdName } from 'src/auth/utils/metadata/GuardMetadata';
+import { AdminOrSameUserIdGuard } from '../auth/utils/guards/LocalGuard';
+import { UserIdName } from '../auth/utils/metadata/GuardMetadata';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('user')
