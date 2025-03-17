@@ -3,7 +3,7 @@ import { API_URL } from "../config";
 
 const getIdByUsername = async (username: string): Promise<string> => {
     const id = await httpGet(`${API_URL}user/find/${username}`);
-    return id;
+    return String(id);
 };
 
 const getUserById = async (id: string | number) => {
