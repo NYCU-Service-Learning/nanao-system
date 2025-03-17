@@ -114,7 +114,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const displayData = userDetail || defaultData;
 
   // 性別的對應表，用於將性別代碼轉換為顯示的字串
-  const genderMap: { [key: string]: string } = {
+  const genderMap: Record<string, string> = {
     MALE: '男',
     FEMALE: '女',
   };

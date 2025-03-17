@@ -68,6 +68,7 @@ const Admin: React.FC = () => {
         editImg: false,
         uploadImg: false,
         editAi: false,
+        deleteUser: false,
     });
     const toggleModal = useCallback((modalName: keyof typeof modals, value: boolean) => {
         setModals(prev => ({ ...prev, [modalName]: value }));
@@ -212,16 +213,23 @@ const Admin: React.FC = () => {
     };
 
     // 定義一個異步函數 `handleDelete`，根據使用者 ID 刪除用戶資料
-    const handleDelete = async (id: string) => {
+    const handleDelete = async () => {
+        const deleteUserId = await getIdByUsername(currentEditUser);
         try {
             // 使用 axios 發送 DELETE 請求到後端的 /user/{ID} 路由
-            await deleteUserById(id);
+            await deleteUserById(deleteUserId);
+            toggleModal('deleteUser', false);
             // 重新取得用戶列表
             await fetchUsers();
         } catch (error) {
             setErrMsg('Error deleting user.');
         }
     };
+
+    const openDeleteUserForm = (user: User) => {
+        setCurrentEditUser(user.username);
+        toggleModal('deleteUser', true);
+    }
 
     // 定義函數 handleEditUser，用於打開編輯用戶帳密的編輯表單
     const openEditUserForm = (user: User) => {
@@ -472,7 +480,7 @@ const Admin: React.FC = () => {
                                     &nbsp;
                                     {/*刪除按鈕，僅對非管理員用戶顯示*/}
                                     {user.role !== 'ADMIN' && (
-                                        <Button variant="outline-danger" onClick={async () => handleDelete(await getIdByUsername(user.username))}>刪除</Button>
+                                        <Button variant="outline-danger" onClick={async () => openDeleteUserForm(user)}>刪除</Button>
                                     )}
                                 </td>
                             </tr>
@@ -545,6 +553,18 @@ const Admin: React.FC = () => {
                         {/*送出按鈕，點擊時調用handleAddUser函數*/}
                         <Button variant="outline-primary" onClick={handleAddUser}>
                             送出
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={modals.deleteUser} onHide={() => toggleModal('deleteUser', false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>刪除帳號</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className='modal-body'><div className='delete-user-alert'>你確定要刪除這個用戶嗎？<br />如果刪除了，<br />你再也不能反悔！</div></Modal.Body>
+                    <Modal.Footer>
+                        <Button variant='outline-danger' onClick={handleDelete}>
+                            刪除
                         </Button>
                     </Modal.Footer>
                 </Modal>
@@ -777,7 +797,7 @@ const Admin: React.FC = () => {
                     </div>
                 </Modal>
             </Container>
-        </div>
+        </div >
     );
 };
 
