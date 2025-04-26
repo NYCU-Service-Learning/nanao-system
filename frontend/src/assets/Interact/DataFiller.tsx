@@ -1,7 +1,7 @@
 import { Modal, Radio, Slider, Form, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { RadioChangeEvent } from "antd/lib/radio";
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 // 定義 DataFillerProps 介面，包含組件需要的屬性，主要是當前部位和疼痛狀態的設定函數
 interface DataFillerProps {
@@ -50,6 +50,8 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
     setValue(value);
   };
 
+  
+  const navigate = useNavigate();
   // 讀取 query parameter
   const location = useLocation();
   const queryParam = new URLSearchParams(location.search);
@@ -57,12 +59,26 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
   const month_pain = queryParam.get('month_pain') === 'true';
   const week_pain = queryParam.get('week_pain') === 'true';
 
-  // 預填表單,使已填過部位顯示上次填入數據
   useEffect(() => {
-    if(props.currentPart !== ''){
+
+    // 用 query parameter 預填表單
+    if(props.currentPart !== '' && !isNaN(pain_level)){
       setValue(pain_level);
       setMonthValue(month_pain);
       setWeekValue(week_pain);
+      navigate('/interact');
+    }
+
+    // 若非初始值，預填上次輸入值
+    else if(props.currentPart !== '' && (
+        props.PainLevel[props.currentPart] !== 0 
+    ||  props.MonthPain[props.currentPart] !== false
+    ||  props.WeekPain[props.currentPart] !== false
+      ))
+    {
+      setValue(props.PainLevel[props.currentPart]);
+      setMonthValue(props.MonthPain[props.currentPart]);
+      setWeekValue(props.WeekPain[props.currentPart]);
     }
   }, [props.currentPart])
 
