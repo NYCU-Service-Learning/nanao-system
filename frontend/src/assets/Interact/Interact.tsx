@@ -1,10 +1,10 @@
 import './Interact.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
 import { httpPost } from '../../api/APIUtils';
@@ -31,6 +31,18 @@ const Interact: React.FC = () => {
   const [MonthPain, setMonthPain] = React.useState<PainStatusType>({}); // 每年疼痛狀態
   const [WeekPain, setWeekPain] = React.useState<PainStatusType>({}); // 每週疼痛狀態
   const navigate = useNavigate(); // 用於導航的 hook
+
+  // 讀取 query parameter
+  const location = useLocation();
+  const queryParam = new URLSearchParams(location.search);
+  const current_part = queryParam.get('current_part');
+
+  // 變動 currentPart 觸發 DataFiller 中的 useEffect
+  useEffect(() => {
+    if(current_part){
+      setCurrentPart(current_part);
+    }
+  }, [current_part])
 
   const handleSubmit = async () => {
     try {

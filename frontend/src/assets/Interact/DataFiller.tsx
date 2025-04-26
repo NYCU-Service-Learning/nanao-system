@@ -1,6 +1,7 @@
 import { Modal, Radio, Slider, Form, Typography } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RadioChangeEvent } from "antd/lib/radio";
+import { useLocation } from 'react-router-dom'
 
 // 定義 DataFillerProps 介面，包含組件需要的屬性，主要是當前部位和疼痛狀態的設定函數
 interface DataFillerProps {
@@ -48,6 +49,22 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
   const onChangeValue = (value: number) => {
     setValue(value);
   };
+
+  // 讀取 query parameter
+  const location = useLocation();
+  const queryParam = new URLSearchParams(location.search);
+  const pain_level = parseInt(queryParam.get('pain_level'), 10);
+  const month_pain = queryParam.get('month_pain') === 'true';
+  const week_pain = queryParam.get('week_pain') === 'true';
+
+  // 預填表單,使已填過部位顯示上次填入數據
+  useEffect(() => {
+    if(props.currentPart !== ''){
+      setValue(pain_level);
+      setMonthValue(month_pain);
+      setWeekValue(week_pain);
+    }
+  }, [props.currentPart])
 
   const getPainLevelText = (value: number) => {
     if (0 <= value && value <= 1) return "沒有疼痛";
@@ -119,7 +136,7 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
 
           </Form.Item>
           {/* 是否在過去一年影響正常生活的 Radio 選項 */}
-          <Form.Item label="此部位過去一年此部位的疼痛是否影響正常生活？">
+          <Form.Item label="過去一年中,此部位的疼痛是否影響正常生活？">
             <Radio.Group onChange={onChangeMonth} value={MonthValue}>
               <Radio value={true}>Yes</Radio>
               <Radio value={false}>No</Radio>
