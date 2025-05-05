@@ -107,7 +107,13 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
           setWeekValue(false);
           setValue(0);
         }}
-        onCancel={() => { props.setCurrentPart(''); }}// 按下 Cancel 後清除當前選擇的部位
+        onCancel={() => {
+          // 按下 Cancel 後清除當前選擇的部位與值
+          props.setCurrentPart(''); 
+          setMonthValue(false);
+          setWeekValue(false);
+          setValue(0);
+        }}
         mask={false}// 組件的返回內容，使用 Modal 來顯示和填寫疼痛資料
       > {/* 表單，用於填寫疼痛資料 */}
         <Form>
