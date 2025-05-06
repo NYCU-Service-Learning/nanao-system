@@ -328,7 +328,7 @@ const Stat: React.FC = () => {
             <Container>
                 <h1>疼痛統計</h1>
                 <Navbar expand="lg" className="justify-content-between mt-4">
-                    <Form onSubmit={handleSearch} className="d-flex w-100 align-items-center" style={{ whiteSpace: 'nowrap' }}>
+                    <Form onSubmit={handleSearch} className="d-md-flex w-100 align-items-center form" style={{ whiteSpace: 'nowrap' }}>
                         {/* 部位選擇選單 */}
                         <div className="d-flex flex-wrap">
                             <Dropdown>
@@ -341,7 +341,7 @@ const Stat: React.FC = () => {
                             </Dropdown>
                         </div>
 
-                        <div className="text-center me-3" style={{ width: '120px' }}>搜尋時間</div>
+                        <div className="me-3" style={{ width: '120px' }}>搜尋時間</div>
                         {/* 查詢日期設定(from) */}
                         <FormControl
                             type="date"
@@ -349,7 +349,7 @@ const Stat: React.FC = () => {
                             value={searchDatefrom}
                             onChange={e => setSearchDatefrom(e.target.value)}
                         />
-                        <div className="text-center me-3" style={{ width: '30px' }}>至</div>
+                        <div className="me-3" style={{ width: '30px' }}>至</div>
                         {/* 查詢日期設定(to) */}
                         <FormControl
                             type="date"

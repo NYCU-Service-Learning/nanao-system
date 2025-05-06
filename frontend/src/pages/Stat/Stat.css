@@ -19,3 +19,7 @@
 .chart-container .recharts-wrapper {
     display: inline-block;
 }
+
+.form > * {
+    margin-bottom: 8px;
+}
