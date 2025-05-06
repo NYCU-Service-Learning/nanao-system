@@ -14,7 +14,7 @@
 /* SVG styling for body selector */
 .BodySelector svg{
   margin: 100px auto;
-  width: 60vh;
+  width: 100vw;
   height: 60vh;
   cursor: pointer;
 }
