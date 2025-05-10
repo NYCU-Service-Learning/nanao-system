@@ -130,6 +130,7 @@ const MentalForm = () => {
           bordered
           pagination={false}
           style={{ marginBottom: "16px" }}
+          scroll={{ x: 'max-content' }}
         />
         <Form.Item style={{ textAlign: "center" }}>
           <button
