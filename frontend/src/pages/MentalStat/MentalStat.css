@@ -3,13 +3,18 @@
   flex-direction: column; /* Arrange nav bar on top */
   justify-content: center;
   align-items: center;
+  width: 80%;
+  margin: 0 auto;
+  max-width: 720px;
+  height: 100vh;
+  padding: 5rem 0;
 }
 
-@media screen and (min-width: 768px) {
+/* @media screen and (min-width: 768px) {
   .chart-container{
     height: 70vh;
   }
-}
+} */
 
 .nav-bar {
   align-self: flex-start; /* Align navigation bar to the top-left */

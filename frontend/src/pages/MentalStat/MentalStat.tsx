@@ -91,8 +91,6 @@ const MentalStat = () => {
         </Select>
       </div>
       <LineChart
-        width={1000}
-        height={600}
         series={[{ data: chartData, label: '心理健康統計' }]}
         xAxis={[{ ...xAxisCommon, scaleType: 'point', data: xLabels, domainLimit: 'nice', reverse: true }]}
         yAxis={[
