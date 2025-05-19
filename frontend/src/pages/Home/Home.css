@@ -1,6 +1,6 @@
 .home {
   position: relative;
-  height: calc(100vh - 50px); /* 100% of the viewport height minus the height of the navbar */
+  height: calc(100vh); /* 100% of the viewport height minus the height of the navbar */
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Space out items to push the button to the bottom */
