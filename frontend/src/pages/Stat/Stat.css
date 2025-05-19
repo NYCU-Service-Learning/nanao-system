@@ -13,6 +13,7 @@
 }
 
 .chart-container {
+    height: min(60vh, 50vw) !important;
     text-align: center;
 }
 
