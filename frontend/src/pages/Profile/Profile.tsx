@@ -139,7 +139,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         {/* Same user */}
         {isYourUser && !errMsg && !userInfo?.email && <button className="btn btn-outline-primary" onClick={handleGoogleLink}>連結 Google 帳號</button>}
         &nbsp;
-        {isYourUser && !errMsg && userInfo?.lineId && <button className="btn btn-outline-primary" onClick={handleLineLink}>連結 Line 帳號</button>}
+        {isYourUser && !errMsg && !userInfo?.lineId && <button className="btn btn-outline-primary" onClick={handleLineLink}>連結 Line 帳號</button>}
         {/* show google link message */}
         {linkMsg && <span className="linkmsg" style={{ color: (googleStatus || lineStatus) === 'Success' ? 'green' : 'red' }}>{linkMsg}</span>}
       </div>
