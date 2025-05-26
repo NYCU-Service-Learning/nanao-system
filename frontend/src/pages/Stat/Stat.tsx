@@ -328,50 +328,75 @@ const Stat: React.FC = () => {
             <Container>
                 <h1>疼痛統計</h1>
                 <Navbar expand="lg" className="justify-content-between mt-4">
-                    <Form onSubmit={handleSearch} className="d-md-flex w-100 align-items-center form" style={{ whiteSpace: 'nowrap' }}>
+                    <Form
+                        onSubmit={handleSearch}
+                        className="d-md-flex w-100 align-items-center form"
+                        style={{ whiteSpace: 'nowrap' }}>
                         {/* 部位選擇選單 */}
                         <div className="d-flex flex-wrap">
                             <Dropdown>
-                                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="me-5">
-                                    {bodyParts.find(part => part.value === selectedBodyPart)?.label || "選擇部位"}
+                                <Dropdown.Toggle
+                                    variant="outline-secondary"
+                                    id="dropdown-basic"
+                                    className="me-5">
+                                    {bodyParts.find(
+                                        (part) =>
+                                            part.value === selectedBodyPart
+                                    )?.label || '選擇部位'}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
-                                    {renderDropdownItems(bodyParts, setSelectedBodyPart)}
+                                    {renderDropdownItems(
+                                        bodyParts,
+                                        setSelectedBodyPart
+                                    )}
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
 
-                        <div className="me-3" style={{ width: '120px' }}>搜尋時間</div>
+                        <div className="me-3" style={{ width: '120px' }}>
+                            搜尋時間
+                        </div>
                         {/* 查詢日期設定(from) */}
                         <FormControl
                             type="date"
                             className="me-3"
                             value={searchDatefrom}
-                            onChange={e => setSearchDatefrom(e.target.value)}
+                            onChange={(e) => setSearchDatefrom(e.target.value)}
                         />
-                        <div className="me-3" style={{ width: '30px' }}>至</div>
+                        <div className="me-3" style={{ width: '30px' }}>
+                            至
+                        </div>
                         {/* 查詢日期設定(to) */}
                         <FormControl
                             type="date"
                             className="me-3"
                             value={searchDateto}
-                            onChange={e => setSearchDateto(e.target.value)}
+                            onChange={(e) => setSearchDateto(e.target.value)}
                         />
                         {/* 送出表單按鈕 */}
-                        <Button variant="outline-success" type="submit" className="me-3">搜尋</Button>
+                        <Button
+                            variant="outline-success"
+                            type="submit"
+                            className="me-3">
+                            搜尋
+                        </Button>
                         {/* admin 的管理及匯出 Excel 功能 */}
                         {user === 'admin' && (
                             <>
                                 {/* 展示互動介面，可刪除疼痛資料 */}
-                                <Button variant="outline-primary" onClick={handleShow} className='me-2'>
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={handleShow}
+                                    className="me-2">
                                     管理
                                 </Button>
                                 {/* 匯出 Excel */}
                                 <Button
                                     variant="outline-primary"
-                                    onClick={() => exportToExcel(userhurt[0].user_id)}
-                                    className='me-2'
-                                >
+                                    onClick={() =>
+                                        exportToExcel(userhurt[0].user_id)
+                                    }
+                                    className="me-2">
                                     匯出 Excel
                                 </Button>
                             </>
@@ -379,10 +404,12 @@ const Stat: React.FC = () => {
                     </Form>
                 </Navbar>
 
-                <div className="chart-container mt-4">
-                    {chartData && (
+                <div
+                    className="chart-container mt-4 p-0"
+                    style={{ width: '100%' }}>
+                    {chartData &&
                         // 根據圖表類型渲染不同的圖表
-                        chartType === 'bar' ? (
+                        (chartType === 'bar' ? (
                             // 長條圖
                             <Bar
                                 data={chartData}
@@ -392,9 +419,10 @@ const Stat: React.FC = () => {
                                             type: 'linear',
                                             position: 'left',
                                             beginAtZero: true,
-                                            max: 10
-                                        }
-                                    }
+                                            max: 10,
+                                        },
+                                    },
+                                    maintainAspectRatio: false,
                                 }}
                             />
                         ) : (
@@ -407,7 +435,7 @@ const Stat: React.FC = () => {
                                             type: 'linear',
                                             position: 'left',
                                             beginAtZero: true,
-                                            max: 10
+                                            max: 10,
                                         },
                                         y2: {
                                             type: 'linear',
@@ -416,14 +444,14 @@ const Stat: React.FC = () => {
                                             display: false,
                                             max: 4,
                                             grid: {
-                                                drawOnChartArea: false
-                                            }
-                                        }
-                                    }
+                                                drawOnChartArea: false,
+                                            },
+                                        },
+                                    },
+                                    maintainAspectRatio: false,
                                 }}
                             />
-                        )
-                    )}
+                        ))}
                 </div>
 
                 {/* admin 管理用 Modal */}
@@ -436,18 +464,32 @@ const Stat: React.FC = () => {
                         <Table striped bordered hover className="mt-4">
                             <thead>
                                 <tr>
-                                    <th className="stat-time-column">填寫時間</th>
-                                    <th className="stat-actions-column">操作</th>
+                                    <th className="stat-time-column">
+                                        填寫時間
+                                    </th>
+                                    <th className="stat-actions-column">
+                                        操作
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {userhurt.map(uh => (
+                                {userhurt.map((uh) => (
                                     <tr key={uh.id}>
-                                        <td className="stat-time-column">{moment(uh.fill_time).format('YYYY-MM-DD HH:mm')}</td>
+                                        <td className="stat-time-column">
+                                            {moment(uh.fill_time).format(
+                                                'YYYY-MM-DD HH:mm'
+                                            )}
+                                        </td>
                                         <td className="stat-actions-column">
                                             {user === 'admin' && (
                                                 // 刪除按鈕，並使用 handleDelete 函式處理刪除事件
-                                                <Button variant="outline-danger" onClick={() => handleDelete(uh.id)}>刪除</Button>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    onClick={() =>
+                                                        handleDelete(uh.id)
+                                                    }>
+                                                    刪除
+                                                </Button>
                                             )}
                                         </td>
                                     </tr>
