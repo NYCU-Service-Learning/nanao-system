@@ -33,7 +33,7 @@ interface NewUserForm {
     name: string;
     username: string;
     password: string;
-    email: string;
+    email: string | null;
 }
 
 interface EditUserForm {
@@ -46,9 +46,8 @@ interface EditUserForm {
 interface EditUserDetailForm {
     gender: string;
     birthday: string;
-    age: number;
+    age: string;
     phone: string;
-    email: string;
     address: string;
     medical_History: string;
     headshot: string;
@@ -79,7 +78,7 @@ const Admin: React.FC = () => {
         name: '',
         username: '',
         password: '',
-        email: ''
+        email: null
     });
     const [showValidation, setShowValidation] = useState(false);
 
@@ -95,9 +94,8 @@ const Admin: React.FC = () => {
     const [editUserDetailForm, setEditUserDetailForm] = useState<EditUserDetailForm>({
         gender: '',
         birthday: '',
-        age: 0,
+        age: '',
         phone: '',
-        email: '',
         address: '',
         medical_History: '',
         headshot: '0',
@@ -134,9 +132,8 @@ const Admin: React.FC = () => {
         setEditUserDetailForm({
             gender: '',
             birthday: '',
-            age: 0,
+            age: '',
             phone: '',
-            email: '',
             address: '',
             medical_History: '',
             headshot: '0'
@@ -160,8 +157,26 @@ const Admin: React.FC = () => {
         // 如果驗證通過，調用原本的 handleAddUser
         try {
             // 使用 axios 發送 POST 請求到後端的 /user 路由
-            await createNewUser({
-                ...newUserForm,
+            // await createNewUser({
+            //     ...newUserForm,
+            //     role: "USER",
+            //     userDetail: {
+            //         create: {
+            //             gender: null,
+            //             birthday: "",
+            //             age: 0,
+            //             medical_History: "",
+            //             address: "",
+            //             phone: "",
+            //             headshot: "0"
+            //         }
+            //     }
+            // });
+            const payload = {
+                name: newUserForm.name,
+                username: newUserForm.username,
+                password: newUserForm.password,
+                email: newUserForm.email || null, // Send null if email is empty
                 role: "USER",
                 userDetail: {
                     create: {
@@ -174,7 +189,8 @@ const Admin: React.FC = () => {
                         headshot: "0"
                     }
                 }
-            });
+            };
+            await createNewUser(payload);
             // 重新取得用戶列表
             await fetchUsers();
             // 關閉視窗，清除資料
@@ -272,7 +288,10 @@ const Admin: React.FC = () => {
 
         if (userdata) {
             // 如果取得用戶資料，將其設定到編輯表單中
-            setEditUserDetailForm(userdata);
+            setEditUserDetailForm({
+                ...userdata,
+                age: userdata.age.toString(), // Convert number to string
+            });
 
         } else {
             clearEditUserDetailForm();
@@ -334,17 +353,27 @@ const Admin: React.FC = () => {
     // 定義一個異步函數 `handleUpdate2`，根據使用者名稱更新使用者詳細資料
     const handleEditUserDetailForm = async () => {
         // 根據使用者名稱取得 ID
+        const ageInput = editUserDetailForm.age.trim();
+        const ageNumber = Number(ageInput);
+
+        if (ageInput === '' || isNaN(ageNumber) || ageNumber < 0) {
+            message.error('年齡必須是一個非負數字！');
+            setErrMsg('年齡必須是一個非負數字！');
+            return;
+        }
+
         const editUserId = await getIdByUsername(currentEditUser);
         try {
-            // 使用 axios 發送 PATCH 請求到後端的 /user-detail/{editUserID} 路由
-            await patchUserDetailById(editUserId, editUserDetailForm);
-            // 重新取得用戶列表
+            // Convert age to number for the API
+            const updatedUserDetail = {
+                ...editUserDetailForm,
+                age: ageNumber, // Send as number to API
+            };
+            await patchUserDetailById(editUserId, updatedUserDetail);
             fetchUsers();
-            // 關閉編輯視窗，清空表單
             toggleModal('editUserDetail', false);
             clearEditUserDetailForm();
         } catch (error) {
-            // 錯誤處理
             setErrMsg('Error updating user.');
         }
     };
@@ -541,8 +570,10 @@ const Admin: React.FC = () => {
                                 <Form.Label>電子郵件</Form.Label>
                                 <Form.Control
                                     type="email"
-                                    value={newUserForm.email}
-                                    onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                                    // value={newUserForm.email}
+                                    // onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
+                                    value={newUserForm.email ?? ''} // Display empty string if null
+                                    onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value || null })}
                                 />
                             </Form.Group>
                         </Form>
@@ -672,8 +703,8 @@ const Admin: React.FC = () => {
                                 <Form.Label>年齡</Form.Label>
                                 <Form.Control
                                     type="text"  // 文本輸入框
-                                    value={editUserDetailForm.age <= 0 ? "" : editUserDetailForm.age}  // 如果年齡小於等於0,顯示空字符,否則顯示年齡值
-                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, age: Number(e.target.value) })}  // 將輸入轉換為數字並更新年齡值
+                                    value={editUserDetailForm.age ?? ""}  // 如果年齡小於等於0,顯示空字符,否則顯示年齡值
+                                    onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, age: e.target.value })}  // 將輸入轉換為數字並更新年齡值
                                 />
                             </Form.Group>
 
@@ -687,7 +718,7 @@ const Admin: React.FC = () => {
                                 />
                             </Form.Group>
 
-                            {/*電子郵件編輯欄位*/}
+                            {/* 電子郵件編輯欄位
                             <Form.Group controlId="formEditUseremail" className="mt-3">
                                 <Form.Label>電子郵件</Form.Label>
                                 <Form.Control
@@ -695,7 +726,7 @@ const Admin: React.FC = () => {
                                     value={editUserDetailForm.email}  // 綁定電子郵件值
                                     onChange={(e) => setEditUserDetailForm({ ...editUserDetailForm, email: e.target.value })}  // 當輸入改變時更新電子郵件
                                 />
-                            </Form.Group>
+                            </Form.Group> */}
 
                             {/*地址編輯欄位*/}
                             <Form.Group controlId="formEditUseraddr" className="mt-3">
