@@ -2,7 +2,6 @@ import { Form, Table, Radio } from "antd";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import React from "react";
-import axios from 'axios';
 import "./Mentalform.css"; // Import the CSS file
 type QuestionData = {
   key: string; // Assuming keys are strings
@@ -15,16 +14,11 @@ interface MentalFormProps {
   [key: string]: number[];
 }
 
-const dataSource = [
-  { key: "1", question: "睡眠困難，譬如難以入睡、易醒或早醒。" },
-  { key: "2", question: "感覺緊張不安。" },
-  { key: "3", question: "覺得容易苦惱或動怒。" },
-  { key: "4", question: "感覺憂鬱、心情低落。" },
-  { key: "5", question: "覺得比不上別人。" },
-  { key: "6", question: "有自殺的想法。" },
-];
-
 import { ColumnsType } from "antd/es/table";
+import { API_URL } from "../../config";
+import { getIdByUsername } from "../../api/userAPI";
+import { httpPost } from "../../api/APIUtils";
+import { dataSource } from "../../utils/questions";
 
 const columns: ColumnsType<QuestionData> = [
   {
@@ -95,29 +89,13 @@ const columns: ColumnsType<QuestionData> = [
     render: (_, record) => (
       <Form.Item name={`response-${record.key}`} style={{ margin: 0 }}>
         <Radio.Group>
-          <Radio value={4}/>
+          <Radio value={4} />
         </Radio.Group>
       </Form.Item>
     ),
   },
 ];
-const url = 'http://localhost:3000/';
 
-/**
- * getUserID - 根據使用者名稱請求使用者 ID 的異步函數
- * @param username 使用者名稱
- * @returns 包含使用者 ID 的 Promise
- */
-  
-const getUserID = async (username: string): Promise<string> => {
-  const response = await axios.get(`${url}user/find/${username}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true, // 向請求中包含憑證 (如 cookies)
-  });
-  return response.data; // 返回使用者 ID
-};
 const MentalForm = () => {
   const [cookies] = useCookies(['user']); // 取得 cookies 中的使用者資訊
   const navigate = useNavigate(); // 用於導航的 hook
@@ -125,30 +103,22 @@ const MentalForm = () => {
 
   React.useEffect(() => {
     const fetchUserID = async () => {
-      const id = await getUserID(cookies.user);
+      const id = await getIdByUsername(cookies.user);
       setUserID(id);
     };
     fetchUserID();
   }, [cookies.user]);
 
-  const onFinish = (values: FormValues) => {
+  const onFinish = async (values: FormValues) => {
     const data: MentalFormProps = {
       problem: [],
     };
-    for(const key in values) {
+    for (const key in values) {
       data["problem"].push(values[key]);
     }
     console.log(data);
-    axios.post(`${url}mentalform/${userID}`, data, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
-    }).then(() => {
-      navigate("/home");
-    }
-    );
-    
+    await httpPost(`${API_URL}mentalform/${userID}`, data);
+    navigate('/home');
   };
 
   return (
@@ -160,6 +130,7 @@ const MentalForm = () => {
           bordered
           pagination={false}
           style={{ marginBottom: "16px" }}
+          scroll={{ x: 'max-content' }}
         />
         <Form.Item style={{ textAlign: "center" }}>
           <button

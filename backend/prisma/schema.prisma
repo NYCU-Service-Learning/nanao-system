@@ -27,7 +27,7 @@ model User{
   hurtForms     HurtForm[]
   weekForms     WeekForm[]
   yearForms     YearForm[]
-  mentalFroms   MentalForm[]
+  mentalForms   MentalForm[]
 }
 
 model UserDetail{

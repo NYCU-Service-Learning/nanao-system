@@ -1,0 +1,42 @@
+.stat{
+    position: relative;
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* Dropdown menu wrapping and overflow fix */
+.dropdown-menu {
+    max-width: 90vw;
+    white-space: normal;
+    flex-wrap: wrap;
+    display: flex;
+    overflow-x: auto;
+}
+
+/* Optional: make dropdown items wrap into columns if too wide */
+.dropdown-menu .dropdown-item {
+    min-width: 160px;
+    flex: 1 1 160px;
+}
+
+
+.table .stat-time-column {
+    width: 50%;
+}
+
+.table .stat-actions-column {
+    width: 50%;
+}
+
+.chart-container {
+    height: min(60vh, 50vw) !important;
+    text-align: center;
+}
+
+.chart-container .recharts-wrapper {
+    display: inline-block;
+}
+
+.form > * {
+    margin-bottom: 8px;
+}

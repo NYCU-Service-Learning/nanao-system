@@ -1,5 +1,5 @@
 .admin {
-    position:relative;
+    position: relative;
     width: 80%;
     margin: 0 auto;
     padding-top: 5%;
@@ -28,7 +28,7 @@
 
 .errmsg {
     color: red;
-    font-size: 16px; 
+    font-size: 16px;
 }
 
 .offscreen {
@@ -36,19 +36,25 @@
 }
 
 .edit-avatar-modal .modal-body {
-    padding: 20px; 
-    display: flex; 
-    flex-direction: column; 
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 15px; 
+    gap: 15px;
 }
 
 .ai-modal .modal-body {
-    padding: 20px; 
-    display: flex; 
-    flex-direction: row; 
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 15px; 
+    gap: 15px;
+}
+
+.delete-user-alert {
+    color: red;
+    font-size: 24px;
+    text-align: center;
 }

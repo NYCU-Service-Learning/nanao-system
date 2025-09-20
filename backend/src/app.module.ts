@@ -12,39 +12,43 @@ import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import configuration from 'config/configuration';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core'
+import { APP_GUARD } from '@nestjs/core';
 import { MentalformModule } from './mentalform/mentalform.module';
 
 @Module({
   imports: [
-    DatabaseModule, 
-    HurtformModule, 
-    YearformModule, 
-    WeekformModule, 
-    UserModule, 
-    UserDetailModule, 
+    DatabaseModule,
+    HurtformModule,
+    YearformModule,
+    WeekformModule,
+    UserModule,
+    UserDetailModule,
     AuthModule,
-    ConfigModule.forRoot({isGlobal:true, load:[configuration],}), 
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     PassportModule.register({
-      session: true
+      session: true,
     }),
-    ThrottlerModule.forRoot([{
-      name: 'short',
-      ttl: 1000,
-      limit: 10,
-    },{
-      name: 'long',
-      ttl: 60000,
-      limit: 100,
-    }]),
-    MentalformModule
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 10,
+      },
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
+    MentalformModule,
   ],
   controllers: [AppController],
-  providers: [AppService, 
+  providers: [
+    AppService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    }
+    },
   ],
 })
 export class AppModule {}

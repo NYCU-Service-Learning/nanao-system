@@ -1,32 +1,18 @@
-import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import * as React from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { Select } from 'antd';
 import './MentalStat.css';
+import { API_URL } from '../../config';
+import { getIdByUsername } from '../../api/userAPI';
+import { httpGet } from '../../api/APIUtils';
+import { dataSource } from '../../utils/questions';
 
 const { Option } = Select;
 
-const url = 'http://localhost:3000/';
-
 const getMentalStat = async (userID) => {
-  const response = await axios.get(`${url}mentalform/${userID}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true,
-  });
-  return response.data;
-};
-
-const getUserID = async (username) => {
-  const response = await axios.get(`${url}user/find/${username}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true,
-  });
-  return response.data;
+  const mentalStat = await httpGet(`${API_URL}mentalform/${userID}`);
+  return mentalStat;
 };
 
 const parseISOToLocal = (isoString) => {
@@ -45,7 +31,7 @@ const MentalStat = () => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const userID = await getUserID(cookies.user);
+      const userID = await getIdByUsername(cookies.user);
       const mentalStat = await getMentalStat(userID);
       console.log(mentalStat);
       const mentalStatData = mentalStat.map((item) => ({
@@ -99,20 +85,12 @@ const MentalStat = () => {
           <Option value="sum">總和</Option>
           {[...Array(6).keys()].map((index) => (
             <Option key={index + 1} value={`${index + 1}`}>
-              {index == 0 ? '睡眠困難，譬如難以入睡、易醒或早醒。' : 
-                index == 1 ? '感覺緊張不安。' :
-                index == 2 ? '覺得容易苦惱或動怒。' :
-                index == 3 ? '感覺憂鬱、心情低落。' :
-                index == 4 ? '覺得比不上別人。' :
-                '有自殺的想法。'
-                }
+              {dataSource.find((e) => Number(e.key) == index + 1).question}
             </Option>
           ))}
         </Select>
       </div>
       <LineChart
-        width={1000}
-        height={600}
         series={[{ data: chartData, label: '心理健康統計' }]}
         xAxis={[{ ...xAxisCommon, scaleType: 'point', data: xLabels, domainLimit: 'nice', reverse: true }]}
         yAxis={[

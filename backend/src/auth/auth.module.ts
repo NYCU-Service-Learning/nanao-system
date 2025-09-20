@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { DatabaseModule } from 'src/database/database.module';
-import { UserService } from 'src/user/user.service';
+import { DatabaseModule } from '../database/database.module';
+import { UserService } from '../user/user.service';
 import { LocalStrategy } from './utils/LocalStrategy';
 import { SessionSerializer } from './utils/SessionSerializer';
-import { DatabaseService } from 'src/database/database.service';
-import { GoogleLinkStrategy, GoogleLoginStrategy } from './utils/GoogleStrategy';
-import { HurtformService } from 'src/hurtform/hurtform.service';
-import { WeekformService } from 'src/weekform/weekform.service';
-import { YearformService } from 'src/yearform/yearform.service';
+import { DatabaseService } from '../database/database.service';
+import {
+  GoogleLinkStrategy,
+  GoogleLoginStrategy,
+} from './utils/GoogleStrategy';
+import { HurtformService } from '../hurtform/hurtform.service';
+import { WeekformService } from '../weekform/weekform.service';
+import { YearformService } from '../yearform/yearform.service';
 import { LineLoginStrategy } from './utils/LineStrategy';
 import { LineLinkStrategy } from './utils/LineStrategy';
 
@@ -27,26 +30,26 @@ import { LineLinkStrategy } from './utils/LineStrategy';
     },
     {
       provide: 'DATABASE_SERVICE',
-      useClass: DatabaseService
+      useClass: DatabaseService,
     },
     {
       provide: 'HURTFORM_SERVICE',
-      useClass: HurtformService
+      useClass: HurtformService,
     },
     {
       provide: 'WEEKFORM_SERVICE',
-      useClass: WeekformService
+      useClass: WeekformService,
     },
     {
       provide: 'YEARFORM_SERVICE',
-      useClass: YearformService
+      useClass: YearformService,
     },
     LocalStrategy,
     SessionSerializer,
     GoogleLinkStrategy,
     GoogleLoginStrategy,
     LineLoginStrategy,
-    LineLinkStrategy
+    LineLinkStrategy,
   ],
 })
 export class AuthModule {}

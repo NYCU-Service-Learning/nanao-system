@@ -10,6 +10,7 @@ interface NavigProps {
 
 // 定義一個 Functional Component（函數式組件）Navig，接收 NavigProps 作為參數
 const Navig: React.FC<NavigProps> = ({ user }) => {
+  // 使用useCookies hook來從cookie中讀取名為'user'的cookie值
   return (
 
     // 使用 React-Bootstrap 的 Navbar 組件來創建導航欄
@@ -22,8 +23,8 @@ const Navig: React.FC<NavigProps> = ({ user }) => {
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/home">首頁</Nav.Link>
 
-            {/* 如果 user 是 null，顯示登入按鈕，否則顯示使用者相關選項 */}
-            {user == null ? (
+            {/* 如果沒有user cookie，顯示登入按鈕，否則顯示使用者相關選項 */}
+            {user == null || user == '' ? (
 
               // 未登入時顯示的導航鏈接
               <Nav.Link as={Link} to="/login">登入</Nav.Link>

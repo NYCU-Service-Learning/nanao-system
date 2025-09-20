@@ -1,31 +1,13 @@
 import './Interact.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import axios from 'axios';
-import withAuthRedirect from '../withAuthRedirect';
-import { useNavigate } from 'react-router-dom';
-
-// 定義後端 API 的基礎 URL
-const url = 'http://localhost:3000/';
-
-/**
- * getUserID - 根據使用者名稱請求使用者 ID 的異步函數
- * @param username 使用者名稱
- * @returns 包含使用者 ID 的 Promise
- */
-
-const getUserID = async (username: string): Promise<string> => {
-  const response = await axios.get(`${url}user/find/${username}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    withCredentials: true, // 向請求中包含憑證 (如 cookies)
-  });
-  return response.data; // 返回使用者 ID
-};
+import { useLocation, useNavigate } from 'react-router-dom';
+import { API_URL } from '../../config';
+import { getIdByUsername } from '../../api/userAPI';
+import { httpPost } from '../../api/APIUtils';
 
 // 定義 PainLevelType 和 PainStatusType 介面，用於描述疼痛狀態的數據結構
 interface PainLevelType {
@@ -50,31 +32,28 @@ const Interact: React.FC = () => {
   const [WeekPain, setWeekPain] = React.useState<PainStatusType>({}); // 每週疼痛狀態
   const navigate = useNavigate(); // 用於導航的 hook
 
+  // 讀取 query parameter
+  const location = useLocation();
+  const queryParam = new URLSearchParams(location.search);
+  const current_part = queryParam.get('current_part');
+
+  // 變動 currentPart 觸發 DataFiller 中的 useEffect
+  useEffect(() => {
+    if(current_part){
+      setCurrentPart(current_part);
+    }
+  }, [current_part])
+
   const handleSubmit = async () => {
     try {
       // 根據 cookies 中的使用者名稱取得使用者 ID
-      const userid = await getUserID(cookies.user);
+      const userid = await getIdByUsername(cookies.user);
 
       // 發送多個 POST 請求，分別提交每年、每週疼痛狀態和疼痛等級
       await Promise.all([
-        axios.post(`${url}hurtform/${userid}`, PainLevel, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true, // 向請求中包含憑證
-        }),
-        axios.post(`${url}weekform/${userid}`, WeekPain, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }),
-        axios.post(`${url}yearform/${userid}`, MonthPain, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }),
+        httpPost(`${API_URL}hurtform/${userid}`, PainLevel),
+        httpPost(`${API_URL}weekform/${userid}`, WeekPain),
+        httpPost(`${API_URL}yearform/${userid}`, MonthPain),
       ]);
       // 成功提交後導航至統計頁面
       navigate('/stat');
@@ -112,4 +91,4 @@ const Interact: React.FC = () => {
   );
 };
 
-export default withAuthRedirect(Interact);
+export default Interact;

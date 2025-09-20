@@ -1,8 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException,HttpStatus, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { UserDetailService } from './user-detail.service';
 import { Prisma } from '@prisma/client';
-import { AdminOrSameUserIdGuard, UserDetailCreateGuard } from 'src/auth/utils/guards/LocalGuard';
-import { UserIdName } from 'src/auth/utils/metadata/GuardMetadata';
+import {
+  AdminOrSameUserIdGuard,
+  UserDetailCreateGuard,
+} from '../auth/utils/guards/LocalGuard';
+import { UserIdName } from '../auth/utils/metadata/GuardMetadata';
 
 @Controller('user-detail')
 export class UserDetailController {
@@ -20,7 +32,6 @@ export class UserDetailController {
     return this.userDetailService.findAll();
   }
 
-
   @UseGuards(AdminOrSameUserIdGuard)
   @UserIdName('id')
   @Get(':id')
@@ -28,11 +39,13 @@ export class UserDetailController {
     return this.userDetailService.findOne(+id);
   }
 
-
   @UseGuards(AdminOrSameUserIdGuard)
   @UserIdName('id')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDetailDto: Prisma.UserDetailUpdateInput) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDetailDto: Prisma.UserDetailUpdateInput,
+  ) {
     return this.userDetailService.update(+id, updateUserDetailDto);
   }
 

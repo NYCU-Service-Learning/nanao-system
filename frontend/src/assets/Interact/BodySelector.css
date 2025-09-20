@@ -14,7 +14,7 @@
 /* SVG styling for body selector */
 .BodySelector svg{
   margin: 100px auto;
-  width: 60vh;
+  width: 100vw;
   height: 60vh;
   cursor: pointer;
 }
@@ -25,7 +25,6 @@
 }
 /* SVG path hover effect with layered glow */
 .BodySelector svg path:hover {
-    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.75))  /* White glow */
-            drop-shadow(0 0 10px rgba(255, 255, 255, 0.75))  /* Stronger white glow */
-            drop-shadow(0 0 20px rgba(255, 217, 0, 0.884));  /* Cyan glow for extra effect */
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.75))  /* White glow */
+            drop-shadow(0 0 20px rgba(255, 13, 0, 0.884));  /* Cyan glow for extra effect */
 }
