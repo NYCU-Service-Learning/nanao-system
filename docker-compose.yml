@@ -14,10 +14,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    env_file:
+    - ./backend/.env 
     environment:
       NODE_ENV: production
-      DATABASE_URL: mysql://nanao_user:nanao_password@db:3306/nanao_db
-      SESSION_SECRET: nanao_db
       CORS_ORIGIN: http://localhost:5173
     depends_on:
       db:
