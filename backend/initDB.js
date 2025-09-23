@@ -16,6 +16,7 @@ async function main() {
                 username: 'admin',
                 password: '$2b$10$PmRQ.FCpi50lnr5OJ9Tib.kaL9WwhI2eCTFvJFn0QJk1xk0eVvfdq',
                 name: 'admin',
+                email: '',
                 role: 'ADMIN',
                 userDetail: {
                     create: {
@@ -24,7 +25,6 @@ async function main() {
                         age: 0,
                         medical_History: '',
                         address: '',
-                        email: '',
                         phone: '',
                         headshot: '0'
                     }
