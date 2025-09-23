@@ -5,7 +5,7 @@ title: 南澳資料庫專案說明
 
 # 專案建置流程
 
-先安裝Node.js v20.18.0(LTS) (https://nodejs.org/en/download/current)，並到[南澳組Github](https://github.com/NYCU-Service-Learning/nanao-system)下載整個專案
+先安裝[Node.js v20.18.0(LTS)](https://nodejs.org/en/download/current)，並到[南澳組Github](https://github.com/NYCU-Service-Learning/nanao-system)下載整個專案。
 
 ## 本地端mysql
 [下載MySQL的installer](https://dev.mysql.com/downloads/installer/)，
