@@ -1,16 +1,15 @@
-FROM node:16-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 RUN apk add --no-cache --virtual .build-deps build-base python3
 COPY package*.json ./
 RUN npm install && npm rebuild bcrypt --build-from-source
-COPY prisma/schema.prisma ./prisma/
-COPY prisma/migrations ./prisma/migrations/
-RUN npm install -g prisma && prisma generate
+COPY prisma ./prisma/
+RUN npx prisma generate
 COPY . .
 RUN npm run build
 RUN apk del .build-deps
 
-FROM node:16-alpine
+FROM node:20-alpine
 WORKDIR /app
 RUN apk add --no-cache bash
 COPY --from=build /app .
