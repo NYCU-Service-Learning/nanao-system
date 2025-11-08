@@ -41,5 +41,13 @@ services:
       timeout: 5s
       retries: 5
 
+  voice_reco:
+    image: userwei/nycu_service-learning-nanao:voice_reco
+    build:
+      context: ./voice_reco
+      dockerfile: Dockerfile
+    ports:
+      - "4000:80"
+
 volumes:
   db-data:
