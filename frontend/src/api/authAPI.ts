@@ -2,12 +2,12 @@ import { API_URL } from "../config"
 import { httpGet, httpPost } from "./APIUtils"
 
 const getStatus = async () => {
-    const data = await httpGet(`${API_URL}auth/status`);
+    const data = await httpGet(`/auth/status`);
     return data;
 };
 
 const requestLogout = async () => {
-    await httpPost(`${API_URL}auth/logout`, {});
+    await httpPost(`/auth/logout`, {});
 }
 
 export { getStatus, requestLogout };

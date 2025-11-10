@@ -49,7 +49,7 @@ export const useAuthHelper = () => {
     const loginWithPwd = async (username: string, password: string) => {
         try {
             const response = await axios.post(
-                `${API_URL}auth/login`,
+                `/auth/login`,
                 {
                     username, password
                 },

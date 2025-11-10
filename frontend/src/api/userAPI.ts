@@ -2,30 +2,30 @@ import { httpGet, httpDelete, httpPatch, httpPost } from "./APIUtils";
 import { API_URL } from "../config";
 
 const getIdByUsername = async (username: string): Promise<string> => {
-    const id = await httpGet(`${API_URL}user/find/${username}`);
+    const id = await httpGet(`/user/find/${username}`);
     return String(id);
 };
 
 const getUserById = async (id: string | number) => {
-    const user = await httpGet(`${API_URL}user/${id}`);
+    const user = await httpGet(`/user/${id}`);
     return user;
 }
 
 const getAllUsers = async () => {
-    const users = await httpGet(`${API_URL}user`);
+    const users = await httpGet(`/user`);
     return users;
 };
 
 const deleteUserById = async (id: string) => {
-    await httpDelete(`${API_URL}user/${id}`);
+    await httpDelete(`/user/${id}`);
 };
 
 const patchUserById = async (id: string, data) => {
-    await httpPatch(`${API_URL}user/${id}`, data);
+    await httpPatch(`/user/${id}`, data);
 };
 
 const createNewUser = async (data) => {
-    await httpPost(`${API_URL}user/`, data);
+    await httpPost(`/user/`, data);
 };
 
 export { getIdByUsername, getAllUsers, deleteUserById, patchUserById, createNewUser,  getUserById };

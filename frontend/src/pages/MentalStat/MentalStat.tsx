@@ -11,7 +11,7 @@ import { dataSource } from '../../utils/questions';
 const { Option } = Select;
 
 const getMentalStat = async (userID) => {
-  const mentalStat = await httpGet(`${API_URL}mentalform/${userID}`);
+  const mentalStat = await httpGet(`/mentalform/${userID}`);
   return mentalStat;
 };
 

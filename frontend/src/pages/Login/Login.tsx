@@ -37,11 +37,11 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}auth/google/login`;
+    window.location.href = `/auth/google/login`;
   };
 
   const handleLineLogin = () => {
-    window.location.href = `${API_URL}auth/line/login`;
+    window.location.href = `/auth/line/login`;
   };
 
   return (

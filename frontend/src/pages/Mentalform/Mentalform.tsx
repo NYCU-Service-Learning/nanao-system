@@ -117,7 +117,7 @@ const MentalForm = () => {
       data["problem"].push(values[key]);
     }
     console.log(data);
-    await httpPost(`${API_URL}mentalform/${userID}`, data);
+    await httpPost(`/mentalform/${userID}`, data);
     navigate('/home');
   };
 

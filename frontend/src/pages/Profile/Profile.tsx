@@ -92,11 +92,11 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   }, [currentProfileUserId, userDetail, userInfo]);
 
   const handleGoogleLink = useCallback(() => {
-    window.location.href = `${API_URL}auth/google/link`;
+    window.location.href = `auth/google/link`;
   }, []);
 
   const handleLineLink = useCallback(() => {
-    window.location.href = `${API_URL}auth/line/link`;
+    window.location.href = `auth/line/link`;
   }, []);
 
   // 定義預設的使用者詳細資料（如果未能取得 userData，則使用該預設值）

@@ -90,7 +90,7 @@ const Stat: React.FC = () => {
         try {
             // params 為查詢時間區間
             const params = generateQueryParams(searchDatefrom, searchDateto);
-            const { data } = await axios.get(`${API_URL}hurtform/${id}`, {
+            const { data } = await axios.get(`/hurtform/${id}`, {
                 params,
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -106,7 +106,7 @@ const Stat: React.FC = () => {
     const fetchUserweek = useCallback(async (id: string) => {
         try {
             const params = generateQueryParams(searchDatefrom, searchDateto);
-            const { data } = await axios.get(`${API_URL}weekform/${id}`, {
+            const { data } = await axios.get(`/weekform/${id}`, {
                 params,
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
@@ -122,7 +122,7 @@ const Stat: React.FC = () => {
     const fetchUseryear = useCallback(async (id: string) => {
         try {
             const params = generateQueryParams(searchDatefrom, searchDateto);
-            const { data } = await axios.get(`${API_URL}yearform/${id}`, {
+            const { data } = await axios.get(`/yearform/${id}`, {
                 params,
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
