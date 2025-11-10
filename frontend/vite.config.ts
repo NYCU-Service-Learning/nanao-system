@@ -16,6 +16,9 @@ export default defineConfig({
     cors: {
       origin: '*',
       credentials: true
+    },
+    watch: {
+      usePolling: true,
     }
   }
 })
