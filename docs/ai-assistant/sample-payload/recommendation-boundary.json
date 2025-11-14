@@ -1,0 +1,7 @@
+{
+  "userId": 2,
+  "analysisContext": {
+    "overallRisk": "super_high",
+    "keyFindings": "this-should-not-be-a-string"
+  }
+}
