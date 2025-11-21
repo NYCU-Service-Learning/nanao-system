@@ -4,6 +4,7 @@ import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
+import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
@@ -30,7 +31,12 @@ const Interact: React.FC = () => {
   const [currentPart, setCurrentPart] = React.useState<string>(''); // 記錄當前選擇的部位 ID
   const [MonthPain, setMonthPain] = React.useState<PainStatusType>({}); // 每年疼痛狀態
   const [WeekPain, setWeekPain] = React.useState<PainStatusType>({}); // 每週疼痛狀態
+  const [audioData, setAudioData] = React.useState<Blob | null>(null); // 用來儲存錄音的 Blob 數據
+  const [isRecording, setIsRecording] = React.useState(false); // 用來控制錄音的開關
   const navigate = useNavigate(); // 用於導航的 hook
+
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const audioChunksRef = React.useRef<Blob[]>([]);
 
   // 讀取 query parameter
   const location = useLocation();
@@ -62,6 +68,84 @@ const Interact: React.FC = () => {
       console.error('Error submitting forms:', error);
     }
   };
+  const startRecording = () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          const recorder = new MediaRecorder(stream);
+          mediaRecorderRef.current = recorder;
+          audioChunksRef.current = [];
+
+          recorder.ondataavailable = (event) => {
+            audioChunksRef.current.push(event.data);// 收集錄音數據
+          };
+          
+          recorder.onstop = () => {
+            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+            setAudioData(audioBlob);//設置錄音數據
+          };
+
+          recorder.start();
+          setIsRecording(true); // 改變錄音狀態
+        })
+        .catch((error) => {
+          console.error('錄音設備錯誤:', error);
+        });
+    } else {
+      console.error('瀏覽器不支持錄音');
+    }
+  };
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();//停止錄音
+      setIsRecording(false);//改變錄音狀態
+    }
+  };
+
+  // 提交錄音並處理
+  const handleSubmitRecording = async () => {
+    if (audioData) {
+      await recordAndSubmit(audioData); // 提交錄音數據
+      navigate('/stat'); // 假設成功後導航到統計頁面
+    } else {
+      console.error('沒有錄音數據');
+    }
+  };
+
+  const recordAndSubmit = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'recording.wav'); // 後端以file搜尋
+
+      //curl -X POST -F "file=@your_path_here.wav" 
+      /*
+      const response = await axios.post('https://audio-converter-api.onrender.com/process-audio', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 這告訴後端資料是表單格式
+        },
+        withCredentials: true, // 如果需要傳送 cookies
+      });*/
+      
+      const response = await axios.post( "http://localhost:4000/process", formData, //傳送給後端
+        {
+          headers: {
+            "Content-Type": "multipart/form-data" // 這告訴後端資料是表單格式
+          }
+        }
+      );
+
+      if (response.data.success) {
+        console.log('音頻處理成功');
+        // 如果音頻處理成功，提交表單
+        // 這裡你可以把提交表單的邏輯放到這裡
+      } else {
+        console.error('音頻處理失敗');
+      }
+    } catch (error) {
+      console.error('錯誤:', error);
+    }
+  };
   // 組件返回的 JSX，包含 BodySelector、DataFiller 組件和提交按鈕
   return (
     <div className="container">
@@ -86,6 +170,16 @@ const Interact: React.FC = () => {
       {/* 提交按鈕，按下後執行 handleSubmit 函數 */}
       <Button variant="outline-primary" className='float-end' onClick={handleSubmit}>
         送出
+      </Button>
+      {/* ai */}
+      <Button onClick={startRecording} disabled={isRecording}>
+        開始錄音
+      </Button>
+      <Button onClick={stopRecording} disabled={!isRecording}>
+        停止錄音
+      </Button>
+      <Button onClick={handleSubmitRecording} disabled={!audioData}>
+        AI
       </Button>
     </div>
   );
