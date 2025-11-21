@@ -4,7 +4,6 @@ import BodySelector from './BodySelector';
 import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
-import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
@@ -127,13 +126,19 @@ const Interact: React.FC = () => {
         withCredentials: true, // 如果需要傳送 cookies
       });*/
       
+      //post版本，有帶config
+      //need to import axios from 'axios';
+      /*
       const response = await axios.post( "http://localhost:4000/process", formData, //傳送給後端
         {
           headers: {
             "Content-Type": "multipart/form-data" // 這告訴後端資料是表單格式
           }
         }
-      );
+      );*/
+
+      //httpPost為包裝好的版本，不帶config
+      const response = await httpPost( "http://localhost:4000/process", formData); //傳送給後端
 
       if (response.data.success) {
         console.log('音頻處理成功');
