@@ -120,6 +120,7 @@ const Interact: React.FC = () => {
       if (response.voice_reco_success) {
         console.log('音頻處理成功');
         console.log(response.text);
+        navigate(response.text);
       } else {
         console.error('音頻處理失敗');
       }
