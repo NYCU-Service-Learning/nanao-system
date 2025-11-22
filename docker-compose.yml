@@ -46,6 +46,8 @@ services:
     build:
       context: ./voice_reco
       dockerfile: Dockerfile
+    env_file:
+      - path: ./voice_reco/.env
     ports:
       - "4000:80"
 
