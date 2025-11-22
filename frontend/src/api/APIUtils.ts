@@ -10,6 +10,15 @@ const instance = axios.create({
     timeout: 10 * 1000,
 });
 
+const wav_instance = axios.create({
+    baseURL: API_URL,
+    headers:{
+        "Content-Type": "multipart/form-data"
+    },
+    withCredentials: true,
+    timeout: 10 * 1000,
+});
+
 const httpGet = async (url: string) => {
     try {
         const response = await instance.get(url);
@@ -27,6 +36,15 @@ const httpPost = async (url: string, data) => {
     } catch (err) {
         console.error(`POST error:\n${err}`);
         throw err;
+    }
+}
+
+const httpPost_reco = async(url: string, data) => {
+    try {
+        const response = await wav_instance.post(url, data);
+        return response.data;
+    } catch (err) {
+        console.error(`POST error:\n${err}`);
     }
 }
 
@@ -50,4 +68,5 @@ const httpPatch = async (url: string, data) => {
     }
 }
 
-export { instance, httpGet , httpPost, httpDelete, httpPatch };
+export { instance, wav_instance, 
+         httpGet , httpPost, httpPost_reco, httpDelete, httpPatch };
