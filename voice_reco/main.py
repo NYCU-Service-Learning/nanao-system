@@ -23,7 +23,8 @@ def process():
     os.remove(f"/app/audio{x}.wav")
     
     response = {
-        "text": result["text"]
+        "text": result["text"],
+        "voice_reco_success": 1
     }
     
     return response, 200

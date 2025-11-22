@@ -7,7 +7,7 @@ import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
-import { httpPost } from '../../api/APIUtils';
+import { httpPost, httpPost_reco } from '../../api/APIUtils';
 
 // 定義 PainLevelType 和 PainStatusType 介面，用於描述疼痛狀態的數據結構
 interface PainLevelType {
@@ -106,7 +106,6 @@ const Interact: React.FC = () => {
   const handleSubmitRecording = async () => {
     if (audioData) {
       await recordAndSubmit(audioData); // 提交錄音數據
-      navigate('/stat'); // 假設成功後導航到統計頁面
     } else {
       console.error('沒有錄音數據');
     }
@@ -117,33 +116,10 @@ const Interact: React.FC = () => {
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.wav'); // 後端以file搜尋
 
-      //curl -X POST -F "file=@your_path_here.wav" 
-      /*
-      const response = await axios.post('https://audio-converter-api.onrender.com/process-audio', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // 這告訴後端資料是表單格式
-        },
-        withCredentials: true, // 如果需要傳送 cookies
-      });*/
-      
-      //post版本，有帶config
-      //need to import axios from 'axios';
-      /*
-      const response = await axios.post( "http://localhost:4000/process", formData, //傳送給後端
-        {
-          headers: {
-            "Content-Type": "multipart/form-data" // 這告訴後端資料是表單格式
-          }
-        }
-      );*/
-
-      //httpPost為包裝好的版本，不帶config
-      const response = await httpPost( "http://localhost:4000/process", formData); //傳送給後端
-
-      if (response.data.success) {
+      const response = await httpPost_reco( "http://localhost:4000/process", formData); //傳送給後端
+      if (response.voice_reco_success) {
         console.log('音頻處理成功');
-        // 如果音頻處理成功，提交表單
-        // 這裡你可以把提交表單的邏輯放到這裡
+        console.log(response.text);
       } else {
         console.error('音頻處理失敗');
       }
