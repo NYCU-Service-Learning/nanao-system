@@ -1,109 +1,161 @@
-// src/analysis/analysis.service.ts
 import { Injectable } from '@nestjs/common';
-import { GeminiService } from '../aiassistant/Aiassistant.service'; // 假設這是 LLM Service 的正確路徑
+import { GeminiService } from '../aiassistant/Aiassistant.service'; 
 import { HurtformService } from '../hurtform/hurtform.service';
+import { MentalformService } from '../mentalform/mentalform.service'; 
 import { CleanBodyDto } from './dto/clean-body'; 
 
 @Injectable()
 export class AnalysisService {
   constructor(
-    // 統一使用 llmService 作為屬性名稱
     private readonly llmService: GeminiService, 
     private readonly hurtformService: HurtformService, 
+    private readonly mentalformService: MentalformService, 
   ) {}
 
+  // =========================================================
+  // W3-W5: 身心健康綜合分析 (HurtForm + MentalForm)
+  // =========================================================
+  async analyzeUserHealth(userId: number, k: number = 5) {
+    // 1. 【並行資料獲取】同時撈取身、心資料
+    const [hurtForms, mentalForms] = await Promise.all([
+      this.hurtformService.findLast_K(userId, k),
+      this.mentalformService.findLast_K(userId, k)
+    ]);
 
-  async analyzeUserHurtForms(userId: number, k: number = 5) {
-    // 1. 【資料獲取】從資料庫撈取最近 K 筆紀錄
-    const recentForms = await this.hurtformService.findLast_K(userId, k);
+    const hasHurtData = hurtForms && hurtForms.length > 0;
+    const hasMentalData = mentalForms && mentalForms.length > 0;
 
-    if (!recentForms || recentForms.length === 0) {
+    if (!hasHurtData && !hasMentalData) {
       return {
-        data_analyzed: 0,
+        data_analyzed: { physical: 0, mental: 0 },
         message: '沒有足夠的資料進行分析',
-        llm_response: '目前沒有紀錄可供分析，請鼓勵使用者多加紀錄。',
+        llm_response: '目前沒有任何身體或心理紀錄可供分析，請鼓勵使用者多加紀錄。',
       };
     }
 
-    // 2. 【資料清洗/格式化】呼叫專屬輔助函式，優化 LLM 輸入
-    const dataForPrompt = this.prepareDataForLlm(recentForms);
+    // 2. 【資料清洗與格式化】分別呼叫專屬的清洗函式
+    const physicalDataPrompt = hasHurtData 
+      ? this.prepareHurtDataForLlm(hurtForms) 
+      : "無近期身體不適紀錄。";
 
-    // 3. 【Prompt 組裝】定義角色和資料
+    const mentalDataPrompt = hasMentalData 
+      ? this.prepareMentalDataForLlm(mentalForms) 
+      : "無近期心理狀況紀錄。";
+
+    // 3. 【Prompt 組裝】
     const systemPrompt = `
-      角色設定：你是一位駐台灣的資深社區健康照護員，專門服務年長者。語氣必須非常溫和、有耐心、使用親切且自然的繁體中文口吻。請避免使用過於複雜或西方的專業術語。
+      角色設定：你是一位駐台灣的資深社區健康照護員，專門服務年長者。語氣必須非常溫和、有耐心、使用親切且自然的繁體中文口吻。
       
-      任務：請分析以下使用者（年長者）最近 ${recentForms.length} 筆的身體不適紀錄 (Hurt Forms)，並根據以下結構輸出 Markdown 內容。
+      任務：請綜合分析該長輩的「身體不適紀錄」與「心理狀況紀錄」。
+      
+      分析策略：
+      1. 若只有身體紀錄：專注分析疼痛趨勢與建議。
+      2. 若只有心理紀錄：專注分析心情變化與關懷。
+      3. **若兩者皆有**：請嘗試尋找關聯性（例如：是否因為身體疼痛導致心情不佳？或是心情焦慮導致身體緊繃？）。
       
       請確保你的輸出是**純 Markdown 格式**。
     `;
     
     const userContent = `
-      以下是使用者的資料 (請根據填寫時間由新到舊分析)：
-      ${JSON.stringify(dataForPrompt, null, 2)}
+      以下是長輩的近期資料 (由新到舊)：
       
-      ## 1. 狀況關心與趨勢提醒
-      ## 2. 可能原因的溫和推測
-      ## 3. 在地化的復健與舒緩建議
+      === 身體不適紀錄 (Hurt Forms) ===
+      ${JSON.stringify(physicalDataPrompt, null, 2)}
+      
+      === 心理狀況紀錄 (Mental Forms) ===
+      ${JSON.stringify(mentalDataPrompt, null, 2)}
+      
+      請根據現有資料輸出 Markdown，包含以下標題 (若某部分無資料，請在該段落說明無資料即可)：
+      ## 1. 整體狀況關懷
+      ## 2. 身體與心理趨勢分析 (若兩者皆有，請分析關聯性)
+      ## 3. 綜合健康建議 (在地化、溫和的建議)
       ## 4. 總結溫馨叮嚀
     `;
 
-    // 4. 【呼叫 LLM】使用 this.llmService
+    // 4. 【呼叫 LLM】
     const llmResponse = await this.llmService.generateText(systemPrompt, userContent);
 
-    // 5. 【回傳前端】
+    // 5. 【回傳結果】
     return {
-      data_analyzed: recentForms.length,
+      data_analyzed: {
+        physical: hasHurtData ? hurtForms.length : 0,
+        mental: hasMentalData ? mentalForms.length : 0,
+      },
       llm_response: llmResponse, 
     };
   }
 
   // =========================================================
-  // W2: 資料清洗功能 (簡化版，依賴 DTO @Transform)
+  // W2: 使用者輸入資料清洗 (保持不變)
   // =========================================================
   clean(body: CleanBodyDto) {
-    // 由於 DTO 的 @Transform 已經完成了大部分清洗工作，這裡只做驗證和回傳
     const isValid = this.validateCleaned(body); 
-
     return {
       original: body, 
       cleaned: body, 
       is_valid: isValid,
-      message: isValid ? 'Data cleaning and normalization completed via DTO transformation.' : 'Data validation failed on key fields.',
+      message: isValid ? 'Data cleaning completed.' : 'Data validation failed.',
     };
   }
   
-  // 驗證清洗後的資料
   private validateCleaned(cleaned: CleanBodyDto): boolean {
-    // 假設 Email 和 Age 是必填/必須有效的欄位
-    if (cleaned.email === '' || cleaned.age === null || cleaned.age === undefined) return false; 
+    if (cleaned.email === '' || cleaned.age === null) return false; 
     return true;
   }
 
   // =========================================================
-  // 輔助函式：LLM 專屬資料序列化
+  // 輔助函式：LLM 資料清洗與轉換區
   // =========================================================
+
   /**
-   * 將 HurtForm 資料庫物件轉換為 LLM 友善的格式
-   * @param recentForms 原始資料庫物件陣列
+   * 清洗 HurtForm 資料：移除 ID，格式化時間
    */
-  private prepareDataForLlm(recentForms: any[]): any[] {
+  private prepareHurtDataForLlm(recentForms: any[]): any[] {
     return recentForms.map((form) => {
-      // 1. 過濾系統欄位
       const { id, user_id, ...rest } = form as any; 
-      
-      // 2. 格式化時間，讓 LLM 閱讀
-      const filledTime = rest.fill_time instanceof Date 
-                           ? rest.fill_time.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) 
-                           : rest.fill_time;
-      
-      // 3. 返回 LLM 友善的中文鍵值對 (這是傳給 LLM 的清洗版本)
       return {
-          填寫時間: filledTime,
+          填寫時間: this.formatDate(rest.fill_time), // 使用共用的時間格式化
           疼痛部位: rest.title,
           疼痛程度: rest.pain_level,
           詳細描述: rest.description,
-          // 如果還有其他欄位，請在這裡添加
       };
+    });
+  }
+
+  /**
+   * 清洗 MentalForm 資料：移除 ID，格式化時間，保留問題回答
+   */
+  private prepareMentalDataForLlm(recentForms: any[]): any[] {
+    return recentForms.map((form) => {
+      // 根據您的 MentalformService，這裡的欄位是 filled_time 和 problem (Array)
+      const { id, user_id, filled_time, problem } = form as any; 
+      
+      return {
+        填寫時間: this.formatDate(filled_time),
+        // 這裡直接傳送分數陣列，Gemini 能夠理解這是量表分數
+        // 如果需要，也可以在這裡把 [1, 5, 2...] 轉成文字描述
+        心理問卷分數: problem, 
+      };
+    });
+  }
+
+  /**
+   * 共用日期格式化工具：將 Date 物件轉為台灣習慣的中文格式
+   */
+  private formatDate(dateInput: any): string {
+    if (!dateInput) return '無日期';
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    
+    // 檢查是否為有效日期
+    if (isNaN(date.getTime())) return String(dateInput);
+
+    return date.toLocaleString('zh-TW', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: false 
     });
   }
 }

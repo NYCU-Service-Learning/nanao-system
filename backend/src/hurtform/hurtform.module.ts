@@ -7,5 +7,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [HurtformController],
   providers: [HurtformService],
+  exports: [HurtformService],
 })
 export class HurtformModule {}
