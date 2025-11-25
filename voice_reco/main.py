@@ -52,8 +52,6 @@ def process():
         ),
     ).text.split(',')
 
-    print(keyword)
-
     url = '/interact?current_part=' + keyword[0] + '&&pain_level=' + keyword[1]
     
     response = {
