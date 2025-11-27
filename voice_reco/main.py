@@ -59,7 +59,7 @@ def process():
         "voice_reco_success": 1
     }
     
-    return response, 200
+    return response, 200, [('Access-Control-Allow-Origin', '*'),('Access-Control-Allow-Credentials', 'false'),('Access-Control-Allow-Methods', 'POST, OPTIONS')]
 
 if __name__ == '__main__':
     app.run(debug=True)
