@@ -1,10 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnalysisService } from './analysis.service';
 import { GeminiService } from '../aiassistant/Aiassistant.service';
+import { HurtformService } from '../hurtform/hurtform.service';
+import { MentalformService } from '../mentalform/mentalform.service';
 
-// 1. 建立 LlmService 的 Mock，這樣就不會真的去呼叫 Google
 const mockLlmService = {
   generateText: jest.fn(),
+};
+
+const mockHurtformService = {
+  findLast_K: jest.fn(),
+};
+
+const mockMentalformService = {
+  findLast_K: jest.fn(),
 };
 
 describe('AnalysisService', () => {
@@ -14,62 +23,92 @@ describe('AnalysisService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AnalysisService,
-        // 使用 useValue 注入我們的 Mock 物件
         { provide: GeminiService, useValue: mockLlmService },
+        { provide: HurtformService, useValue: mockHurtformService },
+        { provide: MentalformService, useValue: mockMentalformService },
       ],
     }).compile();
 
     service = module.get<AnalysisService>(AnalysisService);
     mockLlmService.generateText.mockClear();
+    mockHurtformService.findLast_K.mockClear();
+    mockMentalformService.findLast_K.mockClear();
   });
 
-  // --- 測試純清洗邏輯 (無需 LLM) ---
+  describe('analyzeUserHealth', () => {
+    it('should return default message if no data exists', async () => {
+      mockHurtformService.findLast_K.mockResolvedValue([]);
+      mockMentalformService.findLast_K.mockResolvedValue([]);
+
+      const result = await service.analyzeUserHealth(1);
+
+      expect(result.data_analyzed).toEqual({ physical: 0, mental: 0 });
+      expect(result.message).toBe('沒有足夠的資料進行分析');
+      expect(result.llm_response).toBe('目前沒有任何身體或心理紀錄可供分析，請鼓勵使用者多加紀錄。');
+      expect(mockLlmService.generateText).not.toHaveBeenCalled();
+    });
+
+    it('should call LLM if physical data exists', async () => {
+      mockHurtformService.findLast_K.mockResolvedValue([{
+        id: 1,
+        user_id: 1,
+        fill_time: new Date(),
+        title: 'Headache',
+        pain_level: 5,
+        description: 'Pain'
+      }]);
+      mockMentalformService.findLast_K.mockResolvedValue([]);
+      mockLlmService.generateText.mockResolvedValue('LLM Analysis');
+
+      const result = await service.analyzeUserHealth(1);
+
+      expect(result.data_analyzed.physical).toBe(1);
+      expect(result.llm_response).toBe('LLM Analysis');
+      expect(mockLlmService.generateText).toHaveBeenCalled();
+    });
+
+    it('should call LLM if mental data exists', async () => {
+      mockHurtformService.findLast_K.mockResolvedValue([]);
+      mockMentalformService.findLast_K.mockResolvedValue([{
+        id: 1,
+        user_id: 1,
+        filled_time: new Date(),
+        problem: [1, 2, 3]
+      }]);
+      mockLlmService.generateText.mockResolvedValue('LLM Analysis');
+
+      const result = await service.analyzeUserHealth(1);
+
+      expect(result.data_analyzed.mental).toBe(1);
+      expect(result.llm_response).toBe('LLM Analysis');
+      expect(mockLlmService.generateText).toHaveBeenCalled();
+    });
+  });
+
   describe('clean()', () => {
-    it('should clean name, email, and tags correctly', () => {
-      const input = {
-        name: '  jason  BOURNE ',
-        email: '  Jason@CIA.gov  ',
-        age: '32',
-        tags: ['SPY', 'Action', null, 'spy'],
+    it('should return the body as is (validation only)', () => {
+      // Since cleaning happens in Controller via Pipe, Service just receives data.
+      // We verify that service accepts the data.
+      const input: any = {
+        name: 'Jason Bourne',
+        email: 'jason@cia.gov',
+        age: 32,
+        tags: ['spy', 'action'],
       };
 
       const result = service.clean(input);
 
-      expect(result.cleaned).toEqual({
-        name: 'Jason Bourne',      // 驗證大小寫修正
-        email: 'jason@cia.gov',    // 驗證小寫
-        age: 32,                   // 驗證轉數字
-        tags: ['spy', 'action'],   // 驗證去重和小寫
-      });
+      expect(result.cleaned).toEqual(input);
+      expect(result.is_valid).toBe(true);
     });
 
-    it('should handle invalid data', () => {
-      const input = { name: null, email: 'not-an-email', age: 'abc' };
+    it('should identify invalid data', () => {
+      // Testing validateCleaned logic
+      const input: any = { name: '', email: '', age: null };
       const result = service.clean(input);
-      
-      expect(result.cleaned.name).toBe('');
-      expect(result.cleaned.email).toBe('');
-      expect(result.cleaned.age).toBeNull();
-    });
-  });
 
-  // --- 測試整合邏輯 (需要 LLM) ---
-  describe('cleanAndGenerate()', () => {
-    it('should clean data then call LLM service', async () => {
-      const input = { name: 'Alice' };
-      // 設定 LLM Mock 回傳
-      mockLlmService.generateText.mockResolvedValue('Hello Alice!');
-
-      const result = await service.cleanAndGenerate(input);
-
-      // 1. 驗證 LlmService 有被呼叫
-      expect(mockLlmService.generateText).toHaveBeenCalled();
-      // 2. 驗證參數裡面包含清洗後的資料 (檢查字串包含)
-      expect(mockLlmService.generateText).toHaveBeenCalledWith(
-        expect.stringContaining('"name":"Alice"')
-      );
-      // 3. 驗證最終結果包含 LLM 的回應
-      expect(result.llm).toBe('Hello Alice!');
+      expect(result.is_valid).toBe(false);
+      expect(result.message).toBe('Data validation failed.');
     });
   });
 });

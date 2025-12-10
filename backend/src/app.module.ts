@@ -15,6 +15,7 @@ import configuration from 'config/configuration';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { MentalformModule } from './mentalform/mentalform.module';
+import { AnalysisModule } from './analysis/analysis.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { MentalformModule } from './mentalform/mentalform.module';
       },
     ]),
     MentalformModule,
+    AnalysisModule,
   ],
   controllers: [AppController],
   providers: [
@@ -53,4 +55,4 @@ import { MentalformModule } from './mentalform/mentalform.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

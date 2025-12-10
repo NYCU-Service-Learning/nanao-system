@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { GeminiService } from '../aiassistant/Aiassistant.service'; 
+import { GeminiService } from '../aiassistant/Aiassistant.service';
 import { HurtformService } from '../hurtform/hurtform.service';
-import { MentalformService } from '../mentalform/mentalform.service'; 
-import { CleanBodyDto } from './dto/clean-body'; 
+import { MentalformService } from '../mentalform/mentalform.service';
+import { CleanBodyDto } from './dto/clean-body';
 
 @Injectable()
 export class AnalysisService {
   constructor(
-    private readonly llmService: GeminiService, 
-    private readonly hurtformService: HurtformService, 
-    private readonly mentalformService: MentalformService, 
-  ) {}
+    private readonly llmService: GeminiService,
+    private readonly hurtformService: HurtformService,
+    private readonly mentalformService: MentalformService,
+  ) { }
 
   // =========================================================
   // W3-W5: 身心健康綜合分析 (HurtForm + MentalForm)
@@ -34,12 +34,12 @@ export class AnalysisService {
     }
 
     // 2. 【資料清洗與格式化】分別呼叫專屬的清洗函式
-    const physicalDataPrompt = hasHurtData 
-      ? this.prepareHurtDataForLlm(hurtForms) 
+    const physicalDataPrompt = hasHurtData
+      ? this.prepareHurtDataForLlm(hurtForms)
       : "無近期身體不適紀錄。";
 
-    const mentalDataPrompt = hasMentalData 
-      ? this.prepareMentalDataForLlm(mentalForms) 
+    const mentalDataPrompt = hasMentalData
+      ? this.prepareMentalDataForLlm(mentalForms)
       : "無近期心理狀況紀錄。";
 
     // 3. 【Prompt 組裝】
@@ -55,7 +55,7 @@ export class AnalysisService {
       
       請確保你的輸出是**純 Markdown 格式**。
     `;
-    
+
     const userContent = `
       以下是長輩的近期資料 (由新到舊)：
       
@@ -81,7 +81,7 @@ export class AnalysisService {
         physical: hasHurtData ? hurtForms.length : 0,
         mental: hasMentalData ? mentalForms.length : 0,
       },
-      llm_response: llmResponse, 
+      llm_response: llmResponse,
     };
   }
 
@@ -89,17 +89,17 @@ export class AnalysisService {
   // W2: 使用者輸入資料清洗 (保持不變)
   // =========================================================
   clean(body: CleanBodyDto) {
-    const isValid = this.validateCleaned(body); 
+    const isValid = this.validateCleaned(body);
     return {
-      original: body, 
-      cleaned: body, 
+      original: body,
+      cleaned: body,
       is_valid: isValid,
       message: isValid ? 'Data cleaning completed.' : 'Data validation failed.',
     };
   }
-  
+
   private validateCleaned(cleaned: CleanBodyDto): boolean {
-    if (cleaned.email === '' || cleaned.age === null) return false; 
+    if (cleaned.email === '' || cleaned.age === null) return false;
     return true;
   }
 
@@ -112,12 +112,20 @@ export class AnalysisService {
    */
   private prepareHurtDataForLlm(recentForms: any[]): any[] {
     return recentForms.map((form) => {
-      const { id, user_id, ...rest } = form as any; 
+      // 1. Extract metadata
+      const { id, user_id, fill_time, user, ...bodyParts } = form as any;
+
+      // 2. Filter body parts with pain level > 0
+      const painfulRecords = [];
+      for (const [part, level] of Object.entries(bodyParts)) {
+        if (typeof level === 'number' && level > 0) {
+          painfulRecords.push(`${part}(${level})`);
+        }
+      }
+
       return {
-          填寫時間: this.formatDate(rest.fill_time), // 使用共用的時間格式化
-          疼痛部位: rest.title,
-          疼痛程度: rest.pain_level,
-          詳細描述: rest.description,
+        填寫時間: this.formatDate(fill_time),
+        疼痛摘要: painfulRecords.length > 0 ? painfulRecords.join(', ') : '無不適',
       };
     });
   }
@@ -128,13 +136,13 @@ export class AnalysisService {
   private prepareMentalDataForLlm(recentForms: any[]): any[] {
     return recentForms.map((form) => {
       // 根據您的 MentalformService，這裡的欄位是 filled_time 和 problem (Array)
-      const { id, user_id, filled_time, problem } = form as any; 
-      
+      const { id, user_id, filled_time, problem } = form as any;
+
       return {
         填寫時間: this.formatDate(filled_time),
         // 這裡直接傳送分數陣列，Gemini 能夠理解這是量表分數
         // 如果需要，也可以在這裡把 [1, 5, 2...] 轉成文字描述
-        心理問卷分數: problem, 
+        心理問卷分數: problem,
       };
     });
   }
@@ -145,17 +153,17 @@ export class AnalysisService {
   private formatDate(dateInput: any): string {
     if (!dateInput) return '無日期';
     const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
-    
+
     // 檢查是否為有效日期
     if (isNaN(date.getTime())) return String(dateInput);
 
-    return date.toLocaleString('zh-TW', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        hour12: false 
+    return date.toLocaleString('zh-TW', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
     });
   }
 }

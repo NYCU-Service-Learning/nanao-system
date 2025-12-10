@@ -7,7 +7,7 @@ const instance = axios.create({
         'Content-Type': 'application/json'
     },
     withCredentials: true,
-    timeout: 10 * 1000,
+    timeout: 60 * 1000,
 });
 
 const httpGet = async (url: string) => {
@@ -50,4 +50,4 @@ const httpPatch = async (url: string, data) => {
     }
 }
 
-export { instance, httpGet , httpPost, httpDelete, httpPatch };
+export { instance, httpGet, httpPost, httpDelete, httpPatch };
