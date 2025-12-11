@@ -3,8 +3,7 @@
   "analysisContext": {
     "overallRisk": "medium",
     "keyFindings": [
-      "lower_back_trend",
-      "neck_tightness"
+      "lower_back_trend"
     ]
   }
 }
