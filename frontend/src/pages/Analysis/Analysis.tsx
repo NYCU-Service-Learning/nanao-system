@@ -44,9 +44,9 @@ const Analysis: React.FC = () => {
 
             const result = await fetchUserHealthAnalysis(userId);
             setData(result);
-        } catch (err: unknown) { 
+        } catch (err: unknown) {
             console.error('Failed to load analysis:', err);
-            
+
             let errorMsg: string;
 
             if (err instanceof AxiosError && err.response) {
@@ -56,7 +56,7 @@ const Analysis: React.FC = () => {
             } else {
                 errorMsg = 'An unexpected error occurred';
             }
-            
+
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -66,6 +66,49 @@ const Analysis: React.FC = () => {
     useEffect(() => {
         loadAnalysis();
     }, [cookies.user]);
+
+    const cleanMarkdown = (content: string) => {
+        if (!content) return '';
+        // Remove ```markdown or ``` at the start
+        let cleaned = content.replace(/^```(markdown)?\s*/i, '');
+        // Remove ``` at the end
+        cleaned = cleaned.replace(/\s*```$/, '');
+        return cleaned;
+    };
+
+    const renderAnalysisContent = (content: string) => {
+        const cleaned = cleanMarkdown(content);
+
+        // Split by "## " followed by a number
+        const parts = cleaned.split(/(?=^##\s+\d+\.)/gm);
+
+        return parts.map((part, index) => {
+            // Check if this part starts with a numbered header
+            const match = part.match(/^(##\s+\d+\..*?)(?:\n|$)([\s\S]*)/);
+
+            if (match) {
+                // It's a numbered section
+                const title = match[1].replace(/^##\s+/, ''); // Remove '## '
+                const body = match[2];
+                return (
+                    <details key={index} open={true} className="analysis-section">
+                        <summary className="analysis-summary">{title}</summary>
+                        <div className="analysis-details-content">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                        </div>
+                    </details>
+                );
+            } else {
+                // It's intro text or something else
+                if (!part.trim()) return null;
+                return (
+                    <div key={index} className="analysis-intro">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{part}</ReactMarkdown>
+                    </div>
+                );
+            }
+        });
+    };
 
     if (loading) {
         return <div className="loading-container">正在為您分析健康狀況，請稍候... (AI 運算中)</div>;
@@ -93,9 +136,7 @@ const Analysis: React.FC = () => {
 
             <div className="analysis-content markdown-body">
                 {data?.llm_response ? (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {data.llm_response}
-                    </ReactMarkdown>
+                    renderAnalysisContent(data.llm_response)
                 ) : (
                     <div className="no-data-container">
                         暫無分析結果
