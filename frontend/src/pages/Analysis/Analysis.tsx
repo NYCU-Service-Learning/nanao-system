@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { AxiosError } from 'axios';
 import { getIdByUsername } from '../../api/userAPI';
 import { fetchUserHealthAnalysis } from '../../api/analysisAPI';
 import './Analysis.css';
@@ -41,14 +42,21 @@ const Analysis: React.FC = () => {
                 return;
             }
 
-            // 2. Fetch Analysis
             const result = await fetchUserHealthAnalysis(userId);
             setData(result);
-        } catch (err: any) {
+        } catch (err: unknown) { 
             console.error('Failed to load analysis:', err);
-            const errorMsg = err.response
-                ? `Server Error: ${err.response.status} - ${JSON.stringify(err.response.data)}`
-                : `Network/Client Error: ${err.message}`;
+            
+            let errorMsg: string;
+
+            if (err instanceof AxiosError && err.response) {
+                errorMsg = `Server Error: ${err.response.status} - ${JSON.stringify(err.response.data)}`;
+            } else if (err instanceof Error) {
+                errorMsg = `Network/Client Error: ${err.message}`;
+            } else {
+                errorMsg = 'An unexpected error occurred';
+            }
+            
             setError(errorMsg);
         } finally {
             setLoading(false);
