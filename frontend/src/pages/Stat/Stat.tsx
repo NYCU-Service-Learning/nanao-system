@@ -11,7 +11,6 @@ import 'moment-timezone';
 import { Userhurt, Usertime } from '../../assets/ts/types';
 import { bodyParts } from '../../assets/ts/constants';
 import * as XLSX from 'xlsx';
-import { API_URL } from '../../config';
 import { getIdByUsername, getUserById } from '../../api/userAPI';
 import { deleteHurtformById, deleteWeekformById, deleteYearformById } from '../../api/fromAPI';
 import useQuery from '../../hooks/useQuery';

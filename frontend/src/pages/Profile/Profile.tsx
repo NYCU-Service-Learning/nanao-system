@@ -1,6 +1,5 @@
 import './Profile.css';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { API_URL } from '../../config';
 import { getIdByUsername, getUserById } from '../../api/userAPI';
 import { getUserDetailById } from '../../api/userDetailAPI';
 import useQuery from '../../hooks/useQuery';

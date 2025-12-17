@@ -1,4 +1,3 @@
-import { API_URL } from "../config";
 import { httpDelete } from "./APIUtils";
 
 const deleteHurtformById = async (formId: string) => {

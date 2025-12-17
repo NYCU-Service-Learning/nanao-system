@@ -1,5 +1,4 @@
 import { httpGet, httpPatch } from "./APIUtils";
-import { API_URL } from "../config";
 
 const getUserDetailById = async (id: string) => {
     const userData = await httpGet(`/user-detail/${id}`);

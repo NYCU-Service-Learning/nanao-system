@@ -1,5 +1,4 @@
 import { httpGet, httpDelete, httpPatch, httpPost } from "./APIUtils";
-import { API_URL } from "../config";
 
 const getIdByUsername = async (username: string): Promise<string> => {
     const id = await httpGet(`/user/find/${username}`);

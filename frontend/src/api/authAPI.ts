@@ -1,4 +1,3 @@
-import { API_URL } from "../config"
 import { httpGet, httpPost } from "./APIUtils"
 
 const getStatus = async () => {
