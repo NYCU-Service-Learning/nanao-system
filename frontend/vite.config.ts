@@ -7,8 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '^/api/.*' : {
-        // target: `http://${process.env.BACKEND_URL}:3000`,
-        target: `http://localhost:3000`,
+        target: `http://${process.env.BACKEND_URL ? process.env.BACKEND_URL : "localhost"}:3000`,
+        // target: `http://localhost:3000`,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },
