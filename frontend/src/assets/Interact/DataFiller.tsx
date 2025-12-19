@@ -80,7 +80,7 @@ const DataFiller: React.FC<DataFillerProps> = (props) => {
       setMonthValue(props.MonthPain[props.currentPart]);
       setWeekValue(props.WeekPain[props.currentPart]);
     }
-  }, [props.currentPart])
+  }, [props.currentPart, props.MonthPain, props.PainLevel, props.WeekPain, month_pain, pain_level, week_pain, navigate])
 
   const getPainLevelText = (value: number) => {
     if (0 <= value && value <= 1) return "沒有疼痛";
