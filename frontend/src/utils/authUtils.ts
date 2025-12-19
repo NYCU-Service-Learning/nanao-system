@@ -2,7 +2,6 @@ import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router";
 import { getStatus } from "../api/authAPI";
 import axios from "axios";
-import { API_URL } from "../config";
 
 const HOUR = 60 * 60 * 1000;
 

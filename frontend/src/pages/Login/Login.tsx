@@ -2,7 +2,6 @@ import './Login.css';
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import { API_URL } from '../../config';
 import { useAuthHelper } from '../../utils/authUtils';
 
 const Login: React.FC = () => {

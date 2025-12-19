@@ -5,7 +5,6 @@ import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
 import { httpPost } from '../../api/APIUtils';
 
