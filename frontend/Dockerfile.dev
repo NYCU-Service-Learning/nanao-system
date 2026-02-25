@@ -1,0 +1,5 @@
+FROM node:20
+WORKDIR /workdir
+EXPOSE 5173
+
+CMD ( [ -d "node_modules" ] || (npm ci || npm audit fix)) && npm run dev -- --host

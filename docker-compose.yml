@@ -6,7 +6,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:80"
-
+    volumes:
+      - ./frontend/nginx.conf.template:/etc/nginx/templates/default.conf.template
+    environment:
+      BACKEND_URL: backend
+    depends_on:
+      - backend
+  
   backend:
     image: yclai37/nycu_service-learning-nanao:backend
     build:

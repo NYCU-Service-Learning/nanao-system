@@ -5,6 +5,7 @@ import {
   ConflictException,
   BadRequestException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
@@ -54,9 +55,20 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, updateUserDto: Prisma.UserUpdateInput) {
+  async update(
+    id: number,
+    updateUserDto: Prisma.UserUpdateInput,
+    currentUserRole?: string,
+  ) {
     try {
       await this.findOne(id);
+
+      if (updateUserDto.role !== undefined && currentUserRole !== 'ADMIN') {
+        throw new ForbiddenException(
+          'Only administrators can modify user roles',
+        );
+      }
+
       const hashedUpdateUser = {
         ...updateUserDto,
       };
