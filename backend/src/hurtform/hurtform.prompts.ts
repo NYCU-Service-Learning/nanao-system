@@ -1,7 +1,7 @@
 export const GENERATE_EXERCISE_PROMPT = (
-  userProfile: string,  // 例如：45歲男性，軟體工程師...
-  painSummary: string,  // 例如：下背部緊繃 (痛感 5)
-  mentalStatus: string  // 例如：壓力大，希望能舒緩
+  userProfile: string, // 例如：45歲男性，軟體工程師...
+  painSummary: string, // 例如：下背部緊繃 (痛感 5)
+  mentalStatus: string, // 例如：壓力大，希望能舒緩
 ) => `
 [角色]
 你現在是一個謹慎且專業的智能醫護助理 (Gemini)。

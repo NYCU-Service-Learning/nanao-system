@@ -44,19 +44,23 @@ describe('AnalysisService', () => {
 
       expect(result.data_analyzed).toEqual({ physical: 0, mental: 0 });
       expect(result.message).toBe('沒有足夠的資料進行分析');
-      expect(result.llm_response).toBe('目前沒有任何身體或心理紀錄可供分析，請鼓勵使用者多加紀錄。');
+      expect(result.llm_response).toBe(
+        '目前沒有任何身體或心理紀錄可供分析，請鼓勵使用者多加紀錄。',
+      );
       expect(mockLlmService.generateText).not.toHaveBeenCalled();
     });
 
     it('should call LLM if physical data exists', async () => {
-      mockHurtformService.findLast_K.mockResolvedValue([{
-        id: 1,
-        user_id: 1,
-        fill_time: new Date(),
-        title: 'Headache',
-        pain_level: 5,
-        description: 'Pain'
-      }]);
+      mockHurtformService.findLast_K.mockResolvedValue([
+        {
+          id: 1,
+          user_id: 1,
+          fill_time: new Date(),
+          title: 'Headache',
+          pain_level: 5,
+          description: 'Pain',
+        },
+      ]);
       mockMentalformService.findLast_K.mockResolvedValue([]);
       mockLlmService.generateText.mockResolvedValue('LLM Analysis');
 
@@ -69,12 +73,14 @@ describe('AnalysisService', () => {
 
     it('should call LLM if mental data exists', async () => {
       mockHurtformService.findLast_K.mockResolvedValue([]);
-      mockMentalformService.findLast_K.mockResolvedValue([{
-        id: 1,
-        user_id: 1,
-        filled_time: new Date(),
-        problem: [1, 2, 3]
-      }]);
+      mockMentalformService.findLast_K.mockResolvedValue([
+        {
+          id: 1,
+          user_id: 1,
+          filled_time: new Date(),
+          problem: [1, 2, 3],
+        },
+      ]);
       mockLlmService.generateText.mockResolvedValue('LLM Analysis');
 
       const result = await service.analyzeUserHealth(1);

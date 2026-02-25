@@ -13,7 +13,10 @@ export class GeminiService {
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }); // Select apporpreiate model according to your project needs
   }
 
-  async generateText(systemPrompt: string, userContent: string): Promise<string> {
+  async generateText(
+    systemPrompt: string,
+    userContent: string,
+  ): Promise<string> {
     try {
       const prompt = `${systemPrompt}\n\n[使用者內容]:\n${userContent}`;
       const result = await this.model.generateContent(prompt);

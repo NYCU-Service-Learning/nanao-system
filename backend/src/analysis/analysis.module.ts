@@ -7,6 +7,6 @@ import { MentalformModule } from '../mentalform/mentalform.module';
 @Module({
   imports: [GeminiModule, HurtformModule, MentalformModule],
   controllers: [AnalysisController],
-  providers: [AnalysisService]
+  providers: [AnalysisService],
 })
-export class AnalysisModule { }
+export class AnalysisModule {}

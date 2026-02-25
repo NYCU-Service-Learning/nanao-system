@@ -21,7 +21,7 @@ const mockMentalformService = {
   findLast_K: jest.fn().mockResolvedValue([]),
 };
 
-// We can mock AnalysisService directly if we want to test Controller only, 
+// We can mock AnalysisService directly if we want to test Controller only,
 // OR we can use real AnalysisService with mocked dependencies to test integration of Controller+Service.
 // Let's use real AnalysisService with mocked dependencies to match previous intent.
 
@@ -40,7 +40,9 @@ describe('AnalysisController (E2E)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ transform: true, whitelist: true }),
+    );
     await app.init();
   });
 

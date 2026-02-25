@@ -10,7 +10,7 @@ export class AnalysisService {
     private readonly llmService: GeminiService,
     private readonly hurtformService: HurtformService,
     private readonly mentalformService: MentalformService,
-  ) { }
+  ) {}
 
   // =========================================================
   // W3-W5: 身心健康綜合分析 (HurtForm + MentalForm)
@@ -19,7 +19,7 @@ export class AnalysisService {
     // 1. 【並行資料獲取】同時撈取身、心資料
     const [hurtForms, mentalForms] = await Promise.all([
       this.hurtformService.findLast_K(userId, k),
-      this.mentalformService.findLast_K(userId, k)
+      this.mentalformService.findLast_K(userId, k),
     ]);
 
     const hasHurtData = hurtForms && hurtForms.length > 0;
@@ -29,18 +29,19 @@ export class AnalysisService {
       return {
         data_analyzed: { physical: 0, mental: 0 },
         message: '沒有足夠的資料進行分析',
-        llm_response: '目前沒有任何身體或心理紀錄可供分析，請鼓勵使用者多加紀錄。',
+        llm_response:
+          '目前沒有任何身體或心理紀錄可供分析，請鼓勵使用者多加紀錄。',
       };
     }
 
     // 2. 【資料清洗與格式化】分別呼叫專屬的清洗函式
     const physicalDataPrompt = hasHurtData
       ? this.prepareHurtDataForLlm(hurtForms)
-      : "無近期身體不適紀錄。";
+      : '無近期身體不適紀錄。';
 
     const mentalDataPrompt = hasMentalData
       ? this.prepareMentalDataForLlm(mentalForms)
-      : "無近期心理狀況紀錄。";
+      : '無近期心理狀況紀錄。';
 
     // 3. 【Prompt 組裝】
     const systemPrompt = `
@@ -73,7 +74,10 @@ export class AnalysisService {
     `;
 
     // 4. 【呼叫 LLM】
-    const llmResponse = await this.llmService.generateText(systemPrompt, userContent);
+    const llmResponse = await this.llmService.generateText(
+      systemPrompt,
+      userContent,
+    );
 
     // 5. 【回傳結果】
     return {
@@ -113,6 +117,7 @@ export class AnalysisService {
   private prepareHurtDataForLlm(recentForms: any[]): any[] {
     return recentForms.map((form) => {
       // 1. Extract metadata
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, user_id, fill_time, user, ...bodyParts } = form as any;
 
       // 2. Filter body parts with pain level > 0
@@ -125,7 +130,8 @@ export class AnalysisService {
 
       return {
         填寫時間: this.formatDate(fill_time),
-        疼痛摘要: painfulRecords.length > 0 ? painfulRecords.join(', ') : '無不適',
+        疼痛摘要:
+          painfulRecords.length > 0 ? painfulRecords.join(', ') : '無不適',
       };
     });
   }
@@ -136,6 +142,7 @@ export class AnalysisService {
   private prepareMentalDataForLlm(recentForms: any[]): any[] {
     return recentForms.map((form) => {
       // 根據您的 MentalformService，這裡的欄位是 filled_time 和 problem (Array)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, user_id, filled_time, problem } = form as any;
 
       return {
@@ -163,7 +170,7 @@ export class AnalysisService {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     });
   }
 }
