@@ -1,43 +1,40 @@
 services:
-  frontend:
-    image: userwei/nycu_service-learning-nanao:frontend
+  frontend-dev:
+    image: localhost/nycu_service-learning-nanao:frontend-dev
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
-      - "5173:80"
+      - "5173:5173"
     volumes:
-      - ./frontend/nginx.conf.template:/etc/nginx/templates/default.conf.template
+      - ./frontend/:/workdir
     environment:
-      BACKEND_URL: backend
+      - BACKEND_URL=backend-dev
     depends_on:
-      - backend
-  
-  backend:
-    image: userwei/nycu_service-learning-nanao:backend
+      - backend-dev
+      - db-dev
+  backend-dev:
+    image: localhost/nycu_service-learning-nanao:backend-dev
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+      dockerfile: Dockerfile.dev
     env_file:
-    - ./backend/.env 
+      - ./backend/.env
+    volumes:
+      - ./backend/:/workdir
     environment:
-      NODE_ENV: production
-      CORS_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://frontend-dev:5173
+      DATABASE_URL: mysql://root:example@db-dev:3306/nanao_db
     depends_on:
-      db:
+      db-dev:
         condition: service_healthy
-
-  db:
+  db-dev:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: nanao_db
       MYSQL_USER: nanao_user
       MYSQL_PASSWORD: nanao_password
-    ports:
-      - "3307:3306"
     volumes:
       - db-data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
@@ -46,6 +43,5 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
 volumes:
   db-data:

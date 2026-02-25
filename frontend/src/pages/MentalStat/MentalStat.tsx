@@ -3,7 +3,6 @@ import * as React from 'react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { Select } from 'antd';
 import './MentalStat.css';
-import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
 import { httpGet } from '../../api/APIUtils';
 import { dataSource } from '../../utils/questions';
@@ -11,7 +10,7 @@ import { dataSource } from '../../utils/questions';
 const { Option } = Select;
 
 const getMentalStat = async (userID) => {
-  const mentalStat = await httpGet(`${API_URL}mentalform/${userID}`);
+  const mentalStat = await httpGet(`/mentalform/${userID}`);
   return mentalStat;
 };
 

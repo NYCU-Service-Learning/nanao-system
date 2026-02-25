@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
@@ -56,11 +57,12 @@ export class UserController {
   update(
     @Param('id') id: string,
     @Body() updateUserDto: Prisma.UserUpdateInput,
+    @Req() req: any,
   ) {
     if (updateUserDto?.password === '') {
       throw new BadRequestException('You should provide a non-empty password');
     }
-    return this.userService.update(Number(id), updateUserDto);
+    return this.userService.update(Number(id), updateUserDto, req.user.role);
   }
 
   @UseGuards(AdminOrSameUserIdGuard)

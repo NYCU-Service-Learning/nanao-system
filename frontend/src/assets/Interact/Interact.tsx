@@ -5,7 +5,6 @@ import DataFiller from './DataFiller';
 import { Button } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { API_URL } from '../../config';
 import { getIdByUsername } from '../../api/userAPI';
 import { httpPost } from '../../api/APIUtils';
 
@@ -51,9 +50,9 @@ const Interact: React.FC = () => {
 
       // 發送多個 POST 請求，分別提交每年、每週疼痛狀態和疼痛等級
       await Promise.all([
-        httpPost(`${API_URL}hurtform/${userid}`, PainLevel),
-        httpPost(`${API_URL}weekform/${userid}`, WeekPain),
-        httpPost(`${API_URL}yearform/${userid}`, MonthPain),
+        httpPost(`/hurtform/${userid}`, PainLevel),
+        httpPost(`/weekform/${userid}`, WeekPain),
+        httpPost(`/yearform/${userid}`, MonthPain),
       ]);
       // 成功提交後導航至統計頁面
       navigate('/stat');
