@@ -1,7 +1,0 @@
-{
-  "name": "NYCU Nanao (frontend)",
-  "dockerComposeFile": ["../../docker-compose-dev.yaml"],
-  "service": "frontend-dev",
-  "shutdownAction": "none",
-  "workspaceFolder": "/workdir"
-}
