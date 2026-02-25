@@ -1,0 +1,9 @@
+{
+  "userId": 2,
+  "analysisContext": {
+    "overallRisk": "medium",
+    "keyFindings": [
+      "lower_back_trend"
+    ]
+  }
+}

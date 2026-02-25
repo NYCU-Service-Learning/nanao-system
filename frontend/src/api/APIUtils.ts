@@ -7,7 +7,7 @@ const instance = axios.create({
         'Content-Type': 'application/json'
     },
     withCredentials: true,
-    timeout: 10 * 1000,
+    timeout: 60 * 1000,
 });
 
 const wav_instance = axios.create({

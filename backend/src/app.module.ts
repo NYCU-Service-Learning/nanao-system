@@ -7,6 +7,7 @@ import { YearformModule } from './yearform/yearform.module';
 import { WeekformModule } from './weekform/weekform.module';
 import { UserModule } from './user/user.module';
 import { UserDetailModule } from './user-detail/user-detail.module';
+import { GeminiModule } from './aiassistant/Aiassistant.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
@@ -14,6 +15,7 @@ import configuration from 'config/configuration';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { MentalformModule } from './mentalform/mentalform.module';
+import { AnalysisModule } from './analysis/analysis.module';
 
 @Module({
   imports: [
@@ -24,6 +26,7 @@ import { MentalformModule } from './mentalform/mentalform.module';
     UserModule,
     UserDetailModule,
     AuthModule,
+    GeminiModule,
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     PassportModule.register({
       session: true,
@@ -41,6 +44,7 @@ import { MentalformModule } from './mentalform/mentalform.module';
       },
     ]),
     MentalformModule,
+    AnalysisModule,
   ],
   controllers: [AppController],
   providers: [
@@ -51,4 +55,4 @@ import { MentalformModule } from './mentalform/mentalform.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

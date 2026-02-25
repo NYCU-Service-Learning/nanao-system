@@ -7,5 +7,6 @@ import { DatabaseModule } from '../database/database.module';
   imports: [DatabaseModule],
   controllers: [MentalformController],
   providers: [MentalformService],
+  exports: [MentalformService],
 })
 export class MentalformModule {}
