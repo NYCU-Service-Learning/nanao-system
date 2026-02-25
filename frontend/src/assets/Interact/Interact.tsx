@@ -1,13 +1,13 @@
-import './Interact.css';
-import React, { useEffect } from 'react';
-import BodySelector from './BodySelector';
-import DataFiller from './DataFiller';
-import { Button } from 'react-bootstrap';
-import { useCookies } from 'react-cookie';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { API_URL } from '../../config';
-import { getIdByUsername } from '../../api/userAPI';
-import { httpPost, httpPost_reco } from '../../api/APIUtils';
+import "./Interact.css";
+import React, { useEffect } from "react";
+import BodySelector from "./BodySelector";
+import DataFiller from "./DataFiller";
+import { Button } from "react-bootstrap";
+import { useCookies } from "react-cookie";
+import { useLocation, useNavigate } from "react-router-dom";
+import { API_URL } from "../../config";
+import { getIdByUsername } from "../../api/userAPI";
+import { httpPost, httpPost_reco } from "../../api/APIUtils";
 
 // 定義 PainLevelType 和 PainStatusType 介面，用於描述疼痛狀態的數據結構
 interface PainLevelType {
@@ -25,9 +25,9 @@ interface PainStatusType {
  * 最終數據會通過按鈕提交到後端 API 進行儲存。
  */
 const Interact: React.FC = () => {
-  const [cookies] = useCookies(['user']); // 取得 cookies 中的使用者資訊
+  const [cookies] = useCookies(["user"]); // 取得 cookies 中的使用者資訊
   const [PainLevel, setPainLevel] = React.useState<PainLevelType>({}); // 儲存每個部位的疼痛等級
-  const [currentPart, setCurrentPart] = React.useState<string>(''); // 記錄當前選擇的部位 ID
+  const [currentPart, setCurrentPart] = React.useState<string>(""); // 記錄當前選擇的部位 ID
   const [MonthPain, setMonthPain] = React.useState<PainStatusType>({}); // 每年疼痛狀態
   const [WeekPain, setWeekPain] = React.useState<PainStatusType>({}); // 每週疼痛狀態
   const [audioData, setAudioData] = React.useState<Blob | null>(null); // 用來儲存錄音的 Blob 數據
@@ -40,14 +40,14 @@ const Interact: React.FC = () => {
   // 讀取 query parameter
   const location = useLocation();
   const queryParam = new URLSearchParams(location.search);
-  const current_part = queryParam.get('current_part');
+  const current_part = queryParam.get("current_part");
 
   // 變動 currentPart 觸發 DataFiller 中的 useEffect
   useEffect(() => {
-    if(current_part){
+    if (current_part) {
       setCurrentPart(current_part);
     }
-  }, [current_part])
+  }, [current_part]);
 
   const handleSubmit = async () => {
     try {
@@ -61,10 +61,10 @@ const Interact: React.FC = () => {
         httpPost(`${API_URL}yearform/${userid}`, MonthPain),
       ]);
       // 成功提交後導航至統計頁面
-      navigate('/stat');
+      navigate("/stat");
     } catch (error) {
       // 捕捉錯誤並在控制台輸出錯誤訊息
-      console.error('Error submitting forms:', error);
+      console.error("Error submitting forms:", error);
     }
   };
   const startRecording = () => {
@@ -77,28 +77,30 @@ const Interact: React.FC = () => {
           audioChunksRef.current = [];
 
           recorder.ondataavailable = (event) => {
-            audioChunksRef.current.push(event.data);// 收集錄音數據
+            audioChunksRef.current.push(event.data); // 收集錄音數據
           };
-          
+
           recorder.onstop = () => {
-            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-            setAudioData(audioBlob);//設置錄音數據
+            const audioBlob = new Blob(audioChunksRef.current, {
+              type: "audio/wav",
+            });
+            setAudioData(audioBlob); //設置錄音數據
           };
 
           recorder.start();
           setIsRecording(true); // 改變錄音狀態
         })
         .catch((error) => {
-          console.error('錄音設備錯誤:', error);
+          console.error("錄音設備錯誤:", error);
         });
     } else {
-      console.error('瀏覽器不支持錄音');
+      console.error("瀏覽器不支持錄音");
     }
   };
   const stopRecording = () => {
     if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();//停止錄音
-      setIsRecording(false);//改變錄音狀態
+      mediaRecorderRef.current.stop(); //停止錄音
+      setIsRecording(false); //改變錄音狀態
     }
   };
 
@@ -107,25 +109,28 @@ const Interact: React.FC = () => {
     if (audioData) {
       await recordAndSubmit(audioData); // 提交錄音數據
     } else {
-      console.error('沒有錄音數據');
+      console.error("沒有錄音數據");
     }
   };
 
   const recordAndSubmit = async (audioBlob: Blob) => {
     try {
       const formData = new FormData();
-      formData.append('file', audioBlob, 'recording.wav'); // 後端以file搜尋
+      formData.append("file", audioBlob, "recording.wav"); // 後端以file搜尋
 
-      const response = await httpPost_reco( "http://localhost:4000/process", formData); //傳送給後端
+      const response = await httpPost_reco(
+        "http://localhost:4000/process",
+        formData,
+      ); //傳送給後端
       if (response.voice_reco_success) {
-        console.log('音頻處理成功');
+        console.log("音頻處理成功");
         console.log(response.text);
         navigate(response.text);
       } else {
-        console.error('音頻處理失敗');
+        console.error("音頻處理失敗");
       }
     } catch (error) {
-      console.error('錯誤:', error);
+      console.error("錯誤:", error);
     }
   };
   // 組件返回的 JSX，包含 BodySelector、DataFiller 組件和提交按鈕
@@ -150,7 +155,11 @@ const Interact: React.FC = () => {
         setWeekPain={setWeekPain}
       />
       {/* 提交按鈕，按下後執行 handleSubmit 函數 */}
-      <Button variant="outline-primary" className='float-end' onClick={handleSubmit}>
+      <Button
+        variant="outline-primary"
+        className="float-end"
+        onClick={handleSubmit}
+      >
         送出
       </Button>
       {/* ai */}
