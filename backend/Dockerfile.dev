@@ -1,3 +1,0 @@
-FROM node:20-bullseye
-WORKDIR /workdir
-CMD ( [ -d "node_modules" ] || (npm ci || npm fix audit)) && npx prisma migrate dev --name nanao_db && node initDB.js && npm run start:dev 

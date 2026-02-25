@@ -1,23 +1,4 @@
 # 專案建置流程
-## 方法一：Visual Studio Code Dev Container
-1. 安裝 Visual Studio Code
-2. 安裝 Docker Desktop
-3. 安裝 Docker-compose
-4. 在此資料夾開啟 Visual Studio Code
-5. 在 backend 資料夾下創建 .env 檔案，可以參考 backend/.env.sample 並填入對應的值
-5. 如果尚未安裝插件 Dev Container，請到 Extension 界面安裝
-6. 按 F1 或是 crtl+shift+P，並執行指令 `Dev Containers: Rebuild and Reopen in Container`，選擇 frontend 或是 backend 即可開始開發
-7. 如果要在 frontend、backend 切換，可以
-    1. **使用多視窗開發**：開啟另一個 Visual Studio Code 視窗並開啟此專案資料夾，按 F1 或是 ctrl+shift+P 並且輸入 `Dev Containers: Reopen in Container` 並選擇對應的資料夾。
-    2. **使用單一視窗開發**：在 F1 或是 ctrl+shift+P 輸入 `Run Dev Containers: Switch Container` 即可進行切換。
-8. 在瀏覽器輸入 `localhost:5173` 即可連線到專案
-
-## 方法二：Docker Compose
-1. 安裝 Docker 以及 Docker-compose，或是使用 podman 一系列的 container 管理工具亦可
-2. 在專案資料夾輸入 `docker compose -f docker-compose-dev.yaml up`，並且使用 `docker exec -it {your_container_name} bash` 進入 Container 並使用任何文字編輯器編輯(使用 podman 請將 docker 改成 podman 並且自行設置 podman compose)
-3. 在瀏覽器輸入 `localhost:5173` 即可連線到專案
-
-# 專案建置流程(Legacy)
 
 安裝[Node.js v20.18.0(LTS)](https://nodejs.org/en/download/current)。
 

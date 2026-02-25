@@ -1,4 +1,1 @@
-import axios from "axios";
-
-export const API_URL = "/api";
-axios.defaults.baseURL = API_URL;
+export const API_URL = "http://localhost:3000/";

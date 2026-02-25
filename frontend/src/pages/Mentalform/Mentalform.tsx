@@ -15,6 +15,7 @@ interface MentalFormProps {
 }
 
 import { ColumnsType } from "antd/es/table";
+import { API_URL } from "../../config";
 import { getIdByUsername } from "../../api/userAPI";
 import { httpPost } from "../../api/APIUtils";
 import { dataSource } from "../../utils/questions";
@@ -116,7 +117,7 @@ const MentalForm = () => {
       data["problem"].push(values[key]);
     }
     console.log(data);
-    await httpPost(`/mentalform/${userID}`, data);
+    await httpPost(`${API_URL}mentalform/${userID}`, data);
     navigate('/home');
   };
 
