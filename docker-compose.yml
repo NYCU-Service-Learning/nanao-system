@@ -1,21 +1,21 @@
 services:
   frontend:
-    image: userwei/nycu_service-learning-nanao:frontend
+    image: yclai37/nycu_service-learning-nanao:frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "5173:80"
-  
+
   backend:
-    image: userwei/nycu_service-learning-nanao:backend
+    image: yclai37/nycu_service-learning-nanao:backend
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     env_file:
-    - ./backend/.env 
+      - ./backend/.env
     environment:
       NODE_ENV: production
       CORS_ORIGIN: http://localhost:5173
@@ -40,6 +40,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  voice_reco:
+    image: yclai37/nycu_service-learning-nanao:voice_reco
+    build:
+      context: ./voice_reco
+      dockerfile: Dockerfile
+    env_file:
+      - ./voice_reco/.env
+    ports:
+      - "4000:80"
 
 volumes:
   db-data:

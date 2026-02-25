@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - dev
-      - 'feature/*'
+      - "feature/*"
 
 jobs:
   build_and_test:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js Environment for Backend
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Dependencies for Backend
         working-directory: ./backend
@@ -39,7 +39,7 @@ jobs:
       - name: Set up Node.js Environment for Frontend
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Dependencies for Frontend
         working-directory: ./frontend
@@ -78,15 +78,24 @@ jobs:
       - name: Build and Push Docker Image for Backend
         working-directory: ./backend
         run: |
-          docker build -t userwei/nycu_service-learning-nanao:backend .
-          docker push userwei/nycu_service-learning-nanao:backend
+          docker build -t yclai37/nycu_service-learning-nanao:backend .
+          docker push yclai37/nycu_service-learning-nanao:backend
 
       - name: Build and Push Docker Image for Frontend
         working-directory: ./frontend
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          docker build -t userwei/nycu_service-learning-nanao:frontend .
-          docker push userwei/nycu_service-learning-nanao:frontend
+          docker build -t yclai37/nycu_service-learning-nanao:frontend .
+          docker push yclai37/nycu_service-learning-nanao:frontend
+
+      # - name: Create voice_reco .env file
+      #   run: |
+      #     echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" > voice_reco/.env
+
+      - name: Build and Push Docker Image for Voice Recognition
+        working-directory: ./voice_reco
+        run: |
+          docker build -t yclai37/nycu_service-learning-nanao:voice_reco .
+          docker push yclai37/nycu_service-learning-nanao:voice_reco
 
       # - name: Deploy Application via SSH
       #   if: ${{ github.ref == 'refs/heads/main' }}
