@@ -11,7 +11,8 @@ import Profile from './pages/Profile/Profile';
 import Admin from './pages/Admin/Admin';
 import Stat from './pages/Stat/Stat';
 import MentalStat from './pages/MentalStat/MentalStat';
-import Mentalform from './pages/Mentalform/Mentalform'
+import Mentalform from './pages/Mentalform/Mentalform';
+import Analysis from './pages/Analysis/Analysis';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import withAuthRedirect from './assets/withAuthRedirect';
@@ -22,6 +23,7 @@ const ProfileWithAuth = withAuthRedirect(Profile);
 const AdminWithAuth = withAuthRedirect(Admin);
 const StatWithAuth = withAuthRedirect(Stat);
 const MentalStatWithAuth = withAuthRedirect(MentalStat);
+const AnalysisWithAuth = withAuthRedirect(Analysis);
 
 function App() {
   const [cookies] = useCookies(["user"]);
@@ -45,6 +47,7 @@ function App() {
               <Route path="/profile" element={<ProfileWithAuth user={cookies.user} />} />
               <Route path="/admin" element={<AdminWithAuth user={cookies.user} />} />
               <Route path="/stat" element={<StatWithAuth user={cookies.user} />} />
+              <Route path="/analysis" element={<AnalysisWithAuth user={cookies.user} />} />
               <Route path="/" element={<Navigate to="/home" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
