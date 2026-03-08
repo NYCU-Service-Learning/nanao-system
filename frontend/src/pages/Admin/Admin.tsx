@@ -198,6 +198,7 @@ const Admin: React.FC = () => {
             clearNewUserForm();
         } catch (error) {
             // 錯誤處理
+            console.error('Error adding user:', error);
             setErrMsg('Error adding user.');
         }
     };
@@ -223,7 +224,8 @@ const Admin: React.FC = () => {
             return userData;
         } catch (error) {
             // 錯誤處理，return null 表示失敗
-            setErrMsg('Error fetching users.');
+            console.error('Error fetching user data:', error);
+            setErrMsg('Error fetching user data.');
             return null;
         }
     };
@@ -238,6 +240,7 @@ const Admin: React.FC = () => {
             // 重新取得用戶列表
             await fetchUsers();
         } catch (error) {
+            console.error('Error deleting user:', error);
             setErrMsg('Error deleting user.');
         }
     };
@@ -274,6 +277,7 @@ const Admin: React.FC = () => {
             clearEditUserForm();
         } catch (error) {
             // 錯誤處理
+            console.error('Error updating user:', error);
             setErrMsg('Error updating user.');
         }
     };
@@ -343,6 +347,7 @@ const Admin: React.FC = () => {
             }
         } catch (error) {
             // 錯誤處理
+            console.error('上傳失敗:', error);
             message.error('上傳失敗');
         } finally {
             // 設定上傳狀態回 false
@@ -374,6 +379,7 @@ const Admin: React.FC = () => {
             toggleModal('editUserDetail', false);
             clearEditUserDetailForm();
         } catch (error) {
+            console.error('Error updating user:', error);
             setErrMsg('Error updating user.');
         }
     };
