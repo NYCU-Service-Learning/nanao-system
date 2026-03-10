@@ -27,10 +27,28 @@ quit
 
 ## 後端建置
 切換至後端的目錄
+```
+cd backend
+```
 
 ### 環境變數.env
 
-新增名稱為`.env`的檔案，並加入指定的環境變數。
+新增名稱為`.env`的檔案，並參考`.env.sample`加入指定的環境變數。若未新增第三方登入環境變數及`Gemini API key`專案仍可運行，但無法使用相關功能。
+
+#### Google 第三方登入環境變數
+請至 [Google Cloud Console](https://console.cloud.google.com) 建立新專案並設定OAuth2.0，設定正確後可拿到`GOOGLE_CLIENT_ID`和`GOOGLE_SECRET_KEY`。
+
+- 已授權的JavaScript來源:`http://localhost:5173`, `http://localhost:3000`
+- 已授權的重新導向 URI: `http://localhost:3000/auth/google/login/callback`, `http://localhost:3000/auth/google/link/callback`
+
+
+#### Line 第三方登入環境變數
+請至 [Line Developer](https://developers.line.biz/en/) 創建開發者帳戶並設定第三方登入。`Login`及`Link`請使用不同channel，並分別填入相應的`callback URL`。
+
+Login: `http://localhost:3000/auth/line/login/callback`
+Link: `http://localhost:3001/auth/line/link/callback`
+
+在設置完`channel`後會給予`Channel ID`和`Channel Secret`
 
 ### 資料庫建置
 安裝完MySQL後在terminal執行下列指令安裝本專案必要的所有package，並將database schema導入到資料庫中。
@@ -54,7 +72,10 @@ insert into userDetail values (1, null, '', 0, 'None', '0', '', '', now());
 開發過程中若有更動到後端目錄中的`schema.prisma`皆須重新執行`npx prisma migrate dev --name nanao_db`才會更新資料庫的格式。若資料庫被強制重置則需要重新加入admin帳號
 
 ## 前端建置
-切換至前端的目錄
+切換至前端的目錄 
+```
+cd frontend
+```
 
 ### 套件安裝
 執行下列指令安裝本專案必要的所有package
@@ -65,12 +86,12 @@ npm audit fix
 
 執行`npm run dev`，若能正常運行就設定完成了
 
-### 錯誤排除
-如果npm install時出現node-sass套件相關錯誤，可將該套件刪除後再進行套件安裝。
+### Voice_Reco
+切換到voice_reco目錄 
 ```
-npm uninstall node-sass
-rm -rf node_modules
+cd voice_reco
 ```
+新增名稱為`.env`的檔案，並參考`.env.sample`加入指定的環境變數。
 
 ## 啟動專案
 開啟兩個terminal分別啟動前端與後端

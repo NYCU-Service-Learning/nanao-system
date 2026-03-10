@@ -2,6 +2,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-oauth2';
 import { Injectable, Inject } from '@nestjs/common';
 import { AuthService } from '../auth.service';
+import { getAuthConfig } from './AuthConfig';
+import {
+  AccountLinkingError,
+  LineAccountAlreadyLinkedError,
+  AccountAlreadyLinkedError,
+} from '../exceptions/AuthLinkingExceptions';
 import axios from 'axios';
 
 const getUserProfile = async (accessToken: string) => {
@@ -29,9 +35,16 @@ export class LineLoginStrategy extends PassportStrategy(
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: AuthService,
   ) {
+    const config = getAuthConfig();
+
+    // Call super() first with appropriate configuration
     super({
-      clientID: process.env.LINE_LOGIN_CHANNEL_ID,
-      clientSecret: process.env.LINE_LOGIN_SECRET_KEY,
+      clientID: config.line.login.enabled
+        ? config.line.login.channelId
+        : 'dummy',
+      clientSecret: config.line.login.enabled
+        ? config.line.login.secretKey
+        : 'dummy',
       callbackURL: 'http://localhost:3000/auth/line/login/callback',
       authorizationURL:
         'https://access.line.me/oauth2/v2.1/authorize?response_type=code&state=login',
@@ -57,9 +70,14 @@ export class LineLinkStrategy extends PassportStrategy(Strategy, 'line-link') {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: AuthService,
   ) {
+    const config = getAuthConfig();
+
+    // Call super() first with appropriate configuration
     super({
-      clientID: process.env.LINE_LINK_CHANNEL_ID,
-      clientSecret: process.env.LINE_LINK_SECRET_KEY,
+      clientID: config.line.link.enabled ? config.line.link.channelId : 'dummy',
+      clientSecret: config.line.link.enabled
+        ? config.line.link.secretKey
+        : 'dummy',
       callbackURL: 'http://localhost:3000/auth/line/link/callback',
       authorizationURL:
         'https://access.line.me/oauth2/v2.1/authorize?response_type=code&state=login',
@@ -82,8 +100,16 @@ export class LineLinkStrategy extends PassportStrategy(Strategy, 'line-link') {
       await this.authService.linkLineAccount(currentUser, user_profile);
       req.query.status = 'Success';
     } catch (error) {
-      req.query.status = 'Fail';
-      console.log(error);
+      if (error instanceof LineAccountAlreadyLinkedError) {
+        req.query.status = 'LineAlreadyLinked';
+      } else if (error instanceof AccountAlreadyLinkedError) {
+        req.query.status = 'AccountAlreadyLinked';
+      } else if (error instanceof AccountLinkingError) {
+        req.query.status = 'LinkingError';
+      } else {
+        req.query.status = 'Fail';
+      }
+      console.log('Line linking error:', error.message);
     }
     done(null, user_profile);
   }

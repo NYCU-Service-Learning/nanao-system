@@ -2,6 +2,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { Injectable, Inject } from '@nestjs/common';
 import { AuthService } from '../auth.service';
+import { getAuthConfig } from './AuthConfig';
+import {
+  AccountLinkingError,
+  GoogleAccountAlreadyLinkedError,
+  AccountAlreadyLinkedError,
+} from '../exceptions/AuthLinkingExceptions';
 
 @Injectable()
 export class GoogleLoginStrategy extends PassportStrategy(
@@ -11,9 +17,14 @@ export class GoogleLoginStrategy extends PassportStrategy(
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: AuthService,
   ) {
+    const config = getAuthConfig();
+
+    // Call super() first with appropriate configuration
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_SECRET_KEY,
+      clientID: config.google.enabled ? config.google.clientId : 'dummy',
+      clientSecret: config.google.enabled
+        ? config.google.clientSecret
+        : 'dummy',
       callbackURL: 'http://localhost:3000/auth/google/login/callback',
       scope: ['email', 'profile'],
     });
@@ -43,9 +54,14 @@ export class GoogleLinkStrategy extends PassportStrategy(
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: AuthService,
   ) {
+    const config = getAuthConfig();
+
+    // Call super() first with appropriate configuration
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_SECRET_KEY,
+      clientID: config.google.enabled ? config.google.clientId : 'dummy',
+      clientSecret: config.google.enabled
+        ? config.google.clientSecret
+        : 'dummy',
       callbackURL: 'http://localhost:3000/auth/google/link/callback',
       scope: ['email', 'profile'],
       passReqToCallback: true,
@@ -69,12 +85,16 @@ export class GoogleLinkStrategy extends PassportStrategy(
       await this.authService.linkGoogleAccount(currentUser, user);
       req.query.status = 'Success';
     } catch (error) {
-      // if (error.name.includes('Conflict')) {
-      //   req.query.status = 'Conflict'
-      // } else {
-      req.query.status = 'Fail';
-      console.log(error);
-      // }
+      if (error instanceof GoogleAccountAlreadyLinkedError) {
+        req.query.status = 'GoogleAlreadyLinked';
+      } else if (error instanceof AccountAlreadyLinkedError) {
+        req.query.status = 'AccountAlreadyLinked';
+      } else if (error instanceof AccountLinkingError) {
+        req.query.status = 'LinkingError';
+      } else {
+        req.query.status = 'Fail';
+      }
+      console.log('Google linking error:', error.message);
     }
     done(null, user);
   }

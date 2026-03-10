@@ -5,6 +5,11 @@ import { UserService } from '../user/user.service';
 import { HurtformService } from '../hurtform/hurtform.service';
 import { WeekformService } from '../weekform/weekform.service';
 import { YearformService } from '../yearform/yearform.service';
+import {
+  GoogleAccountAlreadyLinkedError,
+  LineAccountAlreadyLinkedError,
+  AccountAlreadyLinkedError,
+} from './exceptions/AuthLinkingExceptions';
 
 import { Role } from '@prisma/client';
 
@@ -101,51 +106,41 @@ export class AuthService {
   }
 
   async linkGoogleAccount(user: any, profile: any): Promise<any> {
-    // TODO: check if the email is already used by another account
-    // if yes, merge two accounts
-    const existingId = await this.userService.findIdByEmail(profile.email);
-    const existingUser = existingId
-      ? await this.userService.findOne(existingId)
-      : null;
-    const existingLine = existingUser ? existingUser.lineId : null;
+    // Check if the current user already has a Google account linked
+    if (user.email && user.email !== profile.email) {
+      throw new AccountAlreadyLinkedError('Google');
+    }
 
-    if (
-      existingUser &&
-      existingUser.id != user.id &&
-      existingUser.role != Role.ADMIN
-    ) {
-      // merge two accounts
-      // Note: emotion form should be add when merge to main branch
-      await this.mergeAccounts(user.id, existingUser.id);
+    // Check if this Google account is already linked to another user
+    const existingUserId = await this.userService.findIdByEmail(profile.email);
+    if (existingUserId && existingUserId !== user.id) {
+      throw new GoogleAccountAlreadyLinkedError(profile.email);
     }
-    const updateData: any = { email: profile.email };
-    if (existingLine !== null) {
-      updateData.lineId = existingLine;
-    }
-    await this.userService.update(user.id, updateData);
+
+    // Safe to link the Google account
+    await this.userService.update(user.id, { email: profile.email });
   }
 
   async linkLineAccount(user: any, profile: any): Promise<any> {
-    const existingId = await this.userService.findIdByLine(profile.userId);
-    const existingUser = existingId
-      ? await this.userService.findOne(existingId)
-      : null;
-    const existingEmail = existingUser ? existingUser.email : null;
+    // Check if the current user already has a Line account linked
+    if (user.lineId && user.lineId !== profile.userId) {
+      throw new AccountAlreadyLinkedError('Line');
+    }
 
-    if (
-      existingUser &&
-      existingUser.id != user.id &&
-      existingUser.role != Role.ADMIN
-    ) {
-      // merge two accounts
-      // Note: emotion form should be add when merge to main branch
-      await this.mergeAccounts(user.id, existingUser.id);
+    // Check if this Line account is already linked to another user
+    const existingUserId = await this.userService.findIdByLine(profile.userId);
+    if (existingUserId && existingUserId !== user.id) {
+      throw new LineAccountAlreadyLinkedError(
+        profile.displayName || profile.userId,
+      );
     }
-    const updateData: any = { lineId: profile.userId };
-    if (existingEmail !== null) {
-      updateData.email = existingEmail;
-    }
-    await this.userService.update(user.id, updateData);
+
+    // Safe to link the Line account
+    await this.userService.update(user.id, { lineId: profile.userId });
+  }
+
+  async getUserById(userId: number) {
+    return await this.userService.findOne(userId);
   }
 
   private mergeAccounts = async (newUserId: number, existingUserId: number) => {
