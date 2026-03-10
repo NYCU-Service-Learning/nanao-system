@@ -25,7 +25,7 @@ import { AnalysisModule } from './analysis/analysis.module';
     WeekformModule,
     UserModule,
     UserDetailModule,
-    AuthModule,
+    AuthModule.forRoot(),
     GeminiModule,
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     PassportModule.register({

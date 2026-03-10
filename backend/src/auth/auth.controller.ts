@@ -14,6 +14,12 @@ import { AuthenticatedGuard, LocalAuthGuard } from './utils/guards/LocalGuard';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from './utils/guards/GoogleGuard';
 import { LineAuthGuard } from './utils/guards/LineGuard';
+import {
+  GoogleAuthEnabledGuard,
+  LineLoginAuthEnabledGuard,
+  LineLinkAuthEnabledGuard,
+} from './utils/guards/ThirdPartyAuthGuard';
+import { getAuthConfig } from './utils/AuthConfig';
 
 @Controller('auth')
 export class AuthController {
@@ -28,11 +34,11 @@ export class AuthController {
   }
 
   @Get('google/login')
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(GoogleAuthEnabledGuard, GoogleAuthGuard)
   async googleAuth() {}
 
   @Get('google/login/callback')
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(GoogleAuthEnabledGuard, GoogleAuthGuard)
   async googleAuthRedirect(
     @Query('error') error: string,
     @Request() req,
@@ -65,11 +71,11 @@ export class AuthController {
   }
 
   @Get('line/login')
-  @UseGuards(LineAuthGuard)
+  @UseGuards(LineLoginAuthEnabledGuard, LineAuthGuard)
   async lineAuth() {}
 
   @Get('line/login/callback')
-  @UseGuards(LineAuthGuard)
+  @UseGuards(LineLoginAuthEnabledGuard, LineAuthGuard)
   async lineAuthRedirect(
     @Query('error') error: string,
     @Request() req,
@@ -117,23 +123,80 @@ export class AuthController {
     });
   }
 
+  @Get('config')
+  async getAuthConfig(@Res() res: Response) {
+    const config = getAuthConfig();
+    return res.json({
+      auth: {
+        local: true, // Local authentication is always available
+        google: config.google.enabled,
+        lineLogin: config.line.login.enabled,
+        lineLink: config.line.link.enabled,
+      },
+    });
+  }
+
+  @Get('linked-accounts')
+  async getLinkedAccounts(@Request() req, @Res() res: Response) {
+    // Check both authentication patterns
+    const user = req.session.user || req.user;
+
+    if (!user) {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Not authenticated',
+      });
+    }
+
+    // Get the full user data to check linked accounts
+    const fullUser = await this.authService.getUserById(user.id);
+
+    return res.json({
+      status: 'success',
+      linkedAccounts: {
+        google: !!fullUser?.email,
+        line: !!fullUser?.lineId,
+      },
+      accountInfo: {
+        googleEmail: fullUser?.email || null,
+        lineId: fullUser?.lineId || null,
+      },
+    });
+  }
+
   @Get('google/link')
-  @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
+  @UseGuards(
+    AuthenticatedGuard,
+    GoogleAuthEnabledGuard,
+    AuthGuard('google-link'),
+  )
   async googleLink() {}
 
   @Get('google/link/callback')
-  @UseGuards(AuthenticatedGuard, AuthGuard('google-link'))
+  @UseGuards(
+    AuthenticatedGuard,
+    GoogleAuthEnabledGuard,
+    AuthGuard('google-link'),
+  )
   async googleLinkRedirect(@Request() req, @Res() res: Response) {
     const status = req.query.status;
     return res.redirect(`http://localhost:5173/profile?googleLink=${status}`);
   }
 
   @Get('line/link')
-  @UseGuards(AuthenticatedGuard, AuthGuard('line-link'))
+  @UseGuards(
+    AuthenticatedGuard,
+    LineLinkAuthEnabledGuard,
+    AuthGuard('line-link'),
+  )
   async lineLink() {}
 
   @Get('line/link/callback')
-  @UseGuards(AuthenticatedGuard, AuthGuard('line-link'))
+  @UseGuards(
+    AuthenticatedGuard,
+    LineLinkAuthEnabledGuard,
+    AuthGuard('line-link'),
+  )
   async lineLinkRedirect(@Request() req, @Res() res: Response) {
     const status = req.query.status;
     return res.redirect(`http://localhost:5173/profile?lineLink=${status}`);
