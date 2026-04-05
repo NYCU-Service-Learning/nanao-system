@@ -1,28 +1,28 @@
 services:
-  frontend:
-    image: yclai37/nycu_service-learning-nanao:frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "5173:80"
+# frontend:
+#   image: yclai37/nycu_service-learning-nanao:frontend
+#   build:
+#     context: ./frontend
+#     dockerfile: Dockerfile
+#   ports:
+#     - "5173:80"
 
-  backend:
-    image: yclai37/nycu_service-learning-nanao:backend
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./backend/.env
-    environment:
-      NODE_ENV: production
-      CORS_ORIGIN: http://localhost:5173
-      DATABASE_URL: mysql://nanao_user:nanao_password@db:3306/nanao_db
-    depends_on:
-      db:
-        condition: service_healthy
+# backend:
+#   image: yclai37/nycu_service-learning-nanao:backend
+#   build:
+#     context: ./backend
+#     dockerfile: Dockerfile
+#   ports:
+#     - "3000:3000"
+#   env_file:
+#     - ./backend/.env
+#   environment:
+#     NODE_ENV: production
+#     CORS_ORIGIN: http://localhost:5173
+#     DATABASE_URL: mysql://nanao_user:nanao_password@db:3306/nanao_db
+#   depends_on:
+#     db:
+#       condition: service_healthy
 
   db:
     image: mysql:8.0
@@ -42,15 +42,15 @@ services:
       timeout: 5s
       retries: 5
 
-  voice_reco:
-    image: yclai37/nycu_service-learning-nanao:voice_reco
-    build:
-      context: ./voice_reco
-      dockerfile: Dockerfile
-    env_file:
-      - ./voice_reco/.env
-    ports:
-      - "4000:80"
+# voice_reco:
+#   image: yclai37/nycu_service-learning-nanao:voice_reco
+#   build:
+#     context: ./voice_reco
+#     dockerfile: Dockerfile
+#   env_file:
+#     - ./voice_reco/.env
+#   ports:
+#     - "4000:80"
 
 volumes:
   db-data:

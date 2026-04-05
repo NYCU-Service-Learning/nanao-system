@@ -1,6 +1,17 @@
 # 專案建置流程
 
-安裝[Node.js v20.18.0(LTS)](https://nodejs.org/en/download/current)。
+安裝[Node.js v24](https://nodejs.org/en/download/current)。
+
+或使用 Nix flake 進入開發環境：
+```bash
+# 後端
+cd backend
+nix develop
+
+# 前端
+cd frontend
+nix develop
+```
 
 ## 本地端mysql
 [下載MySQL的installer](https://dev.mysql.com/downloads/installer/)，
@@ -54,14 +65,16 @@ Link: `http://localhost:3001/auth/line/link/callback`
 安裝完MySQL後在terminal執行下列指令安裝本專案必要的所有package，並將database schema導入到資料庫中。
 ```
 npm install
-npm audit fix
+npx prisma generate
 npx prisma migrate dev --name nanao_db
 ```
+
+注意：Prisma 7 需要 `prisma/prisma.config.ts` 設定檔來指定資料庫連線URL。此檔案會從 `.env` 讀取 `DATABASE_URL`。
 打開MySQL command line client輸入以下MySQL指令新增管理員帳號
 ```
 USE nanao_db;
-insert into user values (DEFAULT, 'admin', '$2b$10$PmRQ.FCpi50lnr5OJ9Tib.kaL9WwhI2eCTFvJFn0QJk1xk0eVvfdq', 'admin', '', '', DEFAULT, 'ADMIN');
-insert into userDetail values (1, null, '', 0, 'None', '0', '', '', now());
+INSERT INTO User VALUES (DEFAULT, 'admin', '$2b$10$PmRQ.FCpi50lnr5OJ9Tib.kaL9WwhI2eCTFvJFn0QJk1xk0eVvfdq', 'admin', '', '', DEFAULT, 'ADMIN');
+INSERT INTO UserDetail VALUES (1, null, '', 0, 'None', '0', '', '', now());
 ```
 
 執行`npm run start:dev`，若以上都能正常運行就設定完成了
@@ -81,7 +94,6 @@ cd frontend
 執行下列指令安裝本專案必要的所有package
 ```
 npm install
-npm audit fix
 ```
 
 執行`npm run dev`，若能正常運行就設定完成了
