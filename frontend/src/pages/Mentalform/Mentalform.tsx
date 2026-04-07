@@ -1,7 +1,7 @@
-import { Form, Table, Radio } from "antd";
+import { Form, Table, Radio, Button } from "antd";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
-import React from "react";
+import React, { useState } from "react";
 import "./Mentalform.css"; // Import the CSS file
 type QuestionData = {
   key: string; // Assuming keys are strings
@@ -100,6 +100,7 @@ const MentalForm = () => {
   const [cookies] = useCookies(['user']); // 取得 cookies 中的使用者資訊
   const navigate = useNavigate(); // 用於導航的 hook
   const [userID, setUserID] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   React.useEffect(() => {
     const fetchUserID = async () => {
@@ -110,6 +111,10 @@ const MentalForm = () => {
   }, [cookies.user]);
 
   const onFinish = async (values: FormValues) => {
+    if (!userID) return;
+
+    setIsSubmitting(true);
+
     const data: MentalFormProps = {
       problem: [],
     };
@@ -117,7 +122,14 @@ const MentalForm = () => {
       data["problem"].push(values[key]);
     }
     console.log(data);
-    await httpPost(`${API_URL}mentalform/${userID}`, data);
+    try {
+      await httpPost(`mentalform/${userID}`, data);
+      navigate('/home');
+    } catch (error) {
+      console.error("表單送出失敗:", error);
+    } finally {
+      setIsSubmitting(false); 
+    }
     navigate('/home');
   };
 
@@ -133,12 +145,14 @@ const MentalForm = () => {
           scroll={{ x: 'max-content' }}
         />
         <Form.Item style={{ textAlign: "center" }}>
-          <button
-            type="submit"
+          <Button
+            type="primary"
+            htmlType="submit"
             className="submit-button"
+            loading={isSubmitting} 
           >
-            送出
-          </button>
+            {isSubmitting ? "送出中..." : "送出"}
+          </Button>
         </Form.Item>
       </Form>
     </div>
