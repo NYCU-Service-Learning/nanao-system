@@ -16,6 +16,7 @@ import Analysis from './pages/Analysis/Analysis';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import withAuthRedirect from './assets/withAuthRedirect';
+import AxiosInterceptor from './utils/AxiosInterceptor';
 
 const InteractWithAuth = withAuthRedirect(Interact);
 const MentalformWithAuth = withAuthRedirect(Mentalform);
@@ -31,6 +32,7 @@ function App() {
   return (
     <CookiesProvider>
       <Router>
+        <AxiosInterceptor />
         <div className="App">
           <div className="toplb">
             <Navig user={cookies.user} />

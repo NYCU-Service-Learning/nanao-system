@@ -45,6 +45,7 @@ const httpPost_reco = async(url: string, data) => {
         return response.data;
     } catch (err) {
         console.error(`POST error:\n${err}`);
+        throw err;
     }
 }
 

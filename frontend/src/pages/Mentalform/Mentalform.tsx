@@ -130,7 +130,6 @@ const MentalForm = () => {
     } finally {
       setIsSubmitting(false); 
     }
-    navigate('/home');
   };
 
   return (
