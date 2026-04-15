@@ -3,18 +3,14 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown'; // 👈 新增這行
 
 interface NavigProps {
   user: string | null;
 }
 
-// 定義一個 Functional Component（函數式組件）Navig，接收 NavigProps 作為參數
 const Navig: React.FC<NavigProps> = ({ user }) => {
-  // 使用useCookies hook來從cookie中讀取名為'user'的cookie值
   return (
-
-    // 使用 React-Bootstrap 的 Navbar 組件來創建導航欄
-    // 詳細可以參考 React-Bootstrap 的官方文件
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
       <Container>
         <Navbar.Brand>疼痛互動系統</Navbar.Brand>
@@ -23,28 +19,36 @@ const Navig: React.FC<NavigProps> = ({ user }) => {
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/home">首頁</Nav.Link>
 
-            {/* 如果沒有user cookie，顯示登入按鈕，否則顯示使用者相關選項 */}
             {user == null || user == '' ? (
-
-              // 未登入時顯示的導航鏈接
               <Nav.Link as={Link} to="/login">登入</Nav.Link>
             ) : (
-
-              // 已登入時顯示的導航鏈接
               <>
                 {user === "admin" ? (
                   <Nav.Link as={Link} to="/admin">管理介面</Nav.Link>
                 ) : (
                   <>
-                    <Nav.Link as={Link} to="/interact">疼痛回報</Nav.Link>
-                    <Nav.Link as={Link} to="/stat">疼痛統計</Nav.Link>
-                    <Nav.Link as={Link} to="/mentalform">心理問卷</Nav.Link>
-                    <Nav.Link as={Link} to="/mentalstat">心理統計</Nav.Link>
-                    <Nav.Link as={Link} to="/analysis">AI 分析</Nav.Link>
+                    {/* --- 第一組：紀錄類選單 --- */}
+                    <NavDropdown title="紀錄回報" id="report-dropdown">
+                      <NavDropdown.Item as={Link} to="/interact">疼痛回報</NavDropdown.Item>
+                      <NavDropdown.Item as={Link} to="/mentalform">心理問卷</NavDropdown.Item>
+                    </NavDropdown>
+
+                    {/* --- 第二組：分析類選單 --- */}
+                    <NavDropdown title="統計分析" id="analysis-dropdown">
+                      <NavDropdown.Item as={Link} to="/stat">疼痛統計</NavDropdown.Item>
+                      <NavDropdown.Item as={Link} to="/mentalstat">心理統計</NavDropdown.Item>
+                      <NavDropdown.Divider /> {/* 這是分隔線 */}
+                      <NavDropdown.Item as={Link} to="/analysis">AI 深度分析</NavDropdown.Item>
+                    </NavDropdown>
                   </>
                 )}
-                <Nav.Link as={Link} to="/profile">{user}</Nav.Link>
-                <Nav.Link as={Link} to="/logout">登出</Nav.Link>
+
+                {/* --- 用戶資訊選單 --- */}
+                <NavDropdown title={user} id="user-dropdown">
+                  <NavDropdown.Item as={Link} to="/profile">個人帳號</NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <NavDropdown.Item as={Link} to="/logout">登出</NavDropdown.Item>
+                </NavDropdown>
               </>
             )}
           </Nav>
