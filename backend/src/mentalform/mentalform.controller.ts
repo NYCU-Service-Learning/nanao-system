@@ -10,7 +10,9 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { MentalformService } from './mentalform.service';
 import {
   AdminOrSameUserIdGuard,
@@ -35,6 +37,15 @@ export class MentalformController {
     @Body() createMentalformDto: CreateMentalformDto,
   ) {
     return this.mentalformService.create(userId, createMentalformDto);
+  }
+
+  @UseGuards(AdminOrSameUserIdGuard)
+  @Get('export')
+  async exportCsv(@Res() res: Response) {
+    const csvData = await this.mentalformService.exportCsv();
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=mental_records.csv');
+    return res.send(csvData);
   }
 
   @UseGuards(AdminOrSameUserIdGuard)

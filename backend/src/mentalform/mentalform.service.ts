@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import { CreateMentalformDto } from './dto/create-mentalform.dto';
+import { parse } from 'json2csv';
 
 @Injectable()
 export class MentalformService {
@@ -157,5 +158,40 @@ export class MentalformService {
         id: id,
       },
     });
+  }
+
+  async exportCsv(): Promise<string> {
+    const records = await this.databaseService.mentalForm.findMany({
+      include: {
+        user: true, 
+      },
+      orderBy: {
+        fill_time: 'desc',
+      }
+    });
+
+    if (records.length === 0) {
+      return '';
+    }
+
+    const formattedData = records.map((record) => ({
+      表單編號: record.id,
+      使用者帳號: record.user.username,
+      使用者姓名: record.user.name,
+      填表時間: record.fill_time.toLocaleString('zh-TW'),
+      第一題: record.problem1,
+      第二題: record.problem2,
+      第三題: record.problem3,
+      第四題: record.problem4,
+      第五題: record.problem5,
+      第六題: record.problem6,
+    }));
+
+    const fields = [
+      '表單編號', '使用者帳號', '使用者姓名', '填表時間', 
+      '第一題', '第二題', '第三題', '第四題', '第五題', '第六題'
+    ];
+
+    return '\uFEFF' + parse(formattedData, { fields });
   }
 }

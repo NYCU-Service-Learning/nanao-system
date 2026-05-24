@@ -8,6 +8,7 @@ import { Button as AntButton, message, Upload } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 import { createNewUser, deleteUserById, getAllUsers, getIdByUsername, patchUserById } from '../../api/userAPI';
 import { getUserDetailById, patchUserDetailById } from '../../api/userDetailAPI';
+import { exportMentalformCsv } from '../../api/mentalformUtils';
 
 // 定義 User 的 interface，指定資料類型
 interface User {
@@ -469,7 +470,16 @@ const Admin: React.FC = () => {
                 <Navbar expand="lg">
                     <Container>
                         <Nav className="ms-auto">
-                            {/*新增帳號按鈕，點擊時顯示新增帳號視窗*/}
+                            {/* 新增匯出 CSV 按鈕 */}
+                            <Button 
+                                variant="outline-primary" 
+                                className="me-2" 
+                                onClick={exportMentalformCsv}
+                            >
+                                匯出心理表單 (CSV)
+                            </Button>
+
+                            {/* 原本的新增帳號按鈕 */}
                             <Button variant="outline-success" onClick={() => toggleModal('addUser', true)}>新增帳號</Button>
                         </Nav>
                     </Container>
