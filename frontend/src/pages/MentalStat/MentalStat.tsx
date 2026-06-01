@@ -58,7 +58,7 @@ const MentalStat = () => {
   }, [selectedQuestion, mentalData]);
 
   const valueFormatter = (date) =>
-    date.toLocaleDateString('fr-FR', {
+    date.toLocaleDateString('zh-TW', {
       month: '2-digit',
       day: '2-digit',
     });
