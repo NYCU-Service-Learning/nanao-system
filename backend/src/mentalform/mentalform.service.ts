@@ -48,11 +48,42 @@ export class MentalformService {
       problem6: createMentalformDto['problem'][5],
       user: { connect: { id: userId } },
     };
+
+    const saveddata=await this.databaseService.mentalForm.create({
+      data: databaseFormat,
+    });
+
+    // add up the scores from problem1~6
+    const problemsarray=createMentalformDto['problem'];
+    const totalScore=problemsarray.reduce((sum, current) => sum+current, 0);
+
+    // add feedback message
+    let feedbackMessage= '';
+    let adviceLink= '';
+
+    if(totalScore<=5){
+      feedbackMessage= '狀態良好，請繼續保持喔！';
+    } else if(totalScore<=14){
+      feedbackMessage= '近期壓力較大，建議可以聽點輕音樂、多出門走走放鬆心情。';
+    } else{
+      feedbackMessage= '身心負荷較重，若有需要，可以考慮尋求專業心理輔導資源。';
+      adviceLink= 'https://counsel.nycu.edu.tw/'; // 附上交大諮商中心的連結
+    }
+
+    // 4. 回傳全新格式，包含分析結果給前端 (同時保留原本的 data，以免前端其他地方報錯)
     return {
-      data: await this.databaseService.mentalForm.create({
-        data: databaseFormat,
-      }),
+      status: 'success',
+      score: totalScore,
+      message: feedbackMessage,
+      link: adviceLink,
+      data: saveddata
     };
+    
+    // return {
+    //   data: await this.databaseService.mentalForm.create({
+    //     data: databaseFormat,
+    //   }),
+    // };
   }
 
   async findMany(
