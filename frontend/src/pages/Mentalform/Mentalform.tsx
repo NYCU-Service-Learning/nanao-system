@@ -1,4 +1,4 @@
-import { Form, Table, Radio } from "antd";
+import { Form, Table, Radio, Modal } from "antd";
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import React from "react";
@@ -116,9 +116,59 @@ const MentalForm = () => {
     for (const key in values) {
       data["problem"].push(values[key]);
     }
-    console.log(data);
-    await httpPost(`${API_URL}mentalform/${userID}`, data);
-    navigate('/home');
+    console.log("Data about to be submitted:",data);
+
+    try{
+      const response= await httpPost(`${API_URL}mentalform/${userID}`, data);
+      
+      // obtain the scores from backend
+      console.log("後端回傳:", response); // 偷印出來看
+      const resultdata= response.score !== undefined ? response : response.data;
+      const {score, message, link}=resultdata || {};
+
+      // 修改得分的警示顏色
+      let scoreColor= '#1677ff'; // default blue
+      if(score<=5){
+        scoreColor= '#52c41a'; // well: green
+      } else if (score<=14){
+        scoreColor= '#faad14'; // warning: orange
+      } else{
+        scoreColor= '#ff4d4f'; // emergent: red
+      }
+
+      Modal.info({
+        title: '問卷分析結果',
+        content:(
+          <div style={{marginTop: '16px'}}>
+            <p style={{fontSize: '16px', fontWeight: 'bold', color: scoreColor }}>
+              您的總分是：{score} 分
+            </p>
+            <p>{message}</p>
+            {link && (
+              <p style={{marginTop: '12px'}}>
+                👉 <a href={link} target="_blank" rel="noopener noreferrer">點此前往校內諮商中心</a>
+              </p>
+            )}
+          </div>
+        ),
+
+        // when users finish reading, navigate home
+        onOk() {
+          navigate('/home');
+        },
+      });
+    }
+
+    catch(error){
+      console.error("Submission denied", error);
+      Modal.error({
+        title: "發生錯誤",
+        content: "問卷送出失敗，請重新嘗試。"
+      });
+    }
+
+    //await httpPost(`${API_URL}mentalform/${userID}`, data);
+    //navigate('/home');
   };
 
   return (
