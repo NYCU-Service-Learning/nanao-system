@@ -67,7 +67,7 @@ export class MentalformService {
       feedbackMessage= '近期壓力較大，建議可以聽點輕音樂、多出門走走放鬆心情。';
     } else{
       feedbackMessage= '身心負荷較重，若有需要，可以考慮尋求專業心理輔導資源。';
-      adviceLink= 'https://counsel.nycu.edu.tw/'; // 附上交大諮商中心的連結
+      adviceLink= 'https://mhcc.nycu.edu.tw/'; // 交大健康心理中心的連結
     }
 
     // 4. 回傳全新格式，包含分析結果給前端 (同時保留原本的 data，以免前端其他地方報錯)
